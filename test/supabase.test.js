@@ -23,8 +23,8 @@ test('PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존',{skip:!proc
  await assert.rejects(db.query("SELECT public.orbit_api('list','{}'::jsonb)"),/permission denied/);
  await db.exec('RESET ROLE');
  await db.exec('SET ROLE service_role');
- process.env.SUPABASE_URL='https://test-project.supabase.co';process.env.SUPABASE_SERVICE_ROLE_KEY='test-server-key';
- globalThis.fetch=async(url,options)=>{assert.equal(String(url),'https://test-project.supabase.co/rest/v1/rpc/orbit_api');assert.equal(options.headers.apikey,'test-server-key');assert.equal(options.headers.Authorization,'Bearer test-server-key');const {action,payload}=JSON.parse(options.body);try{const result=await db.query('SELECT public.orbit_api($1,$2::jsonb) AS data',[action,JSON.stringify(payload)]);return Response.json(result.rows[0].data);}catch(e){return Response.json({code:e.code,message:e.message},{status:400});}};
+ process.env.SUPABASE_URL='https://test-project.supabase.co';process.env.SUPABASE_SECRET_KEY='sb_secret_test-server-key';
+ globalThis.fetch=async(url,options)=>{assert.equal(String(url),'https://test-project.supabase.co/rest/v1/rpc/orbit_api');assert.equal(options.headers.apikey,'sb_secret_test-server-key');assert.equal(options.headers.Authorization,undefined);const {action,payload}=JSON.parse(options.body);try{const result=await db.query('SELECT public.orbit_api($1,$2::jsonb) AS data',[action,JSON.stringify(payload)]);return Response.json(result.rows[0].data);}catch(e){return Response.json({code:e.code,message:e.message},{status:400});}};
  const {store}=await import('../supabase-store.js');
  assert.deepEqual(await store.list(),[]);
  const {id}=await store.create({title:'테스트 요청',requester:'홍길동',requested_at:'2026-11-03T01:00:00Z'});
@@ -39,5 +39,5 @@ test('PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존',{skip:!proc
  await db.exec("CREATE FUNCTION orbit_private.reject_event() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'test write failure'; END; $$; CREATE TRIGGER test_reject BEFORE INSERT ON orbit_private.events FOR EACH ROW EXECUTE FUNCTION orbit_private.reject_event(); SET ROLE service_role;");
  await assert.rejects(store.status(id,'완료',''),/Supabase request failed/);
  assert.equal((await store.detail(id)).status,'진행 중'); // 이력 삽입 실패 시 상태도 롤백
- }finally{globalThis.fetch=savedFetch;for(const key of ['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY']){if(saved[key]===undefined)delete process.env[key];else process.env[key]=saved[key];}await db.close();}
+ }finally{globalThis.fetch=savedFetch;for(const key of ['SUPABASE_URL','SUPABASE_SECRET_KEY']){if(saved[key]===undefined)delete process.env[key];else process.env[key]=saved[key];}await db.close();}
 });

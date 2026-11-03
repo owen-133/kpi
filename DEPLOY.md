@@ -10,7 +10,7 @@
 2. **Free** 조직에 `orbit-ops` 프로젝트를 만듭니다. 프로젝트 DB 비밀번호는 안전하게 보관합니다.
 3. 프로젝트 **SQL Editor**에서 저장소의 `supabase/schema.sql` 전체를 실행합니다. 이 스크립트는 테이블과 서버 전용 RPC를 만듭니다. 재실행해도 기존 업무는 지우지 않습니다.
 4. 프로젝트 설정/Connect에서 **Project URL**을 확인합니다 (`https://프로젝트ID.supabase.co`).
-5. 프로젝트 설정의 API Keys에서 **legacy service_role key**를 확인합니다. `anon`/publishable 키나 DB 비밀번호가 아닙니다. 최신 secret 키 대신 이 버전은 legacy JWT service_role 키를 사용합니다. 키는 Render 환경변수에만 입력하고 채팅, GitHub, 브라우저 JS에 넣지 않습니다.
+5. 프로젝트 설정의 API Keys에서 **New secret key**를 확인합니다. `anon`/publishable 키나 DB 비밀번호가 아닙니다. `New secret key`로 만든 `sb_secret_` 키를 사용합니다. 이름은 `orbit-render`로 지정하면 됩니다. 키는 Render 환경변수에만 입력하고 채팅, GitHub, 브라우저 JS에 넣지 않습니다.
 
 ## 2. Render Web Service
 
@@ -25,7 +25,7 @@ GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다.
 | Start Command | `npm start` |
 | Health Check Path | `/health` |
 
-환경변수는 다음과 같습니다. `SUPABASE_SERVICE_ROLE_KEY`와 비밀번호는 비밀 값으로 관리합니다.
+환경변수는 다음과 같습니다. `SUPABASE_SECRET_KEY`와 비밀번호는 비밀 값으로 관리합니다.
 
 | Key | Value |
 |---|---|
@@ -34,7 +34,7 @@ GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다.
 | HOST | 0.0.0.0 |
 | STORAGE_BACKEND | supabase |
 | SUPABASE_URL | Supabase Project URL |
-| SUPABASE_SERVICE_ROLE_KEY | Supabase legacy service_role key |
+| SUPABASE_SECRET_KEY | Supabase Secret key (`sb_secret_`로 시작) |
 | ADMIN_PASSWORD | 본인이 정한 관리자 비밀번호 |
 | VIEWER_PASSWORD | 관리자와 다른 조회용 비밀번호 |
 

@@ -19,7 +19,7 @@ npm start
 
 - `STORAGE_BACKEND=supabase`로 외부 DB를 선택합니다. 배포 환경은 관리자·조회 비밀번호와 DB 연결이 필수입니다.
 - 로그인은 초기 버전의 HTTP Basic 인증입니다. HTTPS에서 `admin`은 변경, `viewer`는 조회만 허용합니다. 개인별 SSO는 아직 없습니다.
-- `SUPABASE_SERVICE_ROLE_KEY`는 서버에만 두고 클라이언트나 Git에 넣지 않습니다.
+- `SUPABASE_SECRET_KEY`는 서버에만 두고 클라이언트나 Git에 넣지 않습니다.
 - 등록·상태 변경·메모는 DB 함수에서 트랜잭션으로 저장합니다. 변경 이력 테이블의 수정·삭제를 트리거로 막고 공개 API 키의 RPC 호출을 차단합니다.
 - Supabase 연결 오류 시 로컬 저장으로 전환하지 않습니다. 운영 데이터가 임시 디스크에서 사라지는 문제를 방지합니다.
 
