@@ -17,6 +17,7 @@ test('PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존',{skip:!proc
  const schema=readFileSync(new URL('../supabase/schema.sql',import.meta.url),'utf8');
  await db.exec(schema);await db.exec(schema);
  const settingsSchema=readFileSync(new URL('../supabase/settings.sql',import.meta.url),'utf8');await db.exec(settingsSchema);await db.exec(settingsSchema);
+ const deletionSchema=readFileSync(new URL('../supabase/deletion.sql',import.meta.url),'utf8');await db.exec(deletionSchema);await db.exec(deletionSchema);
  await db.exec('SET ROLE anon');
  await assert.rejects(db.query("SELECT public.orbit_api('list','{}'::jsonb)"),/permission denied/);
  await assert.rejects(db.query("SELECT public.orbit_settings('get','{}'::jsonb)"),/permission denied/);
@@ -26,7 +27,7 @@ test('PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존',{skip:!proc
  await db.exec('RESET ROLE');
  await db.exec('SET ROLE service_role');
  process.env.SUPABASE_URL='https://test-project.supabase.co';process.env.SUPABASE_SECRET_KEY='sb_secret_test-server-key';
- globalThis.fetch=async(url,options)=>{const name=new URL(url).pathname.endsWith('/orbit_settings')?'orbit_settings':'orbit_api';assert.equal(options.headers.apikey,'sb_secret_test-server-key');assert.equal(options.headers.Authorization,undefined);const {action,payload}=JSON.parse(options.body);try{const result=await db.query('SELECT public.'+name+'($1,$2::jsonb) AS data',[action,JSON.stringify(payload)]);return Response.json(result.rows[0].data);}catch(e){return Response.json({code:e.code,message:e.message},{status:400});}};
+ globalThis.fetch=async(url,options)=>{const name=new URL(url).pathname.split('/').at(-1);assert.ok(['orbit_settings','orbit_api','orbit_lifecycle'].includes(name));assert.equal(options.headers.apikey,'sb_secret_test-server-key');assert.equal(options.headers.Authorization,undefined);const {action,payload}=JSON.parse(options.body);try{const result=await db.query('SELECT public.'+name+'($1,$2::jsonb) AS data',[action,JSON.stringify(payload)]);return Response.json(result.rows[0].data);}catch(e){return Response.json({code:e.code,message:e.message},{status:400});}};
  const {store}=await import('../supabase-store.js');
  assert.deepEqual(await store.list(),[]);
  assert.equal((await store.settings()).revision,0);
@@ -41,7 +42,11 @@ test('PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존',{skip:!proc
  let task=await store.detail(id);assert.equal(task.status,'완료');assert.equal(task.events.length,4);assert.ok(task.completed_at);
  await store.status(id,'진행 중','추가 요청');task=await store.detail(id);assert.equal(task.completed_at,null);assert.equal(task.events.length,5);
  await assert.rejects(store.note('00000000-0000-0000-0000-000000000000','없음'),/찾을 수 없습니다/);
+ for(const status of ['접수','진행 중','대기','완료']){const gone=await store.create({title:'삭제 테스트 '+status,requester:'담당자',requested_at:'2026-11-03T01:00:00Z'});await store.status(gone.id,status,'');await store.lifecycle(gone.id,'delete','테스트 정리','');assert.ok(!(await store.list()).some(t=>t.id===gone.id));await assert.rejects(store.detail(gone.id),/찾을 수 없습니다/);assert.ok((await store.detail(gone.id,true)).deleted_at);await store.lifecycle(gone.id,'restore','복원 확인','');assert.equal((await store.detail(gone.id)).status,status);await store.lifecycle(gone.id,'delete','테스트 정리','');await assert.rejects(store.lifecycle(gone.id,'purge','정리','틀린 제목'),/제목/);await store.lifecycle(gone.id,'purge','정리','삭제 테스트 '+status);assert.equal(await store.detail(gone.id),null);}
+ assert.equal((await store.trash()).length,0);assert.equal((await store.lifecycleHistory()).filter(e=>e.action==='purge').length,4);
  await db.exec('RESET ROLE');
+ assert.equal((await db.query('SELECT count(*)::integer AS n FROM orbit_private.tasks')).rows[0].n,1);
+ await assert.rejects(db.exec('DELETE FROM orbit_private.task_lifecycle_events'),/cannot be updated or deleted/);
  await assert.rejects(db.exec('DELETE FROM orbit_private.settings_events'),/cannot be updated or deleted/);
  await assert.rejects(db.exec('DELETE FROM orbit_private.events'),/cannot be updated or deleted/);
  await assert.rejects(db.exec("UPDATE orbit_private.events SET detail='변조'"),/cannot be updated or deleted/);

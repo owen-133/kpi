@@ -26,6 +26,7 @@ const server=http.createServer(async(req,res)=>{
  if(path==='/api/settings/history'&&req.method==='GET'){if(userRole!=='admin')return send(403,{error:'관리자만 설정 이력을 볼 수 있습니다.'});return send(200,await store.settingsHistory());}
  if(path==='/api/settings'&&req.method==='POST'){if(!Number.isInteger(body.revision)||body.revision<0)return send(400,{error:'설정 버전을 확인하세요.'});return send(200,await store.saveSettings(validateSettings(body.values),body.revision));}
  if(path==='/api/session')return send(200,{role:userRole,shared:!!process.env.ADMIN_PASSWORD});
+ if(['/api/trash','/api/lifecycle-history'].includes(path)&&req.method==='GET'){if(userRole!=='admin')return send(403,{error:'관리자만 휴지통과 삭제 이력을 볼 수 있습니다.'});return send(200,await (path==='/api/trash'?store.trash():store.lifecycleHistory()));}
  if(path==='/api/tasks'&&req.method==='GET')return send(200,await store.list());
  if(path==='/api/tasks'&&req.method==='POST'){
  const fields=['title','requester','department','channel','category','priority','requested_at','due_date','description'];const v={};for(const k of fields){v[k]=String(body[k]||'').trim();if(v[k].length>10000)return send(400,{error:'입력 길이를 확인하세요.'});}
@@ -33,9 +34,10 @@ const server=http.createServer(async(req,res)=>{
  if(v.due_date&&!/^\d{4}-\d{2}-\d{2}$/.test(v.due_date))return send(400,{error:'기한을 확인하세요.'});
  return send(201,await store.create(v));
  }
- const match=path.match(/^\/api\/tasks\/([^/]+)(?:\/(status|notes))?$/);
+ const match=path.match(/^\/api\/tasks\/([^/]+)(?:\/(status|notes|delete|restore|purge))?$/);
  if(match){const id=match[1];
- if(req.method==='GET'&&!match[2]){const task=await store.detail(id);return task?send(200,task):send(404,{error:'업무를 찾을 수 없습니다.'});}
+ if(req.method==='GET'&&!match[2]){const task=await store.detail(id,userRole==='admin');return task?send(200,task):send(404,{error:'업무를 찾을 수 없습니다.'});}
+ if(req.method==='POST'&&['delete','restore','purge'].includes(match[2])){const reason=String(body.reason||'').trim();if(!reason||reason.length>1000)return send(400,{error:'사유를 1~1000자로 입력하세요.'});return send(200,await store.lifecycle(id,match[2],reason,String(body.confirmation||'')));}
  if(req.method==='POST'&&match[2]==='status'){if(!statuses.includes(body.status))return send(400,{error:'올바른 상태를 선택하세요.'});const reason=String(body.reason||'').trim();if(reason.length>10000)return send(400,{error:'사유가 너무 깁니다.'});return send(200,await store.status(id,body.status,reason));}
  if(req.method==='POST'&&match[2]==='notes'){const note=String(body.note||'').trim();if(!note||note.length>10000)return send(400,{error:'메모를 1~10000자로 입력하세요.'});return send(201,await store.note(id,note));}
  }return send(404,{error:'지원하지 않는 요청입니다.'});
