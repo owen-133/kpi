@@ -136,7 +136,7 @@ test('pullEvents returns events once; a second pull is empty', () => {
 
 test('history returns a copy; editing it does not change the aggregate', () => {
   const request = newRequest();
-  const copy = request.history() as { status: string }[];
+  const copy = request.history() as unknown as { status: string }[];
   copy.push({ status: 'done' });
   copy[0] = { status: 'done' };
   assert.equal(request.history().length, 1);
