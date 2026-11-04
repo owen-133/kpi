@@ -24,3 +24,7 @@
 Svelte 런타임(MIT)도 웹 번들에 포함됩니다. 라이선스 파일을 `third_party/svelte/LICENSE.md`에 보존하며 배포용 notices 파일에도 포함합니다.
 
 웹 번들 및 고지 파일은 `public/board/`, `public/THIRD_PARTY_NOTICES.txt`, `public/CLAUDE_BOARD_LICENSE.txt`로 배포합니다. 원본 소스·고지와 라이선스를 제거하지 마세요.
+
+## PDF 생성
+
+PDF 출력은 pdf-lib와 @pdf-lib/fontkit 및 관련 의존성을 사용합니다. 각 의존성의 라이선스를 함께 보존합니다. 폰트는 Google Fonts의 Nanum Gothic Regular (SIL Open Font License 1.1)이며 원본은 https://github.com/google/fonts/tree/main/ofl/nanumgothic 에서 가져왔습니다. 글꼴 라이선스는 `third_party/nanum-gothic/OFL.txt`, 글꼴은 `public/fonts/NanumGothic-Regular.ttf`에 보존합니다. fontkit 패키지의 원본 라이선스 선언은 `third_party/pdf-lib-fontkit/UPSTREAM_README.md`에 보존합니다. 기타 라이선스는 `third_party/`와 공개 notices 파일에 포함합니다. 한글 표시의 호환성을 위해 PDF 파일에 글꼴을 포함합니다.

@@ -1,3 +1,5 @@
 public/board/* linguist-generated=true -whitespace
+public/pdf/* linguist-generated=true -whitespace
 public/CLAUDE_BOARD_LICENSE.txt -whitespace
+public/THIRD_PARTY_NOTICES.txt linguist-generated=true -whitespace
 third_party/** -whitespace
