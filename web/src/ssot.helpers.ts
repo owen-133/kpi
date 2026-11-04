@@ -10,8 +10,9 @@
 //       Every golden label and test-name a current requirement cites must resolve (a stale pointer fires)
 //   C4  every evidence entry names an existing file and a line inside it (planned and current; dropped is history)
 //   C5  a test tag R-NNN points to a known requirement that is current
-//   C6  no requirement title appears verbatim in AGENTS.md, README.md or docs/** outside docs/ssot/;
-//       AGENTS.md mentions docs/ssot/requirements.md
+//   C6  no requirement title appears verbatim in AGENTS.md or docs/** outside docs/ssot/;
+//       AGENTS.md mentions docs/ssot/requirements.md. README.md is upstream product documentation, not one
+//       of our rule documents, so it is not scanned
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -334,16 +335,13 @@ export function loadFixtureCorpus(dir: string, goldenPath: string): { corpus: Co
 }
 
 // Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts, which mentions tags as examples)
-// and test/**/*.test.js; docs are AGENTS.md, README.md and docs/** outside docs/ssot/.
+// and test/**/*.test.js; docs scanned for restated titles are AGENTS.md and docs/** outside docs/ssot/.
 export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
   const ssot = path.join(repoRoot, SSOT_PATH);
   if (!fs.existsSync(ssot)) throw new Error(`missing ${SSOT_PATH}`);
   const requirements = parseRequirements(fs.readFileSync(ssot, 'utf8'));
   const agents = path.join(repoRoot, 'AGENTS.md');
-  const readme = path.join(repoRoot, 'README.md');
-  for (const required of [agents, readme]) {
-    if (!fs.existsSync(required)) throw new Error(`missing ${path.relative(repoRoot, required)}`);
-  }
+  if (!fs.existsSync(agents)) throw new Error('missing AGENTS.md');
   const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => path.basename(f) !== 'ssot.spec.ts');
   const jsTests = walk(path.join(repoRoot, 'test'), (n) => n.endsWith('.test.js'));
   const ssotDir = path.join(repoRoot, 'docs', 'ssot');
@@ -351,7 +349,7 @@ export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements
   const corpus: Corpus = {
     root: repoRoot,
     testFiles: readSources(repoRoot, [...specs, ...jsTests]),
-    docFiles: readSources(repoRoot, [agents, readme, ...docs]),
+    docFiles: readSources(repoRoot, [agents, ...docs]),
     agentsText: fs.readFileSync(agents, 'utf8'),
     goldenLabels: loadGoldenLabels(path.join(repoRoot, 'test', 'golden', 'legacy-portal.json')),
   };

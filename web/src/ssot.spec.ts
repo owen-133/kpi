@@ -41,6 +41,12 @@ const VIOLATION_FIXTURES: { dir: string; code: RuleCode; needle: string }[] = [
   { dir: 'c6-no-agents-mention', code: 'C6', needle: 'docs/ssot/requirements.md' },
 ];
 const CLEAN_FIXTURES = ['clean', 'clean-markdown-variants', 'clean-test-name-with-key-word'];
+// Tree fixtures are miniature repositories read by loadRealCorpus (AGENTS.md, README.md, docs/**, test/golden).
+// README.md is upstream product documentation, so a title that only README.md contains is not a C6 violation.
+const TREE_CLEAN_FIXTURES = ['tree-title-only-in-readme'];
+const TREE_VIOLATION_FIXTURES: { dir: string; code: RuleCode; needle: string }[] = [
+  { dir: 'tree-title-in-docs-file', code: 'C6', needle: 'docs/notes.md' },
+];
 
 function fixtureViolations(dir: string) {
   const { corpus, requirements } = loadFixtureCorpus(path.join(FIXTURES, dir), GOLDEN);
@@ -50,7 +56,12 @@ function fixtureViolations(dir: string) {
 describe('ssot checks fire on violation fixtures and pass on clean ones', () => {
   it('fixture: every directory under ssot-fixtures is declared here and every declared one exists', () => {
     const onDisk = fs.readdirSync(FIXTURES, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
-    const declared = [...VIOLATION_FIXTURES.map((f) => f.dir), ...CLEAN_FIXTURES].sort();
+    const declared = [
+      ...VIOLATION_FIXTURES.map((f) => f.dir),
+      ...CLEAN_FIXTURES,
+      ...TREE_CLEAN_FIXTURES,
+      ...TREE_VIOLATION_FIXTURES.map((f) => f.dir),
+    ].sort();
     assert.deepStrictEqual(onDisk, declared);
   });
 
@@ -75,6 +86,26 @@ describe('ssot checks fire on violation fixtures and pass on clean ones', () => 
     it(`fixture: ${dir} passes every rule`, () => {
       const violations = fixtureViolations(dir);
       assert.strictEqual(violations.length, 0, formatViolations(violations));
+    });
+  }
+
+  for (const dir of TREE_CLEAN_FIXTURES) {
+    it(`fixture: ${dir} passes every rule and README.md is not scanned for titles`, () => {
+      const { corpus, requirements } = loadRealCorpus(path.join(FIXTURES, dir));
+      assert.deepStrictEqual(corpus.docFiles.map((f) => f.file), ['AGENTS.md']);
+      const readme = fs.readFileSync(path.join(FIXTURES, dir, 'README.md'), 'utf8');
+      assert.ok(readme.includes(requirements[0].title), 'the fixture README.md must contain the requirement title');
+      const violations = checkAll(requirements, corpus);
+      assert.strictEqual(violations.length, 0, formatViolations(violations));
+    });
+  }
+
+  for (const { dir, code, needle } of TREE_VIOLATION_FIXTURES) {
+    it(`fixture: ${dir} fires ${code} through docs/** and no other rule`, () => {
+      const { corpus, requirements } = loadRealCorpus(path.join(FIXTURES, dir));
+      const violations = checkAll(requirements, corpus);
+      assert.deepStrictEqual([...new Set(violations.map((v) => v.code))], [code], formatViolations(violations));
+      assert.ok(violations.some((v) => v.message.includes(needle)), `no ${code} message mentions '${needle}'; got:\n${formatViolations(violations)}`);
     });
   }
 
