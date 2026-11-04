@@ -1,0 +1,42 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {once} from 'node:events';
+
+test('Chromium에서 Svelte 보드·검색·접기·상태변경·조회권한·모바일',{skip:!process.env.ORBIT_PLAYWRIGHT_PATH},async()=>{
+ const {chromium}=await import(process.env.ORBIT_PLAYWRIGHT_PATH);const dir=mkdtempSync(join(tmpdir(),'orbit-board-ui-'));
+ const server=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3201',DATA_DIR:dir,ADMIN_PASSWORD:'test-admin',VIEWER_PASSWORD:'test-viewer'},stdio:['ignore','pipe','pipe']});let browser;
+ try{await Promise.race([once(server.stdout,'data'),once(server,'exit').then(()=>{throw Error('server failed');})]);
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+ const context=await browser.newContext({httpCredentials:{username:'admin',password:'test-admin'},viewport:{width:1440,height:1050}});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error'&&!msg.text().includes('favicon'))errors.push(msg.text());});
+ await page.goto('http://127.0.0.1:3201');await page.getByRole('button',{name:'＋ 새 업무 등록'}).click();
+ await page.locator('[name="title"]').fill('테스트 노트북 준비');await page.locator('[name="requester"]').fill('홍길동');await page.locator('[name="department"]').fill('인사팀');await page.locator('[name="category"]').selectOption('비품·자산');await page.locator('[name="description"]').fill('신규 입사자 장비 세팅');await page.getByRole('button',{name:'업무 등록',exact:true}).click();await page.locator('#detail-dialog[open]').waitFor();
+ await page.getByRole('button',{name:'닫기'}).last().click();await page.locator('nav [data-view="board"]').click();
+ await page.getByRole('heading',{name:'흩어진 요청을, 한 장의 보드로.'}).waitFor();await page.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).waitFor();
+ await page.getByRole('searchbox',{name:'업무 검색'}).fill('해당없음');await page.getByText('조건에 맞는 업무가 없습니다.').waitFor();await page.getByRole('searchbox',{name:'업무 검색'}).fill('신규 입사자');
+ await page.getByRole('combobox',{name:'카드 분류 기준'}).selectOption('department');await page.getByRole('button',{name:/인사팀 전체/}).click();assert.equal(await page.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).count(),0);await page.getByRole('button',{name:/인사팀 접수/}).click();
+ await page.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).click();await page.locator('#status-form select').selectOption('완료');await page.getByRole('button',{name:'상태 변경',exact:true}).click();await page.getByText('접수 → 완료',{exact:true}).waitFor();await page.getByRole('button',{name:'닫기'}).last().click();
+ await page.getByRole('button',{name:/완료 업무 1건/}).click();await page.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).waitFor();
+ await page.screenshot({path:'/tmp/orbit-board-desktop.png',fullPage:true});await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/tmp/orbit-board-mobile.png',fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile horizontal overflow');
+ const viewer=await browser.newContext({httpCredentials:{username:'viewer',password:'test-viewer'}});const vp=await viewer.newPage();await vp.goto('http://127.0.0.1:3201');await vp.locator('nav [data-view="board"]').click();await vp.getByText('조회 전용',{exact:true}).waitFor();assert.equal(await vp.locator('#new-task:visible').count(),0);await vp.getByRole('button',{name:/완료 업무 1건/}).click();await vp.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).click();await vp.locator('#detail-dialog[open]').waitFor();assert.equal(await vp.locator('#status-form').count(),0);
+ assert.equal(await vp.locator('#admin-settings:visible').count(),0);
+ await page.setViewportSize({width:1440,height:1050});await page.getByRole('button',{name:'관리자 설정'}).click();await page.locator('#settings-dialog[open]').waitFor();
+ await page.locator('[name="text_portalName"]').fill('우리 회사 업무 포털');await page.locator('[name="text_overviewTitle"]').fill('<b>새 인사말</b>');await page.locator('[name="categories"]').fill('요청지원\n기타');await page.locator('[name="priorities"]').fill('보통\n긴급');await page.locator('[name="showBanner"]').uncheck();await page.locator('[name="primaryColor"]').fill('#345678');
+ await page.locator('#logo-file').setInputFiles({name:'logo.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});await page.locator('#logo-status').getByText(/logo.png/).waitFor();
+ await page.screenshot({path:'/tmp/orbit-settings-desktop.png',fullPage:true});await page.getByRole('button',{name:'설정 저장',exact:true}).click();await page.locator('#settings-dialog').waitFor({state:'hidden'});
+ assert.match(await page.locator('.brand').innerText(),/우리 회사 업무 포털/);assert.match(await page.locator('#brand-logo img').getAttribute('src'),/^data:image\/png/);await page.locator('nav [data-view="overview"]').click();assert.equal(await page.locator('h1').innerText(),'<b>새 인사말</b>');assert.equal(await page.locator('h1 b').count(),0);assert.equal(await page.locator('.hero').count(),0);
+ await page.reload();await page.getByRole('heading',{name:'<b>새 인사말</b>',exact:true}).waitFor();await page.locator('#new-task').click();assert.equal(await page.locator('[name="category"] option').first().innerText(),'요청지원');await page.getByRole('button',{name:'닫기'}).last().click();
+ await page.getByRole('button',{name:'관리자 설정'}).click();await page.getByRole('button',{name:'변경 이력',exact:true}).click();await page.getByRole('heading',{name:'최근 설정 변경 이력'}).waitFor();await page.locator('#settings-history-content').getByText(/우리 회사 업무 포털/).waitFor();await page.getByRole('button',{name:'닫기'}).last().click();
+ await vp.reload();await vp.getByRole('heading',{name:'<b>새 인사말</b>',exact:true}).waitFor();assert.equal(await vp.locator('#admin-settings:visible').count(),0);
+ assert.equal(await vp.locator('#open-trash:visible').count(),0);
+ await page.locator('nav [data-view="board"]').click();await page.getByRole('button',{name:/완료 업무 1건/}).click();await page.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).click();
+ page.once('dialog',d=>d.accept('테스트 업무 정리'));await page.getByRole('button',{name:'업무 삭제',exact:true}).click();await page.locator('#detail-dialog').waitFor({state:'hidden'});await page.getByText('첫 업무를 기록해 보세요.',{exact:true}).waitFor();
+ await page.getByRole('button',{name:'관리자 휴지통'}).click();await page.locator('#trash-dialog .task-open').filter({hasText:'테스트 노트북 준비'}).waitFor();page.once('dialog',d=>d.accept('복원 확인'));await page.getByRole('button',{name:'복원',exact:true}).click();await page.getByText('휴지통이 비어 있습니다.',{exact:true}).waitFor();await page.locator('#trash-dialog [data-close]').click();
+ await page.getByRole('button',{name:/완료 업무 1건/}).click();await page.locator('button.request-row').filter({hasText:'테스트 노트북 준비'}).click();page.once('dialog',d=>d.accept('테스트 업무 정리'));await page.getByRole('button',{name:'업무 삭제',exact:true}).click();await page.locator('#detail-dialog').waitFor({state:'hidden'});await page.getByRole('button',{name:'관리자 휴지통'}).click();
+ const acceptPurge=d=>d.accept(d.message().includes('제목')?'테스트 노트북 준비':'테스트 영구 삭제');page.on('dialog',acceptPurge);await page.getByRole('button',{name:'영구 삭제',exact:true}).click();await page.getByText('휴지통이 비어 있습니다.',{exact:true}).waitFor();page.off('dialog',acceptPurge);await page.getByRole('button',{name:'삭제·복원 이력 보기'}).click();await page.locator('#deletion-history-content').getByText(/영구 삭제 ·/).waitFor();
+ assert.deepEqual(errors,[]);
+ }finally{if(browser)await browser.close();if(server.exitCode===null){const ended=once(server,'exit');server.kill();await ended;}rmSync(dir,{recursive:true,force:true});}
+});
