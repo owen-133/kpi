@@ -1,0 +1,4 @@
+// R-001
+test('a registered request is stored as open', () => {});
+test('closing a request twice fails', () => {});
+// R-002
