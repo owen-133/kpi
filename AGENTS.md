@@ -155,7 +155,7 @@ cd web && npm ci && npm test && npx tsc --noEmit && npm run build
 4. 같은 커밋에서 상태를 `current` 로 바꾼다.
 
 - id 는 다시 쓰지 않는다. 동작이 바뀌면 같은 커밋에서 정본도 고친다. 도구·다이어그램은 맨 나중에 맞춘다.
-- 기계 검사: `cd web && npm test` (`web/src/ssot.spec.ts`). id 결번·중복, 증거 없는 `current` 요구사항, 모르는·`planned`·`dropped` id 를 가리키는 테스트 태그, `docs/ssot` 밖에서 다시 적은 요구사항 제목을 잡는다.
+- 기계 검사: `cd web && npm test` (`web/src/ssot.spec.ts`). id 결번·중복, 증거 없는 `current` 요구사항, 모르는·`planned`·`dropped` id 를 가리키는 테스트 태그, AGENTS.md 와 `docs/ssot` 밖 `docs/**` 에서 다시 적은 요구사항 제목을 잡는다(README.md 는 제품 설명이라 검사하지 않는다).
 - 리뷰만 보는 것(기계 검사 없음): 말을 바꿔 다시 적은 서술, 인용한 줄이 주장을 받치는지, 계층 선택.
 
 ## 11. 코드 지도 (graft)
