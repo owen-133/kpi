@@ -6,7 +6,7 @@
 </script>
 <button class="request-row" onclick={()=>onopen(task.id)}>
  <StateIcon state={task.state}/>
- <span class="request-main"><strong>{task.title}</strong><span>{task.requester}{task.department?' · '+task.department:''} · {task.channel}</span></span>
+ <span class="request-main"><strong>{task.is_test?'[테스트] ':''}{task.title}</strong><span>{task.requester}{task.department?' · '+task.department:''} · {task.channel} · 담당 {task.assignee||'미배정'}</span></span>
  <span class="request-end"><span class="request-status">{task.status}{task.priority?' · '+task.priority:''}</span><small class:overdue>{task.due_date?`기한 ${task.due_date}`:'기한 미지정'}</small><small>{task.status==='완료'?'처리 완료':'접수 후 '+elapsed(Date.parse(task.created_at),now)}</small></span>
 </button>
 <style>

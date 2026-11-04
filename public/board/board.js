@@ -3159,7 +3159,7 @@ function Is(e, t) {
   return r < 60 ? `${r}초` : r < 3600 ? `${Math.floor(r / 60)}분 ${r % 60}초` : r >= 86400 ? `${Math.floor(r / 86400)}일 ${Math.floor(r % 86400 / 3600)}시간` : `${Math.floor(r / 3600)}시간 ${Math.floor(r % 3600 / 60)}분`;
 }
 function Ls(e, { query: t = "", status: r = "", groupBy: n = "category" } = {}) {
-  const a = e.filter((s) => (!r || s.status === r) && [s.title, s.requester, s.department, s.description].some((l) => String(l || "").toLowerCase().includes(t.toLowerCase()))), i = /* @__PURE__ */ new Map();
+  const a = e.filter((s) => (!r || s.status === r) && [s.title, s.requester, s.department, s.description, s.assignee].some((l) => String(l || "").toLowerCase().includes(t.toLowerCase()))), i = /* @__PURE__ */ new Map();
   for (const s of a) {
     const l = s[n] || "미분류";
     i.has(l) || i.set(l, { id: l, name: l, sessions: [] }), i.get(l).sessions.push({ ...s, state: Jn(s.status) });
@@ -3210,12 +3210,12 @@ function tn(e, t) {
       return t.task.state;
     }
   });
-  var i = E(a, 2), s = z(i), l = F(s, !0), o = E(s), u = F(o), c = E(i, 2), v = z(c), _ = F(v), h = E(v);
+  var i = E(a, 2), s = z(i), l = F(s), o = E(s), u = F(o), c = E(i, 2), v = z(c), _ = F(v), h = E(v);
   let p;
   var w = F(h, !0), m = E(h), y = F(m, !0);
   U(
     (x) => {
-      R(l, t.task.title), R(u, `${t.task.requester ?? ""}${t.task.department ? " · " + t.task.department : ""} · ${t.task.channel ?? ""}`), R(_, `${t.task.status ?? ""}${t.task.priority ? " · " + t.task.priority : ""}`), p = rt(h, 1, "svelte-v68t2j", null, p, { overdue: g(r) }), R(w, t.task.due_date ? `기한 ${t.task.due_date}` : "기한 미지정"), R(y, x);
+      R(l, `${t.task.is_test ? "[테스트] " : ""}${t.task.title ?? ""}`), R(u, `${t.task.requester ?? ""}${t.task.department ? " · " + t.task.department : ""} · ${t.task.channel ?? ""} · 담당 ${(t.task.assignee || "미배정") ?? ""}`), R(_, `${t.task.status ?? ""}${t.task.priority ? " · " + t.task.priority : ""}`), p = rt(h, 1, "svelte-v68t2j", null, p, { overdue: g(r) }), R(w, t.task.due_date ? `기한 ${t.task.due_date}` : "기한 미지정"), R(y, x);
     },
     [
       () => t.task.status === "완료" ? "처리 완료" : "접수 후 " + Is(Date.parse(t.task.created_at), t.now)

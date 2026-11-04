@@ -18,7 +18,7 @@ Claude Board 기반 카드 화면 추가 후에도 이 배포 설정은 같습�
 
 1. https://supabase.com/dashboard 에서 GitHub로 가입합니다.
 2. **Free** 조직에 `orbit-ops` 프로젝트를 만듭니다. 프로젝트 DB 비밀번호는 안전하게 보관합니다.
-3. 프로젝트 **SQL Editor**에서 저장소의 `supabase/schema.sql` 전체를 실행합니다. 이 스크립트는 테이블과 서버 전용 RPC를 만듭니다. 재실행해도 기존 업무는 지우지 않습니다.
+3. 프로젝트 **SQL Editor**에서 저장소의 `supabase/upgrade.sql` 전체를 실행합니다. 이 스크립트는 테이블과 서버 전용 RPC를 만듭니다. 재실행해도 기존 업무는 지우지 않습니다.
 4. 프로젝트 설정/Connect에서 **Project URL**을 확인합니다 (`https://프로젝트ID.supabase.co`).
 5. 프로젝트 설정의 API Keys에서 **New secret key**를 확인합니다. `anon`/publishable 키나 DB 비밀번호가 아닙니다. `New secret key`로 만든 `sb_secret_` 키를 사용합니다. 이름은 `orbit-render`로 지정하면 됩니다. 키는 Render 환경변수에만 입력하고 채팅, GitHub, 브라우저 JS에 넣지 않습니다.
 
@@ -68,3 +68,11 @@ GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다.
 Supabase SQL Editor에서 `supabase/deletion.sql` 전체를 실행합니다. 기존 업무를 삭제하지 않고 휴지통 열·삭제 감사 테이블과 서버 RPC를 추가/갱신합니다. 새 DB는 schema.sql, settings.sql, deletion.sql 순서로 실행하세요. 아직 초기화하지 않은 경우 기존 업무 조회는 유지되지만 삭제·휴지통 요청은 초기화 안내 오류로 차단됩니다.
 
 배포 후 관리자만 상세 화면의 업무 삭제와 상단 휴지통을 사용할 수 있는지 확인합니다. 휴지통에 넣은 업무가 통계·CSV와 viewer에서 제외되고, 복원하면 기존 상태가 유지되는지 테스트하세요. 영구 삭제는 제목 확인을 거친 경우에만 수행하며 앱에서 복구할 수 없습니다. API 키·접속 비밀번호·유료 플랜 설정 변경은 없습니다.
+
+## KPI 기능 누적 업그레이드 (권장)
+
+이번 버전은 `supabase/upgrade.sql` 전체를 SQL Editor에서 실행하면 기존 설정·삭제 기능과 새 KPI 기능을 한 번에 준비합니다. 새 프로젝트도 같은 파일을 사용합니다. 이전 버전의 개별 schema.sql/settings.sql/deletion.sql을 다시 실행할 필요가 없고, 이미 실행한 상태에서 누적본을 실행해도 기록을 지우지 않습니다. task_extras(배정/테스트 표시), task_files(비공개 첨부), improvements/이력, monthly_reports(발행본), 서버 전용 RPC를 추가합니다. 유료 디스크·새 API 키·추가 계정은 필요하지 않습니다.
+
+첨부파일은 Supabase DB에 base64로 저장되므로 파일 크기보다 실제 저장량이 큽니다. 파일당 1MB, 업무당 10개로 제한하지만 무료 DB 전체 사용량도 확인하세요. 공개 Storage 버킷은 만들지 않습니다. 키가 없는 외부 AI 서비스는 호출하지 않습니다.
+
+배포 후 실제 업무 접수 → 배정 → 첨부 → 완료 → 월간 지표 대조 → 보고서 검토·발행 → 개선 기록 흐름과 조회 계정의 변경 차단을 확인합니다. 기본 중요도는 중/상/하이나 기존에 관리자가 저장한 선택지는 보존됩니다. 자동화와 소요시간 정의는 KPI_GUIDE.md를 참고하세요.
