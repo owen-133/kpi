@@ -11,8 +11,8 @@
 | 출력 포트 | `application/port/out/` | 저장소·이벤트 발행 인터페이스 |
 | 애플리케이션 서비스 | `application/service/` | 입력 포트 구현. 흐름만 조립한다 |
 | 입력 어댑터 | `adapter/in/web/` | 일반 핸들러, `'use server'` 액션, 컴포넌트 |
-| 출력 어댑터 | `adapter/out/persistence/` | 출력 포트 구현. 지금은 인메모리 |
-| 조립 | `config/container.ts` | `getContainer()` 가 어댑터를 서비스에 꽂는다 |
+| 출력 어댑터 | `adapter/out/persistence/` | 출력 포트 구현. 인메모리와 Postgres(Drizzle) |
+| 조립 | `config/container.ts`, `config/database.ts` | `getContainer()` 가 어댑터를 서비스에 꽂는다. `database.ts` 는 Postgres 연결을 연다 |
 | 라우트 | `app/` | `adapter/in/web` 의 일부. 페이지와 라우트 핸들러 |
 
 의존 방향은 바깥에서 안쪽이다: `app/` → `adapter/in/web` → `application` → `domain`. `adapter/out` 은 출력 포트를 구현하며, `config/container.ts` 만 그것을 import 한다.
@@ -32,6 +32,7 @@ web/src/
       out/persistence/
   config/
     container.ts
+    database.ts
   app/
 ```
 
@@ -67,7 +68,8 @@ web/src/
 
 - `adapter/out/persistence/` 에 `RequestRepository` 와 `DomainEventPublisher` 의 인메모리 구현이 있다.
 - `adapter/in/web/` 의 일반 핸들러가 입력 포트를 부른다. `'use server'` 액션은 이 핸들러를 부르기만 한다.
-- `config/container.ts` 의 `getContainer()` 가 인메모리 어댑터를 서비스에 꽂아 돌려준다. 같은 프로세스 안에서는 같은 인스턴스를 쓴다.
+- `adapter/out/persistence/` 에는 `RequestRepository` 의 Postgres 구현(`DrizzleRequestRepository`)과 스키마·매퍼도 있다. 행 타입은 이 폴더 밖으로 나가지 않는다.
+- `config/container.ts` 의 `getContainer()` 가 어댑터를 서비스에 꽂아 돌려준다. `PERSISTENCE=memory`(기본)이면 인메모리, `postgres` 이면 Drizzle 구현이다. 같은 프로세스 안에서는 같은 인스턴스를 쓴다.
 - `app/` 의 페이지는 `getContainer()` 와 `adapter/in/web` 만 쓴다.
 
 ### 3.5 한 바퀴
@@ -84,15 +86,16 @@ app/ 페이지 → 액션('use server') → 핸들러 → 입력 포트(서비�
 
 도메인 모델과 테이블 설계는 별개다. `adapter/out/persistence` 의 매퍼가 `Request` 객체와 행 사이를 옮기고, 도메인은 테이블 모양을 모른다. 정규화 규칙은 `AGENTS.md` §4 가 소유한다.
 
-`Request` 애그리거트의 테이블 스케치(설계 스케치이며 마이그레이션된 코드가 아니다):
+`Request` 애그리거트의 테이블(스키마는 `web/src/request/adapter/out/persistence/schema.ts`, 마이그레이션은 `web/drizzle/`):
 
 | 테이블 | 키 | 내용 | 비고 |
 |---|---|---|---|
-| `request` | `id` | 현재 상태, 등록 시각 등 `Request` 자신의 사실 | 파생값(소요 시간)은 저장하지 않는다 |
-| `request_status_history` | `id` | `request_id`(외래키), 이전 상태, 새 상태, 변경 시각 | 추가 전용: update·delete 를 막는다 |
-| `request_memo` | `id` | `request_id`(외래키), 내용 | `memo1`, `memo2` 대신 행 하나가 메모 하나다 |
+| `request_statuses` | `code` | 허용 상태 코드 넷 | 참조 데이터. 마이그레이션이 채우고 update·delete 를 막는다 |
+| `requests` | `id`(uuid) | 제목, 요청자 | 현재 상태와 등록 시각은 저장하지 않는다. 이력의 마지막 행과 첫 행이다 |
+| `request_history` | `request_id`(외래키) + `seq` | 상태(`request_statuses` 외래키), 사유, 변경 시각 | 추가 전용: 트리거가 update·delete 를 막는다 |
+| `request_memos` | `request_id`(외래키) + `seq` | 메모 내용 | `memo1`, `memo2` 대신 행 하나가 메모 하나다 |
 
-이 세 테이블이 `Request` 애그리거트 하나에 대응하고, 다른 애그리거트는 `request.id` 를 외래키로만 가리킨다.
+이 네 테이블 중 `request_statuses` 를 뺀 셋이 `Request` 애그리거트 하나에 대응하고, `save` 한 번이 트랜잭션 하나로 새 이력·메모 행만 덧붙인다. 다른 애그리거트는 `requests.id` 를 외래키로만 가리킨다. ORM 선택, import 허용 범위, 마이그레이션 명령은 `AGENTS.md` §4 가 소유한다.
 
 ## 5. 확인
 

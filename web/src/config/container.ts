@@ -6,6 +6,9 @@ import type { ListRequestsQuery } from '../request/application/port/in/ListReque
 import type { RegisterRequestUseCase } from '../request/application/port/in/RegisterRequestUseCase.ts';
 import { InMemoryDomainEventPublisher } from '../request/adapter/out/persistence/InMemoryDomainEventPublisher.ts';
 import { InMemoryRequestRepository } from '../request/adapter/out/persistence/InMemoryRequestRepository.ts';
+import { DrizzleRequestRepository } from '../request/adapter/out/persistence/DrizzleRequestRepository.ts';
+import type { RequestRepository } from '../request/application/port/out/RequestRepository.ts';
+import { createDatabase } from './database.ts';
 
 export type Container = {
   readonly registerRequest: RegisterRequestUseCase;
@@ -15,9 +18,17 @@ export type Container = {
 
 const CONTAINER_KEY = 'orbit-ops.container';
 
-/** Builds a fresh container with its own empty in-memory adapters. */
+/** PERSISTENCE=memory (default) or postgres. Any other value, or postgres without DATABASE_URL, throws. */
+function createRequestRepository(): RequestRepository {
+  const persistence = process.env.PERSISTENCE ?? 'memory';
+  if (persistence === 'memory') return new InMemoryRequestRepository();
+  if (persistence === 'postgres') return new DrizzleRequestRepository(createDatabase(process.env.DATABASE_URL));
+  throw new Error(`PERSISTENCE must be 'memory' or 'postgres', got '${persistence}'`);
+}
+
+/** Builds a fresh container; the request store follows PERSISTENCE (in-memory adapters start empty). */
 export function createContainer(): Container {
-  const requestRepository = new InMemoryRequestRepository();
+  const requestRepository = createRequestRepository();
   const eventPublisher = new InMemoryDomainEventPublisher();
   return {
     registerRequest: new RegisterRequestService(requestRepository, eventPublisher),

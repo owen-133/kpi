@@ -7,6 +7,7 @@ import path from 'node:path';
 import {
   checkAppBoundary,
   checkContainerOnly,
+  checkOrmOnlyInPersistence,
   checkRule1,
   checkRule2,
   checkRule6,
@@ -69,6 +70,10 @@ describe('architecture rules on the real tree', () => {
       return;
     }
     runRule(t, 'container-only', collectFiles(SRC), checkContainerOnly);
+  });
+
+  it('ORM and driver packages are imported only under adapter/out/persistence and config/{container,database}.ts', (t) => {
+    runRule(t, 'orm-only', collectFiles(SRC), checkOrmOnlyInPersistence);
   });
 });
 
@@ -135,6 +140,14 @@ describe('architecture checks fire on violation fixtures', () => {
 
   it('fixture: container-only flags a non-container file importing adapter/out', () => {
     detects(checkContainerOnly, 'CONTAINER', fixtureFile('container-only/src/lib/BadImportsOut.ts'), 'adapter/out');
+  });
+
+  it('fixture: ORM rule flags an application service importing drizzle-orm', () => {
+    detects(checkOrmOnlyInPersistence, 'ORM', fixtureFile('orm-in-application/src/request/application/service/BadOrmImport.ts'), "'drizzle-orm'");
+  });
+
+  it('fixture: ORM rule flags a route importing postgres', () => {
+    detects(checkOrmOnlyInPersistence, 'ORM', fixtureFile('orm-in-app-route/src/app/bad/page.ts'), "'postgres'");
   });
 
   it('fixture: compliant tree produces no violations and is non-trivial', () => {

@@ -69,7 +69,7 @@ Next.js 대응:
 
 ## 4. DB 정규화
 
-테이블 설계는 도메인 모델과 별개다. 매핑은 `adapter/out/persistence` 의 매퍼가 한다(`docs/architecture.md`). 스키마 파일 경로를 `<스키마>` 로 쓴다(기존 `supabase/schema.sql` 은 고치지 않는다).
+테이블 설계는 도메인 모델과 별개다. 매핑은 `adapter/out/persistence` 의 매퍼가 한다(`docs/architecture.md`). 스키마 파일 경로 `web/src/request/adapter/out/persistence/schema.ts` 를 `<스키마>` 로 쓴다(기존 `supabase/schema.sql` 은 고치지 않는다).
 
 | # | 규칙 | 검사 |
 |---|---|---|
@@ -81,6 +81,14 @@ Next.js 대응:
 | 6 | 이력·감사 테이블은 추가 전용이다(update·delete 차단. 기존 `supabase/schema.sql` 의 `events_immutable` 트리거 설계와 같다). 애그리거트 하나는 자기 테이블 묶음에 대응한다(§3 규칙 8) | `/usr/bin/grep -nEi 'before update or delete' <스키마>` 가 이력 테이블마다 하나씩 나온다 |
 | 7 | 비정규화는 잰 이유가 있을 때만 하고, 그 이유를 테이블 옆 주석에 적는다 | 리뷰에서 본다: 중복 컬럼 옆에 측정값을 적은 주석이 있다 |
 | 8 | 새 쿼리는 실행 전에 순수 `EXPLAIN` 으로 본다(라이브에서 `EXPLAIN ANALYZE` 금지). `WHERE` 주조건은 인덱스 컬럼이고 함수로 감싸지 않는다. DDL 은 엔진이 지원하면 온라인 알고리즘을 명시하고, 인덱스·제약 이름은 64자 이하다 | `EXPLAIN <쿼리>` 의 출력에서 인덱스 사용을 본다. 이름 길이 플래그: `/usr/bin/grep -nEio -e 'index [a-z0-9_]{65,}' -e 'constraint [a-z0-9_]{65,}' <스키마>` 가 비어 있다 |
+
+### ORM 과 마이그레이션
+
+- ORM 은 Drizzle(`drizzle-orm`, `drizzle-kit`), 운영 드라이버는 `postgres`, 테스트는 인메모리 PGlite(`@electric-sql/pglite`)다. 스키마는 TypeScript 로 쓴다.
+- ORM·드라이버 import 는 `adapter/out/persistence/**` 와 `config/{container,database}.ts` 에서만 한다. 판정: `cd web && npm test` (`web/src/architecture.spec.ts` 의 ORM 규칙)
+- 마이그레이션 SQL 은 `web/drizzle/` 에 있다. 스키마를 고치면 `cd web && npx drizzle-kit generate` 로 만들고, 트리거처럼 스키마 파일로 못 쓰는 DDL 은 `npx drizzle-kit generate --custom` 의 빈 파일에 손으로 쓴다. 판정: 스키마를 고치지 않은 상태에서 `npx drizzle-kit generate && git status --porcelain web/drizzle` 이 비어 있다.
+- 마이그레이션 적용은 직접 연결 또는 세션 연결(`DATABASE_URL`)로 `npx drizzle-kit migrate` 를 한다. 트랜잭션 풀러로는 하지 않는다. 적용은 DB 쓰기라 사용자가 직접 한다.
+- 실행 시 저장소는 환경변수 `PERSISTENCE=memory|postgres`(기본 `memory`)로 고른다. `postgres` 인데 `DATABASE_URL` 이 없으면 컨테이너를 만들 때 예외가 난다. 판정: `cd web && PERSISTENCE=postgres node -e "import('./src/config/container.ts').then((m) => m.createContainer())"` 가 `DATABASE_URL is required` 로 종료코드 1 이다.
 
 DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기고 실행하지 않는다.
 

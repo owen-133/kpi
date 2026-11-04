@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export type RuleId = 'R1' | 'R2' | 'R6' | 'APP' | 'CONTAINER';
+export type RuleId = 'R1' | 'R2' | 'R6' | 'APP' | 'CONTAINER' | 'ORM';
 
 export interface Violation {
   rule: RuleId;
@@ -350,6 +350,28 @@ export function checkContainerOnly(file: string, source: string): Violation[] {
   return out;
 }
 
+// ORM and database driver packages: importable only under adapter/out/persistence and in config/{container,database}.ts.
+const ORM_PACKAGES = ['drizzle-orm', 'postgres', '@electric-sql/pglite'];
+
+function isOrmPackage(spec: string): boolean {
+  return ORM_PACKAGES.some((name) => spec === name || spec.startsWith(`${name}/`));
+}
+
+export function checkOrmOnlyInPersistence(file: string, source: string): Violation[] {
+  const rel = relFromSrc(toPosix(path.resolve(file)));
+  if (rel === null) return [];
+  if (rel === 'config/container.ts' || rel === 'config/database.ts') return [];
+  const where = classify(rel, false);
+  if (where.layer === 'adapter' && where.side === 'out' && where.pkg === 'persistence') return [];
+  const out: Violation[] = [];
+  for (const ref of extractImports(source)) {
+    if (isOrmPackage(ref.spec)) {
+      out.push(violation('ORM', file, ref.line, `only adapter/out/persistence and config/{container,database}.ts may import '${ref.spec}'`));
+    }
+  }
+  return out;
+}
+
 export function checkAll(file: string, source: string): Violation[] {
   return [
     ...checkRule1(file, source),
@@ -357,6 +379,7 @@ export function checkAll(file: string, source: string): Violation[] {
     ...checkRule6(file, source),
     ...checkAppBoundary(file, source),
     ...checkContainerOnly(file, source),
+    ...checkOrmOnlyInPersistence(file, source),
   ];
 }
 
