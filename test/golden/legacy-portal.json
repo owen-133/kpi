@@ -72,10 +72,10 @@
     "content-type": "text/html; charset=utf-8",
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 3527,
-   "sha256": "d0e981324d04df3ea57b795a860e2f4609d0e490458069cdb02dea98f6cd2147"
+   "bytes": 4506,
+   "sha256": "77babab0e07525dbd0fa0cfd73c36bcaad943a59cc08df61fcffb940ffc09c0a"
   },
   "static-app-js-admin": {
    "request": "GET /app.js",
@@ -84,10 +84,10 @@
     "content-type": "text/javascript; charset=utf-8",
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 12577,
-   "sha256": "9c23217bb0063b38466a09e1091749bd7c3e0cbc0e99ee01c4076e57fb72b0cb"
+   "bytes": 18934,
+   "sha256": "0a4cc9fbb3a2d137f02c3e73ef113a16e459cd1520500743db41008945e40466"
   },
   "static-style-css-admin": {
    "request": "GET /style.css",
@@ -96,10 +96,10 @@
     "content-type": "text/css; charset=utf-8",
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 8762,
-   "sha256": "783e0489eb55976866a412d4ec5c9b81541fb3666b08996eed0804e3f5e493b5"
+   "bytes": 12705,
+   "sha256": "d8b19e3471a2b4e45968588b26039ee65209516b6c26a262f8fd610aa7a8185a"
   },
   "static-index-viewer": {
    "request": "GET /",
@@ -108,10 +108,10 @@
     "content-type": "text/html; charset=utf-8",
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 3527,
-   "sha256": "d0e981324d04df3ea57b795a860e2f4609d0e490458069cdb02dea98f6cd2147"
+   "bytes": 4506,
+   "sha256": "77babab0e07525dbd0fa0cfd73c36bcaad943a59cc08df61fcffb940ffc09c0a"
   },
   "page-not-found": {
    "request": "GET /nope.html",
@@ -291,13 +291,13 @@
   },
   "create-too-long-body": {
    "request": "POST /api/tasks",
-   "status": 413,
+   "status": 400,
    "headers": {
     "content-type": "application/json; charset=utf-8",
     "cache-control": "no-store"
    },
    "json": {
-    "error": "입력 내용이 너무 깁니다."
+    "error": "입력 길이를 확인하세요."
    }
   },
   "bad-json": {
@@ -410,7 +410,8 @@
      "status": "접수",
      "created_at": "<TS>",
      "updated_at": "<TS>",
-     "completed_at": null
+     "completed_at": null,
+     "deleted_at": null
     },
     {
      "id": "<ID-1>",
@@ -426,7 +427,8 @@
      "status": "접수",
      "created_at": "<TS>",
      "updated_at": "<TS>",
-     "completed_at": null
+     "completed_at": null,
+     "deleted_at": null
     }
    ]
   },
@@ -640,6 +642,7 @@
     "created_at": "<TS>",
     "updated_at": "<TS>",
     "completed_at": null,
+    "deleted_at": null,
     "events": [
      {
       "id": 1,
@@ -689,7 +692,11 @@
       "kind": "상태 변경",
       "detail": "완료 → 진행 중 · 추가 프로그램 설치 요청"
      }
-    ]
+    ],
+    "kpi": {
+     "files": [],
+     "available": true
+    }
    }
   },
   "detail-second-task": {
@@ -714,6 +721,7 @@
     "created_at": "<TS>",
     "updated_at": "<TS>",
     "completed_at": null,
+    "deleted_at": null,
     "events": [
      {
       "id": 2,
@@ -731,7 +739,11 @@
       "kind": "처리 메모",
       "detail": "같은 출처 메모"
      }
-    ]
+    ],
+    "kpi": {
+     "files": [],
+     "available": true
+    }
    }
   },
   "detail-unknown": {
@@ -778,7 +790,8 @@
      "status": "접수",
      "created_at": "<TS>",
      "updated_at": "<TS>",
-     "completed_at": null
+     "completed_at": null,
+     "deleted_at": null
     },
     {
      "id": "<ID-1>",
@@ -794,7 +807,8 @@
      "status": "진행 중",
      "created_at": "<TS>",
      "updated_at": "<TS>",
-     "completed_at": null
+     "completed_at": null,
+     "deleted_at": null
     }
    ]
   }
@@ -818,10 +832,10 @@
     "content-type": "text/html; charset=utf-8",
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 3527,
-   "sha256": "d0e981324d04df3ea57b795a860e2f4609d0e490458069cdb02dea98f6cd2147"
+   "bytes": 4506,
+   "sha256": "77babab0e07525dbd0fa0cfd73c36bcaad943a59cc08df61fcffb940ffc09c0a"
   },
   "open-session": {
    "request": "GET /api/session",
@@ -879,7 +893,8 @@
      "status": "완료",
      "created_at": "<TS>",
      "updated_at": "<TS>",
-     "completed_at": "<TS>"
+     "completed_at": "<TS>",
+     "deleted_at": null
     }
    ]
   }
