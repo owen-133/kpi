@@ -1,5 +1,7 @@
 # 무료 배포: Render Free + Supabase Free
 
+Claude Board 기반 카드 화면 추가 후에도 이 배포 설정은 같습니다. DB 스키마·키·비밀번호를 다시 만들 필요가 없습니다. `public/board/`에 빌드한 Svelte 화면을 소스와 함께 배포합니다. UI 수정 후에는 로컬에서 `npm run build`를 실행해 생성물을 포함해야 합니다. 기존 Render 서비스는 `main` 새 커밋으로 배포하면 됩니다.
+
 유료 디스크는 사용하지 않습니다. `render.yaml`에도 `plan: free`를 지정했습니다. 기존 Render 수동 생성 화면에서는 반드시 **Instance Type: Free**를 선택하세요. Blueprint를 사용하지 않는 경우 yaml 값은 자동으로 적용되지 않습니다.
 
 무료는 영구적인 무제한 제공을 뜻하지 않습니다. 공급자 정책 변경, 사용량 한도, 비활성 중지, 첫 접속 지연이 있을 수 있습니다. 유료 플랜으로 전환하지 말고 Free로 생성 가능한지 가입 화면에서 확인하세요. 최신 공식 요금·상업 이용 약관은 이 작업 환경의 네트워크 차단 때문에 재확인하지 못했습니다. 참고: https://render.com/docs/free , https://supabase.com/pricing , https://supabase.com/terms . 무료 운영에 별도 AI 유료 API는 필요하지 않습니다.

@@ -1,1 +1,14 @@
-{"name":"orbit-ops","version":"0.1.0","private":true,"type":"module","scripts":{"start":"node server.js","test":"node --test"},"engines":{"node":">=24"}}
+{
+  "name": "orbit-ops",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "build": "npm --prefix frontend ci --no-audit --no-fund && npm --prefix frontend run build"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

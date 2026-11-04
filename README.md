@@ -4,7 +4,7 @@
 
 ## 로컬 개발
 
-Node.js 24 이상이 필요하며 앱의 외부 패키지 의존성은 없습니다.
+Node.js 24 이상이 필요합니다. 서버 런타임은 외부 패키지 없이 동작하고, 업무 보드는 Claude Board의 Svelte 컴포넌트를 수정해 사용합니다.
 
 ```sh
 cd /workspace/kpi
@@ -12,6 +12,18 @@ npm start
 ```
 
 기본은 `127.0.0.1:3000`이며 로그인 없는 로컬 개발 모드입니다. 로컬 데이터는 `data/orbit.sqlite`에 보존됩니다. `npm test`는 SQLite API 흐름과 배포 설정 검증을 실행합니다.
+
+## Claude Board 기반 업무 화면
+
+`ko-itbuddy/claude-board` 커밋 `b81c3c149692f855c5e2fcce44a120e2367ce4a3`의 실제 `Icon.svelte`, `StateIcon.svelte`, `GroupCard.svelte`와 상태/시간 로직을 가져와 웹 총무 업무용으로 수정했습니다. 출처와 변경 내역은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 있습니다. PC 터미널·Tauri 백엔드는 웹 포털 API로 교체했습니다.
+
+- 업무 분류·부서·접수 경로별 카드, 접수 우선 정렬
+- 상태별 필터와 전체 내용 검색, 카드 접기, 완료 업무 펼치기
+- 간략 보기, 직접 새로고침, 기존 상세 화면의 처리 메모·상태 변경 연동
+
+프런트엔드 소스는 `frontend/src/`입니다. 수정 후 `npm run build`로 잠금 파일에 맞춰 개발 도구를 설치하고 `public/board/` 번들과 라이선스 고지를 다시 생성하세요. 생성물을 Git에 포함하므로 기존 Render Build Command를 바꾸지 않아도 배포됩니다. 실행 시 npm 패키지나 유료 AI API는 필요하지 않습니다. 자동 주기 호출은 하지 않으며 다른 사람의 최신 변경은 새로고침으로 가져옵니다.
+
+브라우저 검증은 별도 설치한 `playwright-core` 모듈 경로를 `ORBIT_PLAYWRIGHT_PATH`로 지정해 실행합니다. 기본 테스트에서는 명시적으로 skip합니다. Chromium 기본 경로는 `/usr/bin/chromium`이며 `CHROMIUM_PATH`로 변경할 수 있습니다.
 
 ## 무료 운영 배포
 
