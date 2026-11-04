@@ -2,7 +2,7 @@
  import GroupCard from './board/GroupCard.svelte';
  import StateIcon from './board/StateIcon.svelte';
  import {groupsFor,taskState} from './board/format.js';
- let {tasks,onopen,onexport,onrefresh,readonly=false}=$props();
+ let {tasks,onopen,onexport,onrefresh,texts={},readonly=false}=$props();
  let query=$state(''),status=$state(''),groupBy=$state('category'),compact=$state(false),now=$state(Date.now()),refreshing=$state(false),error=$state('');
  const statuses=['접수','진행 중','대기','완료'];
  const groups=$derived(groupsFor(tasks,{query,status,groupBy}));
@@ -11,7 +11,7 @@
  async function reload(){refreshing=true;error='';try{tasks=await onrefresh();}catch(e){error=e.message;}finally{refreshing=false;}}
 </script>
 <section class="claude-workboard" aria-label="총무 업무 카드 보드">
- <div class="board-title"><div><p>GENERAL AFFAIRS · LIVE BOARD</p><h2>흩어진 요청을, 한 장의 보드로.</h2><span>분류별로 모으고, 상태별로 살펴보세요.</span></div><span class="board-role">{readonly?'조회 전용':'업무 관리'}</span></div>
+ <div class="board-title"><div><p>{texts.cardEyebrow||'GENERAL AFFAIRS · LIVE BOARD'}</p><h2>{texts.cardTitle||'흩어진 요청을, 한 장의 보드로.'}</h2><span>{texts.cardDescription||'분류별로 모으고, 상태별로 살펴보세요.'}</span></div><span class="board-role">{readonly?'조회 전용':'업무 관리'}</span></div>
  <div class="state-chips" aria-label="업무 상태 필터"><button class:chosen={!status} aria-pressed={!status} onclick={()=>status=''}>전체 <b>{tasks.length}</b></button>{#each statuses as s}<button class:chosen={status===s} aria-pressed={status===s} onclick={()=>status=status===s?'':s}><StateIcon state={taskState(s)} scale={.8}/>{s}<b>{tasks.filter(t=>t.status===s).length}</b></button>{/each}</div>
  <div class="board-controls"><input bind:value={query} type="search" placeholder="업무·요청자·부서·내용 검색" aria-label="업무 검색"><select bind:value={groupBy} aria-label="카드 분류 기준"><option value="category">업무 분류별</option><option value="department">요청 부서별</option><option value="channel">접수 경로별</option></select><button onclick={()=>compact=!compact} aria-pressed={compact}>{compact?'상세 보기':'간략 보기'}</button><button onclick={onexport}>CSV 내보내기</button><button onclick={reload} disabled={refreshing}>{refreshing?'불러오는 중…':'새로고침'}</button></div>
  {#if error}<p role="alert">{error}</p>{/if}

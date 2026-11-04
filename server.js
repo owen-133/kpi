@@ -1,3 +1,4 @@
+import {defaults,normalizeSettings,validateSettings} from './public/settings-model.js';
 import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { extname } from 'node:path';
@@ -20,7 +21,10 @@ const server=http.createServer(async(req,res)=>{
  if(path.startsWith('/api/')){
  if(req.method!=='GET'&&userRole!=='admin')return send(403,{error:'조회 계정은 업무를 변경할 수 없습니다.'});
  if(req.method!=='GET'&&req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`&&req.headers.origin!==`https://${req.headers.host}`)return send(403,{error:'허용되지 않은 요청입니다.'});
- let body={};if(req.method==='POST'){let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>64000)return send(413,{error:'입력 내용이 너무 깁니다.'});}try{body=JSON.parse(raw);if(!body||Array.isArray(body)||typeof body!=='object')throw Error();}catch{return send(400,{error:'잘못된 입력입니다.'});}}
+ let body={};if(req.method==='POST'){let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>400000)return send(413,{error:'입력 내용이 너무 깁니다.'});}try{body=JSON.parse(raw);if(!body||Array.isArray(body)||typeof body!=='object')throw Error();}catch{return send(400,{error:'잘못된 입력입니다.'});}}
+ if(path==='/api/settings'&&req.method==='GET'){try{const config=await store.settings();return send(200,{...config,values:normalizeSettings(config.values)});}catch(e){if(e.code==='SETTINGS_MIGRATION_REQUIRED')return send(200,{values:defaults,revision:0,available:false,message:e.message});throw e;}}
+ if(path==='/api/settings/history'&&req.method==='GET'){if(userRole!=='admin')return send(403,{error:'관리자만 설정 이력을 볼 수 있습니다.'});return send(200,await store.settingsHistory());}
+ if(path==='/api/settings'&&req.method==='POST'){if(!Number.isInteger(body.revision)||body.revision<0)return send(400,{error:'설정 버전을 확인하세요.'});return send(200,await store.saveSettings(validateSettings(body.values),body.revision));}
  if(path==='/api/session')return send(200,{role:userRole,shared:!!process.env.ADMIN_PASSWORD});
  if(path==='/api/tasks'&&req.method==='GET')return send(200,await store.list());
  if(path==='/api/tasks'&&req.method==='POST'){
@@ -37,8 +41,8 @@ const server=http.createServer(async(req,res)=>{
  }return send(404,{error:'지원하지 않는 요청입니다.'});
  }
  if(req.method!=='GET')return send(405,{error:'지원하지 않는 요청입니다.'});
- const files={'/':'index.html','/app.js':'app.js','/style.css':'style.css','/favicon.svg':'favicon.svg','/board/board.js':'board/board.js','/board/board.css':'board/board.css','/third-party-notices':'THIRD_PARTY_NOTICES.txt','/claude-board-license':'CLAUDE_BOARD_LICENSE.txt'};if(!files[path])return send(404,{error:'페이지를 찾을 수 없습니다.'});
- const data=readFileSync(new URL('./public/'+files[path],import.meta.url));res.writeHead(200,{'Content-Type':{'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.txt':'text/plain; charset=utf-8','.svg':'image/svg+xml'}[extname(files[path])],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"});res.end(data);
+ const files={'/':'index.html','/app.js':'app.js','/style.css':'style.css','/settings-model.js':'settings-model.js','/admin-settings.js':'admin-settings.js','/favicon.svg':'favicon.svg','/board/board.js':'board/board.js','/board/board.css':'board/board.css','/third-party-notices':'THIRD_PARTY_NOTICES.txt','/claude-board-license':'CLAUDE_BOARD_LICENSE.txt'};if(!files[path])return send(404,{error:'페이지를 찾을 수 없습니다.'});
+ const data=readFileSync(new URL('./public/'+files[path],import.meta.url));res.writeHead(200,{'Content-Type':{'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.txt':'text/plain; charset=utf-8','.svg':'image/svg+xml'}[extname(files[path])],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"});res.end(data);
  }catch(e){if(e.status)return send(e.status,{error:e.message});console.error('Request failed:',e.name);send(503,{error:'데이터 저장소에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.'});}
 });
 server.listen(Number(process.env.PORT||3000),process.env.HOST||'127.0.0.1',()=>console.log(`Orbit Ops listening on port ${process.env.PORT||3000}`));

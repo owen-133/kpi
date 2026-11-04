@@ -10,9 +10,17 @@ CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT,task_id T
 CREATE TRIGGER IF NOT EXISTS events_no_update BEFORE UPDATE ON events BEGIN SELECT RAISE(ABORT,'Audit events cannot be updated'); END;
 CREATE TRIGGER IF NOT EXISTS events_no_delete BEFORE DELETE ON events BEGIN SELECT RAISE(ABORT,'Audit events cannot be deleted'); END;`);
 
+db.exec(`CREATE TABLE IF NOT EXISTS portal_settings(id INTEGER PRIMARY KEY CHECK(id=1), value TEXT NOT NULL, revision INTEGER NOT NULL);
+INSERT OR IGNORE INTO portal_settings VALUES(1,'{}',0);
+CREATE TABLE IF NOT EXISTS settings_events(id INTEGER PRIMARY KEY AUTOINCREMENT,at TEXT NOT NULL,actor TEXT NOT NULL,before_value TEXT NOT NULL,after_value TEXT NOT NULL);
+CREATE TRIGGER IF NOT EXISTS settings_events_no_update BEFORE UPDATE ON settings_events BEGIN SELECT RAISE(ABORT,'Settings audit cannot be updated'); END;
+CREATE TRIGGER IF NOT EXISTS settings_events_no_delete BEFORE DELETE ON settings_events BEGIN SELECT RAISE(ABORT,'Settings audit cannot be deleted'); END;`);
 function record(id,kind,detail){db.prepare('INSERT INTO events(task_id,at,actor,kind,detail) VALUES(?,?,?,?,?)').run(id,new Date().toISOString(),'총무 담당자',kind,detail);}
 function transaction(fn){db.exec('BEGIN');try{const value=fn();db.exec('COMMIT');return value;}catch(e){db.exec('ROLLBACK');throw e;}}
 export const store={
+ settings:()=>{const r=db.prepare('SELECT * FROM portal_settings WHERE id=1').get();return {values:JSON.parse(r.value),revision:r.revision,available:true};},
+ settingsHistory:()=>db.prepare('SELECT * FROM settings_events ORDER BY id DESC LIMIT 30').all().map(e=>({...e,before:JSON.parse(e.before_value),after:JSON.parse(e.after_value),before_value:undefined,after_value:undefined})),
+ saveSettings:(values,revision)=>transaction(()=>{const r=db.prepare('SELECT * FROM portal_settings WHERE id=1').get();if(r.revision!==revision)throw Object.assign(Error('다른 화면에서 설정이 변경됐습니다. 다시 불러온 뒤 저장하세요.'),{status:409});const value=JSON.stringify(values);db.prepare('INSERT INTO settings_events(at,actor,before_value,after_value) VALUES(?,?,?,?)').run(new Date().toISOString(),'admin',r.value,value);db.prepare('UPDATE portal_settings SET value=?,revision=? WHERE id=1').run(value,revision+1);return {values,revision:revision+1,available:true};}),
  list:()=>db.prepare('SELECT * FROM tasks ORDER BY created_at DESC, rowid DESC').all(),
  detail:(id)=>{const task=db.prepare('SELECT * FROM tasks WHERE id=?').get(id);return task?{...task,events:db.prepare('SELECT * FROM events WHERE task_id=? ORDER BY id').all(id)}:null;},
  create:(v)=>transaction(()=>{const id=randomUUID(),now=new Date().toISOString();db.prepare('INSERT INTO tasks VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(id,...['title','requester','department','channel','category','priority','requested_at','due_date','description'].map(k=>v[k]),'접수',now,now,null);record(id,'등록',JSON.stringify(v));return {id};}),
