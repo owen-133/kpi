@@ -40,7 +40,7 @@ const VIOLATION_FIXTURES: { dir: string; code: RuleCode; needle: string }[] = [
   { dir: 'c6-title-in-docs', code: 'C6', needle: 'Register a request' },
   { dir: 'c6-no-agents-mention', code: 'C6', needle: 'docs/ssot/requirements.md' },
 ];
-const CLEAN_FIXTURES = ['clean', 'clean-markdown-variants'];
+const CLEAN_FIXTURES = ['clean', 'clean-markdown-variants', 'clean-test-name-with-key-word'];
 
 function fixtureViolations(dir: string) {
   const { corpus, requirements } = loadFixtureCorpus(path.join(FIXTURES, dir), GOLDEN);

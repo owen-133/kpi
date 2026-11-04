@@ -52,7 +52,7 @@ accept:
 
 등록 입력은 앞뒤 공백을 지우고 항목마다 10000자를 넘으면 400, 본문이 64000자를 넘으면 413, JSON 객체가 아니면 400 이다. 기한은 있으면 `YYYY-MM-DD` 여야 한다. 등록은 변경 이력에 `등록` 한 줄을 남긴다.
 
-### R-002 상태 변경
+### R-002 업무 상태 전환
 layer: core
 status: current
 evidence:
@@ -97,7 +97,7 @@ accept:
 
 사유는 앞뒤 공백을 지운 뒤 10000자를 넘으면 400 이다. 사유 요구는 현재 상태가 완료일 때만 걸린다.
 
-### R-004 처리 메모
+### R-004 업무 메모 추가
 layer: core
 status: current
 evidence:
@@ -258,10 +258,13 @@ evidence:
 - public/app.js:16
 - public/app.js:19
 golden:
+- secured/static-app-js-admin
 test-name:
 accept:
 - Given 업무 보드 화면 / When 검색어를 입력하면 / Then 제목·요청자·부서에 대소문자 구분 없이 검색어가 들어 있는 업무만 보인다
 - Given 업무 보드 화면 / When 상태를 고르면 / Then 그 상태의 업무만 보인다
+
+화면 동작 자체를 검사하는 시험은 없다. golden 은 `public/app.js` 바이트가 그대로인지만 고정한다(동작은 리뷰에서 본다).
 
 ### R-012 CSV 내려받기
 layer: supporting
@@ -270,11 +273,14 @@ evidence:
 - public/app.js:16
 - public/app.js:24
 golden:
+- secured/static-app-js-admin
 test-name:
 accept:
 - Given 업무 보드 화면 / When CSV 내려받기를 누르면 / Then 업무, 요청자, 부서, 접수 경로, 분류, 상태, 요청 시각, 등록 시각, 완료 시각 열의 `총무업무_날짜.csv` 가 내려온다
 
 파일은 BOM 이 붙은 UTF-8 이고, 셀이 `=`·`+`·`@`·`-` 로 시작하면 앞에 `'` 를 붙여 수식으로 읽히지 않게 한다. 내려받는 목록은 화면 필터와 무관하게 전체 업무다.
+
+화면 동작 자체를 검사하는 시험은 없다. golden 은 `public/app.js` 바이트가 그대로인지만 고정한다(동작은 리뷰에서 본다).
 
 ### R-013 누적 실적과 소요 시간
 layer: supporting
@@ -285,12 +291,15 @@ evidence:
 - public/app.js:17
 - README.md:28
 golden:
+- secured/static-app-js-admin
 test-name:
 accept:
 - Given 업무가 여럿 쌓인 상태 / When 화면 위쪽 통계를 보면 / Then 전체 업무는 누적 접수 건수, 진행 중·완료 업무는 현재 상태 건수, 기한 초과는 기한이 오늘(한국 시간)보다 앞서면서 완료가 아닌 건수다
 - Given 완료 상태의 업무가 있는 상태 / When 업무 실적 화면을 보면 / Then 평균 처리 소요 시간은 요청 시각부터 완료 시각까지의 달력 시간(대기·주말 포함)을 시간 단위로 평균한 값이다
 
 실적은 누적 기준이다. 소요 시간은 현재 완료 상태인 업무만 센다. 재개하면 완료 시각이 비워지므로 그 업무는 다시 완료될 때까지 빠진다.
+
+화면 동작 자체를 검사하는 시험은 없다. golden 은 `public/app.js` 바이트가 그대로인지만 고정한다(동작은 리뷰에서 본다).
 
 ### R-014 웹 골격의 Request 예시
 layer: supporting
@@ -317,40 +326,19 @@ accept:
 ### R-015 첨부파일
 layer: out
 status: planned
-evidence:
-- README.md:30
-golden:
-test-name:
 
 ### R-016 팀장 확인과 댓글
 layer: out
 status: planned
-evidence:
-- README.md:30
-golden:
-test-name:
 
 ### R-017 월별 기간 필터
 layer: out
 status: planned
-evidence:
-- README.md:30
-golden:
-test-name:
 
 ### R-018 AI 요약
 layer: out
 status: planned
-evidence:
-- README.md:30
-golden:
-test-name:
 
 ### R-019 개인별 인증
 layer: out
 status: planned
-evidence:
-- README.md:21
-- README.md:30
-golden:
-test-name:

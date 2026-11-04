@@ -97,10 +97,12 @@ export function parseRequirements(text: string): Requirement[] {
       continue;
     }
     if (current === null) continue;
-    const key = KEY_LINE.exec(line);
+    // test titles and acceptance sentences are free text: a bullet there is an item even when it starts with a key word
+    const isFreeTextItem: boolean = (listKey === 'testName' || listKey === 'accept') && BULLET.test(line);
+    const key: RegExpExecArray | null = isFreeTextItem ? null : KEY_LINE.exec(line);
     if (key !== null) {
-      const name = key[2];
-      const value = key[3];
+      const name: string = key[2];
+      const value: string = key[3];
       if (name === 'layer' || name === 'status') {
         if (current[name] === '') current[name] = unwrap(value);
         listKey = null;
