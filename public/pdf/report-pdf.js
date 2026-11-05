@@ -35908,8 +35908,8 @@ async function cE(t, e = {}) {
   r.registerFontkit(Si);
   const n = await r.embedFont(e.fontBytes || await fE(), { subset: !1 }), i = new Set(n.getCharacterSet()), a = (P) => Array.from(String(P ?? "").normalize("NFC")).filter((I) => I === `
 ` || I === "	" || I.charCodeAt(0) >= 32).map((I) => I === `
-` || I === "	" || i.has(I.codePointAt(0)) ? I : "□").join("").replaceAll("	", "    "), o = a(e.portalName || "orbit.ops"), s = a(t.month), u = new Date(t.created_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }), f = "총무 업무 처리현황";
-  r.setTitle(s + " " + f), r.setAuthor(o), r.setSubject("발행한 월간 업무 보고서"), r.setCreator("orbit.ops");
+` || I === "	" || i.has(I.codePointAt(0)) ? I : "□").join("").replaceAll("	", "    "), o = a(e.portalName || "아이지넷"), s = a(t.month), u = new Date(t.created_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }), f = "총무 업무 처리현황";
+  r.setTitle(s + " " + f), r.setAuthor(o), r.setSubject("발행한 월간 업무 보고서"), r.setCreator("아이지넷 총무 업무 포털");
   const c = 595.28, h = 841.89, d = 44, v = c - d * 2;
   let g, m;
   function w(P, I, U, W = 10.3, V = gf) {

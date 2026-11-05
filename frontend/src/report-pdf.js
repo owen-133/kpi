@@ -12,8 +12,8 @@ export async function createReportPdf(record,options={}){
  const font=await document.embedFont(options.fontBytes||await loadFont(),{subset:false});
  const supported=new Set(font.getCharacterSet());
  const clean=value=>Array.from(String(value??'').normalize('NFC')).filter(c=>c==='\n'||c==='\t'||c.charCodeAt(0)>=32).map(c=>c==='\n'||c==='\t'||supported.has(c.codePointAt(0))?c:'□').join('').replaceAll('\t','    ');
- const brand=clean(options.portalName||'orbit.ops'),month=clean(record.month),issued=new Date(record.created_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
- const title='총무 업무 처리현황';document.setTitle(month+' '+title);document.setAuthor(brand);document.setSubject('발행한 월간 업무 보고서');document.setCreator('orbit.ops');
+ const brand=clean(options.portalName||'아이지넷'),month=clean(record.month),issued=new Date(record.created_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+ const title='총무 업무 처리현황';document.setTitle(month+' '+title);document.setAuthor(brand);document.setSubject('발행한 월간 업무 보고서');document.setCreator('아이지넷 총무 업무 포털');
  const width=595.28,height=841.89,margin=44,bodyWidth=width-margin*2;
  let page,y;
  function text(value,x,at,size=10.3,color=ink){page.drawText(clean(value),{x,y:at,size,font,color});}
