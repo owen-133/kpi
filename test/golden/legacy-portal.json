@@ -74,8 +74,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4506,
-   "sha256": "77babab0e07525dbd0fa0cfd73c36bcaad943a59cc08df61fcffb940ffc09c0a"
+   "bytes": 4545,
+   "sha256": "50690f1ef13a4de5d6d9c5a72a984a166726979b286764dcc3972d6b520d0410"
   },
   "static-app-js-admin": {
    "request": "GET /app.js",
@@ -86,8 +86,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 18934,
-   "sha256": "0a4cc9fbb3a2d137f02c3e73ef113a16e459cd1520500743db41008945e40466"
+   "bytes": 19191,
+   "sha256": "af0d4d6b65917e3360769af3e760d8d125f01513c6c4337ea0f78dec1c4f11af"
   },
   "static-style-css-admin": {
    "request": "GET /style.css",
@@ -110,8 +110,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4506,
-   "sha256": "77babab0e07525dbd0fa0cfd73c36bcaad943a59cc08df61fcffb940ffc09c0a"
+   "bytes": 4545,
+   "sha256": "50690f1ef13a4de5d6d9c5a72a984a166726979b286764dcc3972d6b520d0410"
   },
   "page-not-found": {
    "request": "GET /nope.html",
@@ -411,7 +411,8 @@
      "created_at": "<TS>",
      "updated_at": "<TS>",
      "completed_at": null,
-     "deleted_at": null
+     "deleted_at": null,
+     "edit_revision": 0
     },
     {
      "id": "<ID-1>",
@@ -428,7 +429,8 @@
      "created_at": "<TS>",
      "updated_at": "<TS>",
      "completed_at": null,
-     "deleted_at": null
+     "deleted_at": null,
+     "edit_revision": 0
     }
    ]
   },
@@ -643,6 +645,7 @@
     "updated_at": "<TS>",
     "completed_at": null,
     "deleted_at": null,
+    "edit_revision": 0,
     "events": [
      {
       "id": 1,
@@ -722,6 +725,7 @@
     "updated_at": "<TS>",
     "completed_at": null,
     "deleted_at": null,
+    "edit_revision": 0,
     "events": [
      {
       "id": 2,
@@ -791,7 +795,8 @@
      "created_at": "<TS>",
      "updated_at": "<TS>",
      "completed_at": null,
-     "deleted_at": null
+     "deleted_at": null,
+     "edit_revision": 0
     },
     {
      "id": "<ID-1>",
@@ -808,7 +813,8 @@
      "created_at": "<TS>",
      "updated_at": "<TS>",
      "completed_at": null,
-     "deleted_at": null
+     "deleted_at": null,
+     "edit_revision": 0
     }
    ]
   }
@@ -834,8 +840,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4506,
-   "sha256": "77babab0e07525dbd0fa0cfd73c36bcaad943a59cc08df61fcffb940ffc09c0a"
+   "bytes": 4545,
+   "sha256": "50690f1ef13a4de5d6d9c5a72a984a166726979b286764dcc3972d6b520d0410"
   },
   "open-session": {
    "request": "GET /api/session",
@@ -894,7 +900,8 @@
      "created_at": "<TS>",
      "updated_at": "<TS>",
      "completed_at": "<TS>",
-     "deleted_at": null
+     "deleted_at": null,
+     "edit_revision": 0
     }
    ]
   }
