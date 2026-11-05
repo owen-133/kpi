@@ -74,8 +74,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4545,
-   "sha256": "50690f1ef13a4de5d6d9c5a72a984a166726979b286764dcc3972d6b520d0410"
+   "bytes": 4567,
+   "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
   },
   "static-app-js-admin": {
    "request": "GET /app.js",
@@ -86,8 +86,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 19191,
-   "sha256": "af0d4d6b65917e3360769af3e760d8d125f01513c6c4337ea0f78dec1c4f11af"
+   "bytes": 19390,
+   "sha256": "7f6c71f670e8f4d125eb89a12197d2cf5089438996fa2158b64267eb52b475bf"
   },
   "static-style-css-admin": {
    "request": "GET /style.css",
@@ -98,8 +98,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 12705,
-   "sha256": "d8b19e3471a2b4e45968588b26039ee65209516b6c26a262f8fd610aa7a8185a"
+   "bytes": 13774,
+   "sha256": "48937c49787fc214f779a87997a2c3384137cc11f4cc16ac7db5195ef58a4686"
   },
   "static-index-viewer": {
    "request": "GET /",
@@ -110,8 +110,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4545,
-   "sha256": "50690f1ef13a4de5d6d9c5a72a984a166726979b286764dcc3972d6b520d0410"
+   "bytes": 4567,
+   "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
   },
   "page-not-found": {
    "request": "GET /nope.html",
@@ -840,8 +840,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4545,
-   "sha256": "50690f1ef13a4de5d6d9c5a72a984a166726979b286764dcc3972d6b520d0410"
+   "bytes": 4567,
+   "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
   },
   "open-session": {
    "request": "GET /api/session",
