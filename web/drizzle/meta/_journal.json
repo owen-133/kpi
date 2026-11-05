@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793758737776,
+      "tag": "0000_create_request_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793758738109,
+      "tag": "0001_append_only_history",
+      "breakpoints": true
+    }
+  ]
+}

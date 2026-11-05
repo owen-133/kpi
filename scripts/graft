@@ -1,0 +1,19 @@
+#!/bin/sh
+# Run the repo-pinned graft CLI (installed by scripts/setup-graft.sh) with the
+# environment this repo requires. Never falls back to a global graft.
+#
+# Usage: sh scripts/graft <graft arguments>
+#
+# Exit codes: 3 = pinned binary missing (run `sh scripts/setup-graft.sh`);
+# anything else is graft's own exit code.
+set -eu
+
+repo_root=$(cd "$(dirname "$0")/.." && pwd)
+graft_bin="$repo_root/tools/graft/node_modules/.bin/graft"
+
+if [ ! -x "$graft_bin" ]; then
+  echo "graft: pinned binary not found at $graft_bin; run: sh scripts/setup-graft.sh" >&2
+  exit 3
+fi
+
+DO_NOT_TRACK=1 GRAFT_NO_GITIGNORE=1 GRAFT_NO_IGNORE=1 exec "$graft_bin" "$@"
