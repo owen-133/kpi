@@ -74,8 +74,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4567,
-   "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
+   "bytes": 4630,
+   "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
   },
   "static-app-js-admin": {
    "request": "GET /app.js",
@@ -86,8 +86,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 19390,
-   "sha256": "7f6c71f670e8f4d125eb89a12197d2cf5089438996fa2158b64267eb52b475bf"
+   "bytes": 19364,
+   "sha256": "8bd5873d3fd77fb8074a62675a298b1d13870bc30e7e4326c0401d2b28b64bad"
   },
   "static-style-css-admin": {
    "request": "GET /style.css",
@@ -110,8 +110,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4567,
-   "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
+   "bytes": 4630,
+   "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
   },
   "page-not-found": {
    "request": "GET /nope.html",
@@ -840,8 +840,8 @@
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
    },
-   "bytes": 4567,
-   "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
+   "bytes": 4630,
+   "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
   },
   "open-session": {
    "request": "GET /api/session",
