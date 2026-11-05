@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Prints shell `export` lines that enable the environment-gated tests:
-//   eval "$(node scripts/test-env.mjs)"
+//   eval "$(node scripts/env-for-tests.mjs)"
 // Nothing is downloaded here. Exit codes:
 //   2 PGlite missing (run `cd web && npm ci`)   3 pdfinfo/pdftotext missing
 //   4 no Chromium found                          5 real Playwright module not found
@@ -14,7 +14,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const home = homedir();
 const quote = (value) => `'${String(value).replaceAll("'", `'\\''`)}'`;
 const fail = (code, message) => {
-  console.error(`test-env: ${message}`);
+  console.error(`env-for-tests: ${message}`);
   process.exit(code);
 };
 const onPath = (name) => (process.env.PATH ?? '').split(delimiter).some((dir) => dir && existsSync(join(dir, name)));

@@ -1,7 +1,7 @@
 // Re-exports the real Playwright module (ORBIT_PLAYWRIGHT_REAL) with a chromium.launch
-// that honors CHROMIUM_PATH. Used through ORBIT_PLAYWRIGHT_PATH by scripts/test-env.mjs.
+// that honors CHROMIUM_PATH. Used through ORBIT_PLAYWRIGHT_PATH by scripts/env-for-tests.mjs.
 const realEntry = process.env.ORBIT_PLAYWRIGHT_REAL;
-if (!realEntry) throw new Error('ORBIT_PLAYWRIGHT_REAL is not set; run eval "$(node scripts/test-env.mjs)"');
+if (!realEntry) throw new Error('ORBIT_PLAYWRIGHT_REAL is not set; run eval "$(node scripts/env-for-tests.mjs)"');
 
 const real = await import(realEntry);
 const realChromium = real.chromium ?? real.default?.chromium;

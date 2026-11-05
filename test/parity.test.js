@@ -71,7 +71,6 @@ export function compareGroup(group, readText) {
 // ---- the groups ----
 const STATUS_DEFAULT = String.raw`\[([^\]]*)\]`;
 const NEW_STATUS = String.raw`new_status not in \(([^)]*)\)`;
-const FIELDS = String.raw`'title','requester','department','channel','category','priority','requested_at','due_date','description'`;
 
 export const groups = [
   {name: 'status list', kind: 'list', copies: [
