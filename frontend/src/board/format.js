@@ -1,3 +1,4 @@
+import {kstDate} from '../../../public/kpi-model.js';
 // Adapted from Claude Board format.ts (Apache-2.0). See THIRD_PARTY_NOTICES.md.
 // Keep its waiting/working/paused/idle state vocabulary for the reused icons.
 export function stateRgb(state){switch(state){case 'working':return '115 168 255';case 'waiting':return '255 168 92';case 'idle':return '107 217 153';case 'paused':return '242 204 89';default:return '140 140 140';}}
@@ -6,4 +7,9 @@ export const taskState=status=>({'접수':'waiting','진행 중':'working','대�
 export function urgent(group){let best='idle',r=99;for(const s of group.sessions){if(rank[s.state]<r){r=rank[s.state];best=s.state;}}return best;}
 export const active=g=>g.sessions.filter(s=>s.state==='waiting'||s.state==='working');
 export function elapsed(from,now){const s=Math.max(0,Math.floor((now-from)/1000));if(s<60)return `${s}초`;if(s<3600)return `${Math.floor(s/60)}분 ${s%60}초`;if(s>=86400)return `${Math.floor(s/86400)}일 ${Math.floor(s%86400/3600)}시간`;return `${Math.floor(s/3600)}시간 ${Math.floor(s%3600/60)}분`;}
-export function groupsFor(tasks,{query='',status='',groupBy='category'}={}){const filtered=tasks.filter(t=>(!status||t.status===status)&&[t.title,t.requester,t.department,t.description,t.assignee].some(v=>String(v||'').toLowerCase().includes(query.toLowerCase())));const groups=new Map();for(const t of filtered){const name=t[groupBy]||'미분류';if(!groups.has(name))groups.set(name,{id:name,name,sessions:[]});groups.get(name).sessions.push({...t,state:taskState(t.status)});}for(const g of groups.values())g.sessions.sort((a,b)=>rank[a.state]-rank[b.state]||(a.due_date||'9999').localeCompare(b.due_date||'9999')||b.created_at.localeCompare(a.created_at));return [...groups.values()].sort((a,b)=>rank[urgent(a)]-rank[urgent(b)]||a.name.localeCompare(b.name,'ko'));}
+export function groupsFor(tasks,{query='',status='',groupBy='category',dateField='requested_at',from='',to=''}={}){
+ const filtered=tasks.filter(t=>{const day=kstDate(t[dateField]);return (!status||t.status===status)&&(!from||day&&day>=from)&&(!to||day&&day<=to)&&[t.title,t.requester,t.department,t.description,t.assignee].some(v=>String(v||'').toLowerCase().includes(query.toLowerCase()));});
+ const groups=new Map();for(const t of filtered){const day=kstDate(t[dateField]);const name=groupBy==='date'?(day?day+' ('+new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',weekday:'short'}).format(new Date(day+'T00:00:00+09:00'))+')':dateField==='completed_at'?(t.status==='완료'?'완료일 미상':'미완료'):'날짜 미상'):(t[groupBy]||'미분류');if(!groups.has(name))groups.set(name,{id:groupBy+':'+name,name,date:day,sessions:[]});groups.get(name).sessions.push({...t,state:taskState(t.status)});}
+ for(const g of groups.values())g.sessions.sort((a,b)=>rank[a.state]-rank[b.state]||(a.due_date||'9999').localeCompare(b.due_date||'9999')||b.created_at.localeCompare(a.created_at));
+ return [...groups.values()].sort((a,b)=>groupBy==='date'?b.date.localeCompare(a.date):rank[urgent(a)]-rank[urgent(b)]||a.name.localeCompare(b.name,'ko'));
+}
