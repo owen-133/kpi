@@ -3,7 +3,7 @@
  import StateIcon from './board/StateIcon.svelte';
  import {groupsFor,taskState} from './board/format.js';
  let {tasks,onopen,onexport,onrefresh,texts={},readonly=false}=$props();
- let query=$state(''),status=$state(''),groupBy=$state('date'),dateField=$state('requested_at'),from=$state(''),to=$state(''),compact=$state(false),now=$state(Date.now()),refreshing=$state(false),error=$state('');
+ let query=$state(''),status=$state(''),groupBy=$state('date'),dateField=$state('activity'),from=$state(''),to=$state(''),compact=$state(false),now=$state(Date.now()),refreshing=$state(false),error=$state('');
  const statuses=['접수','진행 중','대기','완료'];
  const groups=$derived(groupsFor(tasks,{query,status,groupBy,dateField,from,to}));
  const badRange=$derived(from&&to&&from>to);
@@ -17,8 +17,8 @@
  <div class="board-controls"><input bind:value={query} type="search" placeholder="업무·요청자·부서·내용 검색" aria-label="업무 검색"><select bind:value={groupBy} aria-label="카드 분류 기준"><option value="date">날짜별</option><option value="category">업무 분류별</option><option value="department">요청 부서별</option><option value="channel">접수 경로별</option></select><button onclick={()=>compact=!compact} aria-pressed={compact}>{compact?'상세 보기':'간략 보기'}</button><button onclick={onexport}>CSV 내보내기</button><button onclick={reload} disabled={refreshing}>{refreshing?'불러오는 중…':'새로고침'}</button></div>
  {#if badRange}<p role="alert">시작일은 종료일보다 늦을 수 없습니다.</p>{/if}
  {#if error}<p role="alert">{error}</p>{/if}
- <div class="date-controls"><label>날짜 기준<select bind:value={dateField} aria-label="날짜 기준"><option value="requested_at">요청일</option><option value="completed_at">완료일</option><option value="created_at">등록일</option></select></label><label>시작일<input type="date" bind:value={from} aria-label="시작일"></label><label>종료일<input type="date" bind:value={to} min={from||undefined} aria-label="종료일"></label><button onclick={()=>{from='';to='';}}>기간 초기화</button></div>
- <div class="board-summary"><span>{groups.length}개 그룹 · {visible}건</span><small>{groupBy==='date'?'최신 날짜순 · 같은 날짜는 상태순':'접수 → 진행 중 → 대기 → 완료 순'} · 한국 날짜 기준</small></div>
+ <div class="date-controls"><label>날짜 기준<select bind:value={dateField} aria-label="날짜 기준"><option value="activity">처리일 (완료: 완료일 / 미완료: 요청일)</option><option value="requested_at">요청일</option><option value="completed_at">완료일</option><option value="created_at">등록일</option></select></label><label>시작일<input type="date" bind:value={from} aria-label="시작일"></label><label>종료일<input type="date" bind:value={to} min={from||undefined} aria-label="종료일"></label><button onclick={()=>{from='';to='';}}>기간 초기화</button></div>
+ <div class="board-summary"><span>{groups.length}개 그룹 · {visible}건</span><small>{groupBy==='date'?'최신 날짜순 · 같은 날짜는 상태순':'접수 → 진행 중 → 대기 → 완료 순'} · 한국 날짜 기준{dateField==='activity'?' · 완료는 완료일, 미완료는 요청일':''}</small></div>
  <div class="group-grid" class:daily={groupBy==='date'} class:compact>{#each groups as g (g.id)}<GroupCard {g} {now} {onopen} {compact}/>{:else}<div class="board-empty"><strong>{tasks.length?'조건에 맞는 업무가 없습니다.':'첫 업무를 기록해 보세요.'}</strong><p>{tasks.length?'검색어나 상태 필터를 바꿔보세요.':readonly?'담당자가 등록한 업무가 이곳에 표시됩니다.':'오른쪽 위 새 업무 등록 버튼으로 구두·메신저 요청을 접수하세요.'}</p></div>{/each}</div>
  <p class="board-credit">Claude Board의 카드·상태 컴포넌트를 총무 업무용으로 적용했습니다. <a href="/third-party-notices" target="_blank" rel="noreferrer">오픈소스 안내 ↗</a></p>
 </section>

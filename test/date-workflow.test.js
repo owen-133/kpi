@@ -16,3 +16,17 @@ test('[R-033] 날짜 입력은 KST 자정으로 저장하고 기존 같은 날�
  assert.equal(requestDateValue('2026-11-05'),'2026-11-04T15:00:00.000Z');
  const precise='2026-11-05T01:23:45.123Z';assert.equal(requestDateValue('2026-11-05',precise),precise);assert.equal(requestDateValue('2026-11-06',precise),'2026-11-05T15:00:00.000Z');assert.throws(()=>requestDateValue('2026-02-31'),/요청일/);
 });
+
+test('[R-034] 완료 업무는 한국 완료일로 이동하고 재개 업무는 요청일로 돌아온다',()=>{
+ const base={id:'done',title:'시설 확인',status:'완료',created_at:'2026-11-04T00:00:00Z',requested_at:'2026-11-04T15:00:00Z',completed_at:'2026-11-05T15:00:00Z'};
+ const options={groupBy:'date',dateField:'activity'};
+ assert.equal(groupsFor([base],options)[0].date,'2026-11-06');
+ assert.equal(groupsFor([base],{...options,from:'2026-11-06',to:'2026-11-06'}).length,1);
+ assert.equal(groupsFor([base],{...options,to:'2026-11-05'}).length,0);
+ assert.equal(groupsFor([{...base,completed_at:'2026-11-05T14:59:59Z'}],options)[0].date,'2026-11-05');
+ assert.equal(groupsFor([{...base,status:'진행 중'}],options)[0].date,'2026-11-05');
+ assert.equal(groupsFor([{...base,completed_at:null}],options)[0].name,'완료일 미상');
+ assert.equal(groupsFor([base],{...options,dateField:'requested_at'})[0].date,'2026-11-05');
+ assert.equal(groupsFor([base],{...options,dateField:'created_at'})[0].date,'2026-11-04');
+ assert.deepEqual(groupsFor([],options),[]);
+});
