@@ -131,7 +131,7 @@ evidence:
 - supabase/schema.sql:12-22 ~ create table if not exists orbit_private.events
 - supabase/deletion.sql:8-14 ~ create or replace function orbit_private.protect_events
 - supabase/deletion.sql:38 ~ order by e.id
-- public/app.js:39 ~ $('#new-task').onclick
+- public/app.js:40 ~ $('#new-task').onclick
 - README.md:42 ~ 등록·변경 시각은 서버/DB에서 기록합니다
 - README.md:44 ~ DB 관리자 권한 소유자의 변경까지 막는
 golden:
@@ -177,8 +177,8 @@ layer: supporting
 status: current
 evidence:
 - server.js:27 ~ req.method!=='GET'&&userRole!=='admin'
-- public/app.js:30 ~ const editable=session.role==='admin'&&!t.deleted_at
-- public/app.js:42 ~ classList.toggle('viewer'
+- public/app.js:31 ~ const editable=session.role==='admin'&&!t.deleted_at
+- public/app.js:43 ~ classList.toggle('viewer'
 - README.md:35 ~ 는 조회만 허용합니다
 golden:
 - secured/viewer-create-403
@@ -203,7 +203,7 @@ evidence:
 - server.js:25 ~ res.writeHead(401
 - server.js:24 ~ path==='/health'&&req.method==='GET'
 - server.js:33 ~ shared:!!process.env.ADMIN_PASSWORD
-- public/app.js:23 ~ 로컬 개발 모드입니다
+- public/app.js:24 ~ 로컬 개발 모드입니다
 - server.js:19 ~ if(!process.env.ADMIN_PASSWORD)return 'admin'
 golden:
 - secured/health
@@ -265,9 +265,9 @@ accept:
 layer: supporting
 status: current
 evidence:
-- frontend/src/board/format.js:9 ~ export function groupsFor
+- frontend/src/board/format.js:10 ~ export function groupsFor
 - frontend/src/Board.svelte:15-16 ~ aria-label="업무 상태 필터"
-- public/app.js:25 ~ mountBoard($('#claude-board-root')
+- public/app.js:26 ~ mountBoard($('#claude-board-root')
 golden:
 test-name:
 - 검색과 상태를 함께 적용하고 부서별로 재분류
@@ -282,9 +282,9 @@ accept:
 layer: supporting
 status: current
 evidence:
-- public/app.js:37 ~ function exportCSV
-- public/app.js:25 ~ onexport:exportCSV
-- frontend/src/Board.svelte:16 ~ CSV 내보내기
+- public/app.js:38 ~ function exportCSV
+- public/app.js:26 ~ onexport:exportCSV
+- frontend/src/Board.svelte:17 ~ CSV 내보내기
 golden:
 - secured/static-app-js-admin
 test-name:
@@ -299,11 +299,11 @@ accept:
 layer: supporting
 status: current
 evidence:
-- public/app.js:20 ~ function stats()
-- public/app.js:18 ~ async function refresh()
-- public/app.js:19 ~ const percent=
-- public/app.js:67 ~ function dashboardKpi()
-- public/app.js:71 ~ setInterval(async()=>{if(view!=='overview'
+- public/app.js:21 ~ function stats()
+- public/app.js:19 ~ async function refresh()
+- public/app.js:20 ~ const percent=
+- public/app.js:68 ~ function dashboardKpi()
+- public/app.js:72 ~ setInterval(async()=>{if(view!=='overview'
 - public/kpi-model.js:12 ~ const hours=completed.map
 - README.md:42 ~ 소요 시간은 대기·주말을 포함한
 golden:
@@ -444,7 +444,7 @@ evidence:
 - supabase/kpi.sql:38-40 ~ elsif action='mark_test' then
 - public/kpi-model.js:7 ~ !t.deleted_at&&!t.is_test
 - public/kpi-model.js:20 ~ export function similarTasks
-- public/app.js:19 ~ const real=tasks.filter(t=>!t.is_test)
+- public/app.js:20 ~ const real=tasks.filter(t=>!t.is_test)
 - public/kpi-ui.js:38-39 ~ data.is_test?
 - frontend/src/board/TaskRow.svelte:9 ~ [테스트] 
 golden:
@@ -471,7 +471,7 @@ evidence:
 - public/kpi-ui.js:7 ~ function metricCards
 - public/kpi-ui.js:13 ~ id="report-month"
 - public/kpi-ui.js:16 ~ #metrics-csv
-- public/app.js:67 ~ function dashboardKpi()
+- public/app.js:68 ~ function dashboardKpi()
 golden:
 test-name:
 - KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
@@ -577,7 +577,7 @@ evidence:
 - supabase/deletion.sql:62 ~ if action='trash' then
 - supabase/deletion.sql:68-69 ~ if action='delete' and t.deleted_at is not null
 - supabase/deletion.sql:79-80 ~ update orbit_private.tasks set deleted_at=case
-- public/app.js:34 ~ $('#delete-task').onclick
+- public/app.js:35 ~ $('#delete-task').onclick
 - public/app.js:57-62 ~ $('#open-trash').onclick
 golden:
 test-name:
@@ -631,7 +631,7 @@ evidence:
 - public/admin-settings.js:3-18 ~ export async function openSettings
 - public/settings-model.js:7-8 ~ export const defaults=
 - public/app.js:44-55 ~ function applySettings()
-- public/app.js:40 ~ $('#admin-settings').onclick
+- public/app.js:41 ~ $('#admin-settings').onclick
 - public/app.js:42-52 ~ config=await api('settings')
 golden:
 test-name:
@@ -672,7 +672,7 @@ status: current
 evidence:
 - server.js:43 ~ path==='/api/automation'
 - public/kpi-model.js:17-20 ~ const keywords=
-- public/app.js:68 ~ id="accept-category"
+- public/app.js:69 ~ id="accept-category"
 - public/index.html:4 ~ id="automate-request"
 golden:
 test-name:
@@ -714,7 +714,7 @@ status: current
 evidence:
 - public/settings-model.js:10-11 ~ const old={portalName:'orbit.ops'
 - public/settings-model.js:2 ~ ['portalName','포털 이름','아이지넷']
-- public/app.js:21 ~ task-row--labeled
+- public/app.js:22 ~ task-row--labeled
 - public/index.html:1-3 ~ <title>아이지넷
 - frontend/src/report-pdf.js:15-16 ~ options.portalName||'아이지넷'
 - web/src/app/site.ts:1 ~ SITE_TITLE = "아이지넷"
