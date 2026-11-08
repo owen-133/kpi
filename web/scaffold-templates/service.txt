@@ -1,0 +1,8 @@
+import type { {{UseCase}}Command, {{UseCase}}Result, {{UseCase}}UseCase } from '../port/in/{{UseCase}}UseCase.ts';
+{{outPortImports}}
+// Orchestration only: load, call domain methods, save, publish. Business rules belong in domain/.
+export class {{UseCase}}Service implements {{UseCase}}UseCase {
+{{outPortFields}}{{constructorBlock}}  async execute(_command: {{UseCase}}Command): Promise<{{UseCase}}Result> {
+    throw new Error('not implemented: {{UseCase}}Service.execute');
+  }
+}
