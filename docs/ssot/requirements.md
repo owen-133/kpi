@@ -46,7 +46,7 @@ golden:
 - secured/bad-json-array
 - secured/bad-json-empty-body
 test-name:
-- golden: legacy portal pages and API responses are unchanged
+- golden: legacy behavior is unchanged
 accept:
 - Given 관리자로 로그인한 상태 / When 제목·요청자·요청 시각을 담아 업무를 등록하면 / Then 201 과 새 업무 id 가 돌아오고 상태는 접수다
 - Given 관리자로 로그인한 상태 / When 제목이나 요청자가 비었거나 요청 시각이 날짜로 읽히지 않으면 / Then 400 으로 거절한다
@@ -71,7 +71,7 @@ golden:
 - secured/status-same-noop
 - secured/bad-json-status
 test-name:
-- golden: legacy portal pages and API responses are unchanged
+- golden: legacy behavior is unchanged
 accept:
 - Given 접수 상태의 업무 / When 상태를 진행 중으로 바꾸면 / Then 200 이고 변경 이력에 `접수 → 진행 중` 이 남는다
 - Given 진행 중 상태의 업무 / When 같은 상태 진행 중으로 바꾸면 / Then 200 을 돌려주되 상태와 변경 이력은 그대로다
@@ -92,7 +92,7 @@ golden:
 - secured/reopen-with-reason
 test-name:
 - 접수, 변경 이력, 완료 재개 사유, 조회 권한, 재시작 후 보존
-- golden: legacy portal pages and API responses are unchanged
+- golden: legacy behavior is unchanged
 accept:
 - Given 완료 상태의 업무 / When 사유 없이 다른 상태로 바꾸면 / Then 400 으로 거절하고 상태는 완료 그대로다
 - Given 완료 상태의 업무 / When 사유를 담아 다른 상태로 바꾸면 / Then 200 이고 변경 이력에 `완료 → 진행 중 · 사유` 가 남는다
@@ -162,7 +162,7 @@ golden:
 - secured/detail-unknown
 - secured/detail-wrong-method-path
 test-name:
-- golden: legacy portal pages and API responses are unchanged
+- golden: legacy behavior is unchanged
 accept:
 - Given 등록된 업무가 없는 상태 / When 목록을 조회하면 / Then 빈 목록이 돌아온다
 - Given 업무가 여럿 등록된 상태 / When 목록을 조회하면 / Then 최근 등록한 업무가 먼저 나온다
@@ -239,7 +239,7 @@ golden:
 - secured/cross-origin-get-allowed
 - secured/same-origin-note
 test-name:
-- golden: legacy portal pages and API responses are unchanged
+- golden: legacy behavior is unchanged
 accept:
 - Given 관리자로 로그인한 상태 / When `Origin` 이 서버 주소와 다른 POST 를 보내면 / Then 403 으로 거절한다
 - Given 관리자로 로그인한 상태 / When `Origin` 이 다른 GET 을 보내면 / Then 200 으로 통과한다
