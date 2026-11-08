@@ -12,16 +12,16 @@
   "sha256": "555e4608c500a38a943c8280b10f0e033d185c9c30e66e6938a91e9ea9f90147"
  },
  "public/app.js": {
-  "bytes": 19390,
-  "sha256": "7f6c71f670e8f4d125eb89a12197d2cf5089438996fa2158b64267eb52b475bf"
+  "bytes": 19364,
+  "sha256": "8bd5873d3fd77fb8074a62675a298b1d13870bc30e7e4326c0401d2b28b64bad"
  },
  "public/board/board.css": {
-  "bytes": 9626,
-  "sha256": "bf3da9d3d5405a82ffe4e974059139d8f45ffb942479af5d65df969e87c6af33"
+  "bytes": 10648,
+  "sha256": "3f2e47346cff24517b9f0761aac78a8936d8c0525e613e140749bbb7adac5af6"
  },
  "public/board/board.js": {
-  "bytes": 110490,
-  "sha256": "95113a45d276af2525f7712aebfded4a63893b5236d04c2b9cb24ff63c34c5b1"
+  "bytes": 113097,
+  "sha256": "a7b775570da0e8a1c9c139631621651ca4890c97d59e15a056c39f727f16db34"
  },
  "public/favicon.svg": {
   "bytes": 247,
@@ -32,31 +32,35 @@
   "sha256": "76f45ef4a6bcff344c837c95a7dcc26e017e38b5846d5ae0cdcb5b86be2e2d31"
  },
  "public/index.html": {
-  "bytes": 4567,
-  "sha256": "bc253557fbd8f6890b487d8418137f17afa1062ddd09f2b0788e8bbc23dfcd91"
+  "bytes": 4630,
+  "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
  },
  "public/kpi-model.js": {
   "bytes": 6397,
   "sha256": "a43d8bd3985ff7a60d504d08110402d213567a8315fc97b569ddb1a9452fce5e"
  },
  "public/kpi-ui.js": {
-  "bytes": 17112,
-  "sha256": "3e4e97c639a4eb6c06416d8234c80e517dd48a65a639a7f2f522ad563f3f70b7"
+  "bytes": 17210,
+  "sha256": "ae1822d846ba4d849c7de089b1b09a30d87461fbe354bec4762874216d376dd7"
  },
  "public/pdf/report-pdf.js": {
   "bytes": 1474224,
   "sha256": "404a6162b3cb0c65b3a6050ad5d128f849b1a49bd7abccd18f00d4158f857c7e"
  },
  "public/settings-model.js": {
-  "bytes": 6529,
-  "sha256": "d392ddaa98aaa5cfa0558e5b8fd7abd9fa1fd00516a70c9613f1fda8c94d1900"
+  "bytes": 6642,
+  "sha256": "8963db03dbafa0598c79741aba67847e2d59ca85667abf01071b959810374a84"
  },
  "public/style.css": {
   "bytes": 13774,
   "sha256": "48937c49787fc214f779a87997a2c3384137cc11f4cc16ac7db5195ef58a4686"
  },
+ "public/task-dates.js": {
+  "bytes": 269,
+  "sha256": "585fc88ba3fe3da6b07fa00d27d5acfe5c8ab02b6d1b3e84fbdb983f3c98c620"
+ },
  "public/task-editor.js": {
-  "bytes": 4076,
-  "sha256": "ee860b484ace9ce729850376c6b68830feee5d9b291ba3ee775659140b2c07bb"
+  "bytes": 3984,
+  "sha256": "43d4d959b4a2b2645ddaa811130b073cb566024b9130cf8524cf01dcf00701f9"
  }
 }
