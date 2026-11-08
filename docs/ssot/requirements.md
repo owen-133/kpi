@@ -732,6 +732,7 @@ accept:
 ### R-033 고정 분류와 날짜 중심 업무 조작
 layer: supporting
 status: current
+home: legacy — 기존 포털에 이미 구현된 기능이라 이식 전까지 기존 파일이 소유한다
 evidence:
 - public/task-dates.js:1-2
 - public/settings-model.js:7
@@ -753,6 +754,7 @@ accept:
 ### R-034 완료 처리일 중심 기본 날짜 묶음
 layer: supporting
 status: current
+home: legacy — 기존 포털에 이미 구현된 기능이라 이식 전까지 기존 파일이 소유한다
 evidence:
 - frontend/src/board/format.js:10-16
 - frontend/src/Board.svelte:6-20
