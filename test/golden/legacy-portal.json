@@ -73,7 +73,9 @@
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
-   }
+   },
+   "bytes": 4630,
+   "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
   },
   "static-app-js-admin": {
    "request": "GET /app.js",
@@ -83,7 +85,9 @@
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
-   }
+   },
+   "bytes": 19364,
+   "sha256": "8bd5873d3fd77fb8074a62675a298b1d13870bc30e7e4326c0401d2b28b64bad"
   },
   "static-style-css-admin": {
    "request": "GET /style.css",
@@ -93,7 +97,9 @@
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
-   }
+   },
+   "bytes": 13774,
+   "sha256": "48937c49787fc214f779a87997a2c3384137cc11f4cc16ac7db5195ef58a4686"
   },
   "static-index-viewer": {
    "request": "GET /",
@@ -103,7 +109,9 @@
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
-   }
+   },
+   "bytes": 4630,
+   "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
   },
   "page-not-found": {
    "request": "GET /nope.html",
@@ -831,7 +839,9 @@
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
-   }
+   },
+   "bytes": 4630,
+   "sha256": "06f380a940db02abb596ab0cc7aad687e814de3cf4facde8b860aef415b25393"
   },
   "open-session": {
    "request": "GET /api/session",

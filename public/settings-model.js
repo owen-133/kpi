@@ -4,7 +4,7 @@ export const textFields=[
  ['bannerEyebrow','배너 작은 제목','WORK SMARTER · EVERY DAY'],['bannerTitle','배너 제목','일의 흐름이 보이면,\n하루가 더 명확해져요.'],['bannerDescription','배너 설명','흩어진 요청은 한곳에, 처리한 업무는 기록으로.'],['totalLabel','전체 업무 지표','전체 업무'],['activeLabel','진행 업무 지표','진행 중'],['completedLabel','완료 업무 지표','완료 업무'],['overdueLabel','기한 초과 지표','기한 초과'],['pendingTitle','처리할 업무 제목','지금 처리해야 할 업무'],['pendingDescription','처리할 업무 안내','가까운 처리 기한 순으로 표시합니다. 업무를 눌러 이력을 확인하세요.'],['completionTitle','완료율 제목','업무 완료율'],['recordTitle','기록 안내 제목','오늘도 기록으로 남겨요'],['recordDescription','기록 안내 설명','구두로 받은 작은 요청도 업무입니다.\n접수 시점부터 처리 결과까지 차곡차곡 쌓아보세요.'],
  ['cardEyebrow','카드 보드 작은 제목','GENERAL AFFAIRS · LIVE BOARD'],['cardTitle','카드 보드 제목','흩어진 요청을, 한 장의 보드로.'],['cardDescription','카드 보드 안내','분류별로 모으고, 상태별로 살펴보세요.'],['createDescription','등록창 안내','구두·메신저로 받은 요청을 기록해 주세요.'],['categoryReportTitle','분류별 실적 제목','분류별 업무 현황'],['processingReportTitle','처리 기록 제목','처리 기록'],['monthlyReportTitle','월간 보고서 제목','월간 처리현황 리포트'],['kpiQualityTitle','기한·품질 패널 제목','기한 도래 · 데이터 품질'],['improvementLedgerTitle','개선 관리대장 제목','피드백 · 개선 이력 관리대장'],['reportIssuanceTitle','발행 이력 제목','발행 이력'],['improvementsMenu','개선 이력 메뉴','개선 이력'],['improvementsTitle','개선 이력 제목','피드백을 개선으로, 개선을 성과로'],['improvementsSubtitle','개선 이력 안내','MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.'],['footer','하단 안내','아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다.']
 ];
-export const defaults={texts:Object.fromEntries(textFields.map(([k,,v])=>[k,v])),categories:['일반 총무','비품·자산','구매·지출','시설·환경','계약','복리후생','기타'],channels:['메신저','구두','이메일','전화','기타'],priorities:['중','상','하'],primaryColor:'#26324e',accentColor:'#ff866f',sidebarColor:'#192238',backgroundColor:'#f5f6fb',showBanner:true,logo:''};
+export const defaults={texts:Object.fromEntries(textFields.map(([k,,v])=>[k,v])),categories:['일반 총무','고정업무','비품·자산','구매·지출','시설·환경','계약','복리후생','기타'],channels:['메신저','구두','이메일','전화','기타'],priorities:['중','상','하'],primaryColor:'#26324e',accentColor:'#ff866f',sidebarColor:'#192238',backgroundColor:'#f5f6fb',showBanner:true,logo:''};
 export function normalizeSettings(input={}){
  const texts={...defaults.texts,...input.texts};
  const old={portalName:'orbit.ops',brandSubtitle:'GENERAL AFFAIRS',logoLetter:'o',workspaceName:'MY WORKSPACE',profileName:'총무 워크스페이스',pageEyebrow:'ORBIT OPS · GENERAL AFFAIRS'};
@@ -24,3 +24,5 @@ export function validateSettings(input){
  if(typeof v.logo!=='string'||v.logo.length>280000||(v.logo&&!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(v.logo)))fail('로고는 200KB 이하 PNG, JPEG, WebP 이미지를 사용하세요.');
  return v;
 }
+
+export const registrationCategories=values=>[...new Set([...values.categories,'고정업무'])];
