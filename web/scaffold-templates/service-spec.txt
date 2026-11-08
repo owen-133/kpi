@@ -1,0 +1,17 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { {{UseCase}}Service } from './{{UseCase}}Service.ts';
+{{outPortTypeImports}}
+// Red first: this spec fails with "not implemented" until {{UseCase}}Service.execute is filled in.
+// Replace the placeholder command and result with real ones, name the cases in Given / When / Then,
+// then make it green. Fakes of the out ports stay inside this file.
+describe('{{UseCase}} ({{context}})', () => {
+  it('Given a valid request / When it is executed / Then the expected result is returned', async () => {
+    // Given
+{{givenFakes}}    const service = new {{UseCase}}Service({{fakeArguments}});
+    // When
+    const result = await service.execute({ input: 'TODO' });
+    // Then
+    assert.deepEqual(result, { output: 'TODO' });
+  });
+});

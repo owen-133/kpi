@@ -1,0 +1,7 @@
+import type { {{UseCase}}Command, {{UseCase}}Result, {{UseCase}}UseCase } from '../../../application/port/in/{{UseCase}}UseCase.ts';
+
+// Thin input adapter: no Next imports, no business rules. Routes under app/ and 'use server' actions call this.
+export function {{useCase}}Handler(useCase: {{UseCase}}UseCase, input: {{UseCase}}Command): Promise<{{UseCase}}Result> {
+  // TODO translate and validate the raw input here; reject malformed input with a clear error.
+  return useCase.execute(input);
+}

@@ -1,0 +1,4 @@
+// Output port of the {{context}} context: what a use case needs from the outside.
+// An adapter under adapter/out implements it; only config/container.ts wires it in.
+// TODO declare the operations the service needs, in domain terms.
+export interface {{OutPort}} {}
