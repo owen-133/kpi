@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { notifyManager } from '@tanstack/react-query';
 import { createQueryClient } from './queryClient.ts';
 import { queryKeys } from './queryKeys.ts';
 
@@ -34,4 +35,14 @@ test('every call returns a fresh client with an empty cache', () => {
   a.setQueryData(queryKeys.tasks, [1]);
   assert.equal(createQueryClient().getQueryData(queryKeys.tasks), undefined);
   assert.notEqual(a, createQueryClient());
+});
+
+test('observers are notified from the microtask queue, so a screen follows an answer while page timers are frozen', async () => {
+  createQueryClient();
+  let notified = false;
+  notifyManager.schedule(() => {
+    notified = true;
+  });
+  await Promise.resolve();
+  assert.equal(notified, true, 'no setTimeout(0) between an answer and the redraw');
 });
