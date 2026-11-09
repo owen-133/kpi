@@ -1,0 +1,3 @@
+/* Next appends an empty role=alert route announcer to <body>. The portal is one page with no route changes, so
+   there is nothing to announce; keeping it out of the accessibility tree keeps the page tree equal to the legacy one. */
+next-route-announcer { display: none; }
