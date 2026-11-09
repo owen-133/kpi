@@ -200,7 +200,7 @@ layer: supporting
 status: current
 home: web/src/access
 evidence:
-- web/src/access/adapter/in/web/guardPipeline.ts:114 ~ request.method !== 'GET' && role !== 'admin'
+- web/src/access/adapter/in/web/guardPipeline.ts:127 ~ request.method !== 'GET' && role !== 'admin'
 - web/src/request/adapter/in/web/ui/detail/detailModel.ts:10 ~ return role === 'admin' && !task.deleted_at
 - web/src/portal/adapter/in/web/ui/PortalApp.tsx:56 ~ classList.toggle('viewer'
 golden:
@@ -224,7 +224,7 @@ status: current
 home: web/src/access
 evidence:
 - web/src/access/adapter/out/crypto/Sha256SecretComparator.ts:5 ~ export class Sha256SecretComparator
-- web/src/access/adapter/in/web/guardPipeline.ts:31 ~ function unauthorized()
+- web/src/access/adapter/in/web/guardPipeline.ts:32 ~ function unauthorized()
 - web/src/access/adapter/in/web/routes.ts:8 ~ pattern: '/health', isPublic: true
 - web/src/access/domain/AccessConfiguration.ts:38 ~ get shared(): boolean
 - web/src/board/adapter/in/web/ui/BoardView.tsx:15 ~ 로컬 개발 모드입니다
@@ -259,7 +259,9 @@ layer: supporting
 status: current
 home: web/src/access
 evidence:
-- web/src/access/adapter/in/web/guardPipeline.ts:39 ~ function isCrossOriginWrite(
+- web/src/access/adapter/in/web/guardPipeline.ts:40 ~ function isCrossOriginWrite(
+- web/src/access/adapter/in/web/guardPipeline.ts:49 ~ function isCrossSiteWrite(
+- web/src/access/adapter/in/web/guardPipeline.ts:56 ~ function isJsonContentType(
 golden:
 - secured/cross-origin-create-403
 - secured/cross-origin-status-403
@@ -268,9 +270,17 @@ golden:
 test-name:
 - answers the guard labels like the legacy oracle
 - a POST whose Origin is not the server is 403 with the refusal message, on create and on status, and stores nothing
+- an absent header passes (server-side callers and old browsers)
+- text/plain is 415 with a JSON error and the guard headers, and nothing is stored
+- the viewer gets 403 with the viewer message, not 415
+- refuses cross-site and non-JSON writes with the security headers, and lets same-origin JSON writes through the guard
 accept:
 - Given 관리자로 로그인한 상태 / When `Origin` 이 서버 주소와 다른 POST 를 보내면 / Then 403 으로 거절한다
 - Given 관리자로 로그인한 상태 / When `Origin` 이 다른 GET 을 보내면 / Then 200 으로 통과한다
+- Given 관리자로 로그인한 상태 / When `Sec-Fetch-Site` 가 `cross-site` 또는 `same-site` 인 POST 를 보내면 / Then 403 으로 거절하고 아무것도 저장하지 않는다
+- Given 관리자로 로그인한 상태 / When `Sec-Fetch-Site` 가 `same-origin`·`none` 이거나 없는 POST 를 보내면 / Then 통과한다
+- Given 관리자로 로그인한 상태 / When `Content-Type` 이 `application/json`(대소문자 무관, `; charset=…` 허용)이 아닌 POST 를 보내면 / Then 본문을 읽기 전에 415 로 거절하고, JSON 이면 통과한다
+- Given 로그인하지 않았거나 조회 계정인 상태 / When `Content-Type` 이 JSON 이 아닌 POST 를 보내면 / Then 415 가 아니라 401 · 403 으로 답한다
 
 ### R-010 배포 설정이 없으면 서버가 뜨지 않는다
 layer: supporting
@@ -321,15 +331,19 @@ layer: supporting
 status: current
 home: web/src/request
 evidence:
-- web/src/request/adapter/in/web/ui/tasksCsv.ts:21 ~ export function buildTasksCsv(
+- web/src/request/adapter/in/web/ui/tasksCsv.ts:20 ~ export function buildTasksCsv(
+- web/src/shared/adapter/in/web/ui/csvCell.ts:4 ~ export function csvCell(
 - web/src/board/adapter/in/web/ui/BoardView.tsx:35 ~ tasksCsvFilename(todayKst())
 - web/src/board/adapter/in/web/ui/BoardToolbar.tsx:54 ~ CSV 내보내기
 golden:
 test-name:
+- whitespace without a formula character, and formula characters that are not first, are left alone
+- a formula behind leading whitespace is guarded too: the apostrophe goes in front of the whitespace
 accept:
 - Given 업무 보드 화면 / When CSV 내려받기를 누르면 / Then 업무, 요청자, 부서, 접수 경로, 분류, 상태, 요청일, 등록 시각, 완료 시각 열의 `총무업무_날짜.csv` 가 내려온다
+- Given 제목이 공백·탭·줄바꿈 뒤에 `=` 로 시작하는 업무 / When CSV 를 만들면 / Then 셀이 공백 앞의 `'` 로 시작해 수식으로 읽히지 않고, 공백만 있거나 수식 문자가 앞이 아닌 셀은 그대로다
 
-파일은 BOM 이 붙은 UTF-8 이고, 셀이 `=`·`+`·`@`·`-` 로 시작하면 앞에 `'` 를 붙여 수식으로 읽히지 않게 한다. 내려받는 목록은 화면 필터와 무관하게 휴지통을 뺀 전체 업무이고 테스트 업무(R-021)도 들어 있다.
+파일은 BOM 이 붙은 UTF-8 이고, 셀이 `=`·`+`·`@`·`-` 로 시작하면(앞에 공백·탭·줄바꿈·유니코드 공백이 있어도) 그 공백 앞에 `'` 를 붙여 수식으로 읽히지 않게 한다. 개선 이력 CSV 도 같은 함수(`csvCell`)를 쓰고, 지표 CSV 는 시스템 숫자·날짜만 담아 쓰지 않는다. 내려받는 목록은 화면 필터와 무관하게 휴지통을 뺀 전체 업무이고 테스트 업무(R-021)도 들어 있다.
 
 파일 내용과 이름은 `tasksCsv.char.spec.ts`·`tasksCsv.spec.ts` 가 고정한다. 버튼을 눌러 파일이 내려오는 화면 동작은 직접 검사하는 시험이 없다(리뷰에서 본다).
 

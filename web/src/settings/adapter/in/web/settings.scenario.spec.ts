@@ -141,7 +141,7 @@ describe('An administrator manages the portal settings, one scenario in order', 
 
   it('refuses other methods on the settings paths like any unknown route', async () => {
     const response = await (await sessionPromise).handle(
-      new Request(ORIGIN + '/api/settings/history', { method: 'POST', headers: { Authorization: basic('admin', ADMIN_PASSWORD) }, body: '{}' }),
+      new Request(ORIGIN + '/api/settings/history', { method: 'POST', headers: { Authorization: basic('admin', ADMIN_PASSWORD), 'Content-Type': 'application/json' }, body: '{}' }),
     );
     assert.equal(response.status, 404);
   });

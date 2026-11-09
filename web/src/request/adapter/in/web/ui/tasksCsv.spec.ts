@@ -63,10 +63,15 @@ test('a formula character that is not first is left alone', () => {
   assert.ok(csv.includes('"a=1+2@x-y"'));
 });
 
-test('the task rule looks at the first character only: a leading space or tab is NOT guarded here', () => {
-  // The improvement history export uses a different rule (/^[\s]*[=+@-]/); the two must stay separate.
-  assert.ok(buildTasksCsv([task({ title: ' =1' })]).includes('" =1"'));
-  assert.ok(buildTasksCsv([task({ title: '\t=1' })]).includes('"\t=1"'));
+test('a formula behind leading whitespace is guarded too: the apostrophe goes in front of the whitespace', () => {
+  for (const prefix of [' ', '\t', '\r\n', '\u00a0', '\u3000']) {
+    assert.ok(buildTasksCsv([task({ title: `${prefix}=1` })]).includes(`"'${prefix}=1"`), JSON.stringify(prefix));
+  }
+});
+
+test('whitespace without a formula character is left alone', () => {
+  assert.ok(buildTasksCsv([task({ title: ' a=1' })]).includes('" a=1"'));
+  assert.ok(buildTasksCsv([task({ title: '\t메모' })]).includes('"\t메모"'));
 });
 
 test('double quotes are doubled after the apostrophe guard, and commas and line breaks stay inside the quotes', () => {

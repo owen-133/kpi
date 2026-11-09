@@ -18,7 +18,7 @@ const AUTH = {
   none: {} as Record<string, string>,
   wrong: { Authorization: basic('admin', 'wrong') },
   viewer: { Authorization: basic('viewer', VIEWER_PASSWORD) },
-  admin: { Authorization: basic('admin', ADMIN_PASSWORD) },
+  admin: { Authorization: basic('admin', ADMIN_PASSWORD), 'Content-Type': 'application/json' },
 };
 const MARKER = 'DBMARK-홍길동-010-9999-0000';
 const logged: string[] = [];

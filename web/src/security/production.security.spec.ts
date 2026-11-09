@@ -122,6 +122,52 @@ describe('production start', () => {
       child.kill();
     }
   });
+
+  // R-009: a write from another site or without a JSON body is refused by the real server. The database is unreachable on purpose:
+  // a request that passes the guard reaches it and answers 503, so 503 here means "allowed through".
+  it('refuses cross-site and non-JSON writes with the security headers, and lets same-origin JSON writes through the guard', { skip, timeout: 60_000 }, async () => {
+    const port = await freePort();
+    const child = start(port, { NODE_ENV: 'production', ...SECRETS });
+    let output = '';
+    child.stdout?.on('data', (c) => { output += c; });
+    child.stderr?.on('data', (c) => { output += c; });
+    const base = `http://127.0.0.1:${port}`;
+    const admin = { Authorization: basic('admin', SECRETS.ADMIN_PASSWORD) };
+    const viewer = { Authorization: basic('viewer', SECRETS.VIEWER_PASSWORD) };
+    const VALID = JSON.stringify({ title: '노트북 준비', requester: '홍길동', requested_at: '2026-11-03T01:00:00Z' });
+    const write = (headers: Record<string, string>, body = VALID): Promise<Response> => fetch(`${base}/api/tasks`, { method: 'POST', headers, body });
+    try {
+      for (let attempt = 0; attempt < 60; attempt += 1) {
+        if (/Ready|started server/.test(output)) break;
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+      const json = { ...admin, 'Content-Type': 'application/json' };
+      for (const site of ['cross-site', 'same-site']) {
+        const response = await write({ ...json, 'Sec-Fetch-Site': site });
+        assert.equal(response.status, 403, site);
+        assert.deepEqual(await response.json(), { error: '허용되지 않은 요청입니다.' });
+      }
+      const plain = await write({ ...admin, 'Content-Type': 'text/plain' });
+      assert.equal(plain.status, 415);
+      assert.deepEqual(await plain.json(), { error: 'JSON 형식의 요청만 받을 수 있습니다.' });
+      assert.match(plain.headers.get('content-security-policy') ?? '', /script-src 'nonce-/);
+      assert.equal(plain.headers.get('x-content-type-options'), 'nosniff');
+      assert.equal(plain.headers.get('cache-control'), 'no-store');
+      for (const [name, headers] of [
+        ['same-origin', { ...json, 'Sec-Fetch-Site': 'same-origin' }],
+        ['none', { ...json, 'Sec-Fetch-Site': 'none' }],
+        ['absent', json],
+        ['charset', { ...admin, 'Content-Type': 'application/json; charset=utf-8' }],
+      ] as Array<[string, Record<string, string>]>) {
+        assert.equal((await write(headers)).status, 503, `${name} passes the guard and reaches the unreachable database`);
+      }
+      assert.equal((await fetch(`${base}/api/session`, { headers: { ...admin, 'Content-Type': 'text/plain', 'Sec-Fetch-Site': 'cross-site' } })).status, 200, 'GET is not refused');
+      assert.equal((await write({ 'Content-Type': 'text/plain', 'Sec-Fetch-Site': 'cross-site' })).status, 401, '401 wins over 415 and 403');
+      assert.equal((await write({ ...viewer, 'Content-Type': 'text/plain' })).status, 403, 'the viewer 403 wins over 415');
+    } finally {
+      child.kill();
+    }
+  });
 });
 
 describe('bundle holds no secret names or values', () => {
