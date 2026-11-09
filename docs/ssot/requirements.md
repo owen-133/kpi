@@ -814,42 +814,52 @@ accept:
 ### R-032 회사 브랜딩과 개요 업무 필드의 의미 표시
 layer: supporting
 status: current
+home: web/src/settings
 evidence:
-- public/settings-model.js:10-11 ~ const old={portalName:'orbit.ops'
-- public/settings-model.js:2 ~ ['portalName','포털 이름','아이지넷']
-- public/app.js:22 ~ task-row--labeled
-- public/index.html:1-3 ~ <title>아이지넷
-- frontend/src/report-pdf.js:15-16 ~ options.portalName||'아이지넷'
+- web/src/settings/domain/PortalSettings.ts:107 ~ portalName: 'orbit.ops'
+- web/src/settings/domain/PortalSettings.ts:26 ~ ["portalName", "포털 이름", "아이지넷"]
+- web/src/portal/adapter/in/web/ui/overview/OverviewView.tsx:113 ~ task-row task-row--labeled
+- web/src/app/site.ts:3 ~ PAGE_TITLE
+- web/src/report/adapter/in/web/ui/pdf/createReportPdf.ts:48 ~ options.portalName || '아이지넷'
 - web/src/app/site.ts:1 ~ SITE_TITLE = "아이지넷"
 golden:
 test-name:
-- [R-032] 회사명 기본값과 저장된 이전 브랜딩은 갱신하고 사용자 설정은 보존
-- [R-032] 개요 업무의 상태·기한 라벨, 미지정 표시와 모바일 배치를 확인
+- the default portal name is 아이지넷, and so is the page title
+- settings stored with the retired platform texts are shown with the current defaults, and the stored object is not changed
+- a name and texts the administrator chose, and an uploaded logo, are kept untouched
+- a row status badge is plain, done or wait
+- the due cell is a time element, urgent only for an unfinished task due before today; no date gives the unset badge
 accept:
 - Given 초기 또는 기존 기본 브랜딩 설정 / When 포털을 열면 / Then 아이지넷 회사명으로 표시하고 새 화면과 PDF 생성자에서 이전 플랫폼 이름을 제거한다
 - Given 개요 화면의 처리할 업무 / When 상태와 기한을 표시하면 / Then 업무 상태와 처리 기한 라벨을 각 값에 연결하고 기한이 없는 경우 미지정으로 표시한다
 - Given 관리자가 지정한 고유 문구와 이미지 / When 브랜딩을 갱신하면 / Then 기존 업무와 사용자 지정 내용은 보존하고 이전 기본 브랜딩 표기만 화면에서 변환한다
 
-공식 이미지 파일은 저장소에 없고 사용자 승인에 따라 회사명 워드마크와 AI 이니셜을 사용한다. 과거 이력이나 업무 본문을 DB에서 다시 쓰지 않는다. 화면 설정의 이전 기본 표기는 읽을 때 변환하며 사용자 지정 이미지와 고유 문구는 보존한다.
+공식 이미지 파일은 저장소에 없고 사용자 승인에 따라 회사명 워드마크와 AI 이니셜을 사용한다. 과거 이력이나 업무 본문을 DB에서 다시 쓰지 않는다. 화면 설정의 이전 기본 표기는 읽을 때 변환하며 사용자 지정 이미지와 고유 문구는 보존한다. 개요 화면이 그려지는 배치(모바일 포함)를 검사하는 시험은 없다.
 
 ### R-033 고정 분류와 날짜 중심 업무 조작
 layer: supporting
 status: current
-home: legacy — 기존 포털에 이미 구현된 기능이라 이식 전까지 기존 파일이 소유한다
+home: web/src/board
 evidence:
-- public/task-dates.js:1-2
-- public/settings-model.js:7
-- public/app.js:32-42
-- frontend/src/Board.svelte:1-24
+- web/src/shared/domain/kstDates.ts:31 ~ export function requestTimestampFor(
+- web/src/shared/domain/categories.ts:3 ~ export const FIXED_CATEGORY = '고정업무'
+- web/src/board/domain/groupTasks.ts:148 ~ const field = options.dateField ?? 'activity'
+- web/src/board/adapter/in/web/ui/BoardToolbar.tsx:63 ~ dispatch({ type: 'dateField'
+- web/src/request/adapter/in/web/ui/create/CreateDialog.tsx:57 ~ 요청일 *<input name="requested_at" type="date"
+- web/src/request/adapter/in/web/ui/detail/detailFlow.ts:47 ~ export function recordStatus(
 - web/src/board/domain/boardFacts.spec.ts:3 ~ // R-033
 - web/src/board/domain/groupTasks.spec.ts:2 ~ // R-033
 - web/src/shared/domain/categories.spec.ts:1 ~ // R-033
 - web/src/shared/domain/kstDates.spec.ts:1 ~ // R-033
 golden:
 test-name:
-- [R-033] 기존 설정에도 고정업무를 제공하고 날짜 그룹은 KST 경계·기간·미완료를 구분
-- [R-033] 날짜 입력은 KST 자정으로 저장하고 기존 같은 날짜의 시각은 보존
-- [R-033] 고정업무 날짜 등록·날짜 검색·성공 시 팝업 종료·실패 시 유지
+- older settings still offer the fixed category when registering
+- date groups separate KST boundary, range and the 미완료 group
+- a day input is stored as KST midnight and a precise time of the same day is kept
+- a previous timestamp of another KST day is replaced by midnight of the new day
+- registering posts, closes, refreshes, opens the new task and only then toasts
+- a status change posts the form, closes the detail, refreshes the list and only then toasts
+- a refused status change toasts the message, keeps the detail open and does not refresh
 accept:
 - Given 새 업무 등록 / When 업무 분류를 선택하면 / Then 고정업무를 선택할 수 있다
 - Given 업무 보드 / When 날짜별 묶음과 기간을 선택하면 / Then 한국 시간의 요청일·완료일·등록일로 업무를 찾고 최신 날짜부터 확인한다
@@ -861,15 +871,18 @@ accept:
 ### R-034 완료 처리일 중심 기본 날짜 묶음
 layer: supporting
 status: current
-home: legacy — 기존 포털에 이미 구현된 기능이라 이식 전까지 기존 파일이 소유한다
+home: web/src/board
 evidence:
-- frontend/src/board/format.js:10-16
-- frontend/src/Board.svelte:6-20
+- web/src/board/domain/groupTasks.ts:123 ~ case 'activity':
+- web/src/board/adapter/in/web/ui/boardState.ts:36 ~ groupBy: 'date', dateField: 'activity'
+- web/src/board/adapter/in/web/ui/BoardToolbar.tsx:63 ~ dispatch({ type: 'dateField'
 - web/src/board/domain/boardFacts.spec.ts:4 ~ // R-034
 - web/src/board/domain/groupTasks.spec.ts:3 ~ // R-034
 golden:
 test-name:
-- [R-034] 완료 업무는 한국 완료일로 이동하고 재개 업무는 요청일로 돌아온다
+- a completed task moves to its KST completion day and a reopened one returns to its request day
+- a completed task with a missing completion time is 완료일 미상 and a range hides it
+- a completed task reopened with a stale completion time shows on its request day
 accept:
 - Given 어제 요청하고 오늘 완료한 업무 / When 기본 날짜별 보드를 보면 / Then 한국 시간의 오늘 완료일 그룹과 기간 검색에 포함된다
 - Given 미완료 또는 재개한 업무 / When 기본 날짜별 보드를 보면 / Then 요청일을 사용하고 완료일이 누락된 완료 업무는 완료일 미상으로 구분한다
