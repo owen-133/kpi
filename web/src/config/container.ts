@@ -23,6 +23,8 @@ import { reportRoutes } from '../report/adapter/in/web/routes.ts';
 import { improvementRoutes } from '../improvement/adapter/in/web/routes.ts';
 import { settingsRoutes } from '../settings/adapter/in/web/routes.ts';
 import { automationRoutes } from '../automation/adapter/in/web/routes.ts';
+import { createSettingsUseCases } from '../settings/application/service/createSettingsUseCases.ts';
+import { createAutomationUseCases } from '../automation/application/service/createAutomationUseCases.ts';
 import type { RouteDefinition } from '../shared/adapter/in/web/RouteRegistry.ts';
 import type { OrbitFunctions } from '../shared/port/OrbitFunctions.ts';
 import type { Environment } from './startupChecks.ts';
@@ -78,8 +80,8 @@ export function createContainer(env: Environment = {}, options: ContainerOptions
     ...attachmentRoutes,
     ...reportRoutes,
     ...improvementRoutes,
-    ...settingsRoutes,
-    ...automationRoutes,
+    ...settingsRoutes(createSettingsUseCases(() => database.open())),
+    ...automationRoutes(createAutomationUseCases(() => database.open())),
     ...(options.extraRoutes ?? []),
   ];
   const requestRepository = new InMemoryRequestRepository();
