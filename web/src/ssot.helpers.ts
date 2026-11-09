@@ -80,6 +80,21 @@ function unwrap(value: string): string {
   }
 }
 
+// Last line (1-based, inclusive) of each requirement's block, in the order of `reqs`: the line before the next
+// `#`..`###` heading outside a code fence, or the last line of the text. Same fence rule as parseRequirements.
+export function blockEndLines(text: string, reqs: Requirement[]): number[] {
+  const lines = text.split('\n').map((l) => l.replace(/\r$/, ''));
+  const total = text.endsWith('\n') ? lines.length - 1 : lines.length;
+  return reqs.map((req) => {
+    let inFence = false;
+    for (let i = req.line; i < total; i++) {
+      if (FENCE.test(lines[i])) inFence = !inFence;
+      else if (!inFence && ANY_HEADING.test(lines[i])) return i;
+    }
+    return total;
+  });
+}
+
 // Parses requirement blocks. Tolerant of bullets, bold keys, backticks and blank lines between list items;
 // ignores everything inside code fences and before the first requirement heading.
 export function parseRequirements(text: string): Requirement[] {
@@ -430,6 +445,7 @@ function walk(dir: string, accept: (name: string) => boolean, skipDir: (full: st
   return out.sort();
 }
 
+const TAG_EXAMPLE_SPECS = new Set(['ssot.spec.ts', 'ssot-show.spec.ts']);
 const AGENTS_SKIP_DIR_NAMES = new Set(['.git', '.next', 'graft', 'scratch']);
 const AGENTS_SKIP_DIRS = ['web/ssot-fixtures', 'web/arch-fixtures'];
 
@@ -465,7 +481,7 @@ export function loadFixtureCorpus(dir: string, repoRoot: string): { corpus: Corp
   return { corpus, requirements };
 }
 
-// Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts, which mentions tags as examples)
+// Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts and ssot-show.spec.ts, which mention tags as examples)
 // and the root tooling tests scripts/**/*.test.mjs; docs scanned for restated titles are every non-fixture AGENTS.md
 // (root first, then nested ones) and docs/** outside docs/ssot/.
 export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
@@ -474,7 +490,7 @@ export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements
   const requirements = parseRequirements(fs.readFileSync(ssot, 'utf8'));
   const agents = path.join(repoRoot, 'AGENTS.md');
   if (!fs.existsSync(agents)) throw new Error('missing AGENTS.md');
-  const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => path.basename(f) !== 'ssot.spec.ts');
+  const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => !TAG_EXAMPLE_SPECS.has(path.basename(f)));
   const toolTests = walk(path.join(repoRoot, 'scripts'), (n) => n.endsWith('.test.mjs'));
   const ssotDir = path.join(repoRoot, 'docs', 'ssot');
   const docs = walk(path.join(repoRoot, 'docs'), (n) => n.endsWith('.md'), (full) => full === ssotDir);
