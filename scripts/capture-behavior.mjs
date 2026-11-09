@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 // Records the observable behavior of the running portal as machine-checkable facts.
 //   eval "$(node scripts/env-for-tests.mjs)"
-//   node scripts/capture-behavior.mjs [--screen <id>] [--check]
+//   node scripts/capture-behavior.mjs [--screen <id>] [--check] [--target legacy|next]
 // Writes test/behavior/<screen>.facts.json (facts) and <screen>.md (description) for each screen id.
 // --check recaptures and compares with the committed files: exit 0 equal, 1 different (diff on stderr),
 // 2 setup problem (browser environment missing, server did not start).
+// --target legacy (default) observes `node server.js`. --target next observes the Next app (`next start` in web/) with the
+// same passwords, clocks, seeding, interactions and normalization, and NEVER writes facts: it needs --check and compares
+// the recapture with the committed files, which the legacy run wrote. The diff names the screen, the variant or interaction
+// index and the first differing fact. Next runs on a production build of its own (built once into web/scratch/…, removed
+// afterwards); ORBIT_UI_USE_BUILD=1 serves the existing web/.next instead. NODE_ENV=test is set for the Next server because
+// a production environment refuses to start without DATABASE_URL (this tool seeds an in-memory database).
 //
 // The product is only observed from outside: the script starts `node server.js` on a free port with a temporary
 // data directory, seeds fixtures through the HTTP API, freezes the browser clock and the server clock, drives
@@ -17,7 +23,7 @@ import {existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync}
 import {createServer} from 'node:net';
 import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 import {once} from 'node:events';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -66,10 +72,10 @@ function cleanTree(yaml) {
 }
 
 // ---------------------------------------------------------------- environment: server, clock, seed
+// parse and UTC are own statics because Next copies only own statics when it wraps Date for a request.
 const PRELOAD = `const fs=require('fs');const file=process.env.BEHAVIOR_CLOCK_FILE;const Real=Date;
 const now=()=>Real.parse(fs.readFileSync(file,'utf8').trim());
-class Fake extends Real{constructor(...a){if(a.length===0)super(now());else super(...a);}static now(){return now();}}
-globalThis.Date=Fake;`;
+class Fake extends Real{constructor(...a){if(a.length===0)super(now());else super(...a);}static now(){return now();}static parse=Real.parse;static UTC=Real.UTC;}\nglobalThis.Date=Fake;`;
 
 async function freePort() {
   const s = createServer();
@@ -81,34 +87,71 @@ async function freePort() {
   return port;
 }
 
-async function startEnv() {
+function spawnLegacy({port, dir, preload, clockFile}) {
+  const env = {...process.env, PORT: String(port), HOST: '127.0.0.1', DATA_DIR: join(dir, 'data'), ADMIN_PASSWORD: ADMIN.password, VIEWER_PASSWORD: VIEWER.password, BEHAVIOR_CLOCK_FILE: clockFile};
+  for (const k of ['STORAGE_BACKEND', 'NODE_ENV', 'SUPABASE_URL']) delete env[k];
+  return spawn(process.execPath, ['--require', preload, 'server.js'], {cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe']});
+}
+
+// The Next server gets the same server clock (the preload above, through NODE_OPTIONS) and the same passwords. Its environment is
+// built from scratch so the developer's DATABASE_URL, NODE_ENV or NODE_OPTIONS never leak in.
+function spawnNext(next, {port, preload, clockFile}) {
+  const env = {
+    PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', NEXT_TELEMETRY_DISABLED: '1', NODE_ENV: 'test', NEXT_DIST_DIR: next.distDir,
+    NODE_OPTIONS: `--require ${preload}`, ADMIN_PASSWORD: ADMIN.password, VIEWER_PASSWORD: VIEWER.password, BEHAVIOR_CLOCK_FILE: clockFile,
+  };
+  return spawn(process.execPath, [next.bin, 'start', '-H', '127.0.0.1', '-p', String(port)], {cwd: next.cwd, env, stdio: ['ignore', 'pipe', 'pipe']});
+}
+
+async function waitHttp(base, child, failed, ms = 60000) {
+  for (const deadline = Date.now() + ms; Date.now() < deadline;) {
+    if (child.exitCode !== null) throw failed();
+    try { await fetch(base + '/', {signal: AbortSignal.timeout(2000)}); return; } catch { await new Promise((r) => setTimeout(r, 200)); }
+  }
+  throw new SetupError(`next server did not answer on ${base} within ${ms / 1000}s`);
+}
+
+async function startEnv(h) {
   const dir = mkdtempSync(join(tmpdir(), 'behavior-capture-'));
   mkdirSync(join(dir, 'data'));
   const clockFile = join(dir, 'clock'), preload = join(dir, 'clock.cjs');
   writeFileSync(clockFile, NOW);
   writeFileSync(preload, PRELOAD);
   const port = await freePort();
-  const env = {...process.env, PORT: String(port), HOST: '127.0.0.1', DATA_DIR: join(dir, 'data'), ADMIN_PASSWORD: ADMIN.password, VIEWER_PASSWORD: VIEWER.password, BEHAVIOR_CLOCK_FILE: clockFile};
-  for (const k of ['STORAGE_BACKEND', 'NODE_ENV', 'SUPABASE_URL']) delete env[k];
-  const child = spawn(process.execPath, ['--require', preload, 'server.js'], {cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe']});
+  const base = `http://127.0.0.1:${port}`;
+  const child = h.next ? spawnNext(h.next, {port, preload, clockFile}) : spawnLegacy({port, dir, preload, clockFile});
   let stderr = '';
   child.stderr.on('data', (d) => { stderr += d; });
-  await Promise.race([once(child.stdout, 'data'), once(child, 'exit').then(() => { throw new SetupError(`portal server did not start: ${stderr.trim()}`); })]);
-  const base = `http://127.0.0.1:${port}`;
+  const failed = () => new SetupError(`${h.next ? 'next' : 'portal'} server did not start: ${stderr.trim()}`);
+  const stop = async () => {
+    if (child.exitCode === null) {
+      const done = once(child, 'exit'), hard = setTimeout(() => child.kill('SIGKILL'), 5000);
+      child.kill();
+      await done;
+      clearTimeout(hard);
+    }
+    rmSync(dir, {recursive: true, force: true});
+  };
+  try {
+    if (h.next) await waitHttp(base, child, failed);
+    else await Promise.race([once(child.stdout, 'data'), once(child, 'exit').then(() => { throw failed(); })]);
+    // The seed and every interaction need the database; a store that cannot open is a setup problem, not a behavior difference.
+    if (h.next) {
+      const probe = await fetch(base + '/api/tasks', {headers: {Authorization: 'Basic ' + Buffer.from(`${ADMIN.user}:${ADMIN.password}`).toString('base64')}});
+      if (!probe.ok) throw new SetupError(`next server answered GET /api/tasks with ${probe.status} on an empty in-memory database; its log: ${stderr.trim().split('\n').slice(-3).join(' | ')}`);
+    }
+  } catch (e) { await stop(); throw e; }
   const auth = (who) => 'Basic ' + Buffer.from(`${who.user}:${who.password}`).toString('base64');
   const api = async (path, body, who = ADMIN) => {
     const res = await fetch(base + path, {method: body === undefined ? 'GET' : 'POST', headers: {Authorization: auth(who), 'Content-Type': 'application/json'}, body: body === undefined ? undefined : JSON.stringify(body)});
     const json = await res.json();
-    if (!res.ok) throw new Error(`${path} -> ${res.status} ${json.error}`);
+    if (!res.ok) throw new Error(`${path} -> ${res.status} ${json.error}${h.next && stderr ? ` (server log: ${stderr.trim().split('\n').slice(-3).join(' | ')})` : ''}`);
     return json;
   };
   return {
     base, api, dir,
     at: (iso) => writeFileSync(clockFile, iso),
-    async stop() {
-      if (child.exitCode === null) { const done = once(child, 'exit'); child.kill(); await done; }
-      rmSync(dir, {recursive: true, force: true});
-    },
+    stop,
   };
 }
 
@@ -164,7 +207,7 @@ async function openBrowser() {
 const settle = async (page, ms = 250) => { await page.waitForLoadState('networkidle').catch(() => {}); await page.waitForTimeout(ms); };
 
 async function openSession(h, role, state, {fakeTimers = false} = {}) {
-  const env = await startEnv();
+  const env = await startEnv(h);
   try {
     if (state === 'populated') await seed(env);
     const who = role === 'admin' ? ADMIN : VIEWER;
@@ -174,7 +217,8 @@ async function openSession(h, role, state, {fakeTimers = false} = {}) {
     if (fakeTimers) { await page.clock.install({time: new Date(Date.parse(NOW) - 1000)}); await page.clock.pauseAt(new Date(NOW)); }
     else await page.clock.setFixedTime(new Date(NOW));
     await page.goto(env.base);
-    await page.waitForFunction(() => document.querySelector('#content')?.textContent.trim().length > 0);
+    // A Next page that has not been ported yet never fills #content; the empty page is then recorded as it is and the diff says so.
+    await page.waitForFunction(() => document.querySelector('#content')?.textContent.trim().length > 0).catch((e) => { if (!h.next) throw e; });
     await settle(page);
     return {env, page, role, state, async close() { await context.close(); await env.stop(); }};
   } catch (e) { await env.stop(); throw e; }
@@ -239,7 +283,7 @@ async function interaction(h, cache, spec) {
   const fresh = !s;
   try {
     if (!s) { s = await openSession(h, spec.role, spec.state, {fakeTimers: spec.fakeTimers}); if (!spec.mutates && !spec.fakeTimers) cache.set(key, s); }
-    else { await s.page.reload(); await s.page.waitForFunction(() => document.querySelector('#content')?.textContent.trim().length > 0); await settle(s.page); }
+    else { await s.page.reload(); await s.page.waitForFunction(() => document.querySelector('#content')?.textContent.trim().length > 0).catch((e) => { if (!h.next) throw e; }); await settle(s.page); }
     await spec.open(s.page, s);
     await settle(s.page, 150);
     const record = {role: spec.role, state: spec.state, action: spec.action, before: await lines(s.page, spec.scope)};
@@ -689,6 +733,23 @@ const SCREENS = {
     '- 조회 계정은 읽기만 하며 변경 도구가 보이지 않는다 (R-007).']},
 };
 
+// ---------------------------------------------------------------- the Next target
+// Builds the production bundle once per run (web/src/security/productionBuild.ts owns how) and returns what spawnNext needs.
+async function prepareNext() {
+  const web = join(ROOT, 'web');
+  const bin = join(web, 'node_modules', 'next', 'dist', 'bin', 'next');
+  if (!existsSync(bin)) throw new SetupError(`next is not installed (${bin} missing). Run: (cd web && npm ci)`);
+  if (process.env.ORBIT_UI_USE_BUILD === '1') {
+    if (!existsSync(join(web, '.next', 'BUILD_ID'))) throw new SetupError('ORBIT_UI_USE_BUILD=1 but web/.next has no BUILD_ID. Build it first: (cd web && npm run build)');
+    return {bin, cwd: web, distDir: '.next', remove() {}};
+  }
+  const {buildOwn} = await import(pathToFileURL(join(web, 'src', 'security', 'productionBuild.ts')).href);
+  try {
+    const build = buildOwn({});
+    return {bin, cwd: web, distDir: build.distDir, remove: () => build.remove()};
+  } catch (e) { throw new SetupError(`cannot build the Next app: ${String(e.message).split('\n').slice(0, 12).join('\n')}`); }
+}
+
 // ---------------------------------------------------------------- run
 const stable = (screen, facts) => JSON.stringify({screen, ...facts}, null, 1) + '\n';
 
@@ -698,14 +759,78 @@ function lineDiff(name, expected, actual) {
   return `${name}\n${out.join('\n')}`;
 }
 
+export const TARGETS = ['legacy', 'next'];
+
+// Returns {check, screen, target} or {error} (the caller prints it and exits 2).
+export function parseArgs(argv) {
+  const out = {check: false, screen: null, target: 'legacy'};
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--check') out.check = true;
+    else if (arg === '--screen' || arg === '--target') {
+      const value = argv[++i];
+      if (value === undefined || value.startsWith('--')) return {error: `${arg} needs a value`};
+      out[arg === '--screen' ? 'screen' : 'target'] = value;
+    } else return {error: `unknown argument "${arg}"`};
+  }
+  if (!TARGETS.includes(out.target)) return {error: `unknown target "${out.target}". targets: ${TARGETS.join(', ')}`};
+  if (out.target === 'next' && !out.check) return {error: '--target next never writes facts: add --check to compare the Next app with the committed facts (only the legacy capture writes them)'};
+  return out;
+}
+
+const USAGE = 'usage: node scripts/capture-behavior.mjs [--screen <id>] [--check] [--target legacy|next]   (--target next needs --check)';
+
+const show = (value) => { const text = JSON.stringify(value); return text === undefined ? '(missing)' : text.length > 200 ? text.slice(0, 200) + '…' : text; };
+
+// First place where two JSON values differ: {path, expected, actual}, or null when equal. Arrays by index, objects by key.
+export function firstDifference(expected, actual, path = '') {
+  if (expected === actual) return null;
+  const both = (v) => v !== null && typeof v === 'object';
+  if (!both(expected) || !both(actual) || Array.isArray(expected) !== Array.isArray(actual)) return {path, expected, actual};
+  const keys = Array.isArray(expected) ? Array.from({length: Math.max(expected.length, actual.length)}, (_, i) => i) : [...new Set([...Object.keys(expected), ...Object.keys(actual)])];
+  for (const key of keys) {
+    const found = firstDifference(expected[key], actual[key], `${path}${Array.isArray(expected) ? `[${key}]` : `.${key}`}`);
+    if (found) return found;
+  }
+  return null;
+}
+
+// Reads two facts files (text) and says, per variant and per interaction, the first differing fact. Falls back to a line diff
+// when either text is not JSON. Returns null when they are the same text.
+export function factDiff(name, committedText, capturedText) {
+  if (committedText === capturedText) return null;
+  let committed, captured;
+  try { committed = JSON.parse(committedText); captured = JSON.parse(capturedText); } catch { return lineDiff(name, committedText, capturedText); }
+  const items = [];
+  const note = (label, a, b) => { const d = firstDifference(a, b); if (d) items.push(`  ${label}\n    first differing fact: ${d.path || '(whole record)'}\n      committed: ${show(d.expected)}\n      captured:  ${show(d.actual)}`); };
+  const variantKeys = [...new Set([...Object.keys(committed.variants ?? {}), ...Object.keys(captured.variants ?? {})])];
+  for (const key of variantKeys) note(`${committed.screen ?? name} variant ${key}`, committed.variants?.[key], captured.variants?.[key]);
+  const count = Math.max(committed.interactions?.length ?? 0, captured.interactions?.length ?? 0);
+  for (let i = 0; i < count; i++) {
+    const a = committed.interactions?.[i], b = captured.interactions?.[i];
+    note(`${committed.screen ?? name} interaction ${i} (${(a ?? b).role}/${(a ?? b).state} "${(a ?? b).action}")`, a, b);
+  }
+  const shown = items.slice(0, 12).join('\n');
+  return `${name}: ${items.length} differing record(s) of ${variantKeys.length} variants + ${count} interactions${items.length > 12 ? ' (first 12 shown)' : ''}\n${shown}`;
+}
+
 async function main() {
-  const args = process.argv.slice(2);
-  const check = args.includes('--check');
-  const at = args.indexOf('--screen');
-  const only = at >= 0 ? args[at + 1] : null;
+  const parsed = parseArgs(process.argv.slice(2));
+  if (parsed.error) { console.error(`capture-behavior: ${parsed.error}\n${USAGE}`); process.exit(2); }
+  const {check, screen: only, target} = parsed;
   if (only && !SCREENS[only]) { console.error(`unknown screen "${only}". ids: ${Object.keys(SCREENS).join(', ')}`); process.exit(2); }
   const ids = only ? [only] : Object.keys(SCREENS);
-  const h = {browser: await openBrowser(), skipped: []};
+  const browser = await openBrowser(); // before the build: a missing browser should fail in a second, not after a build
+  let next = null, code;
+  try {
+    next = target === 'next' ? await prepareNext() : null;
+    code = await capture(ids, check, {browser, skipped: [], next});
+  } finally { await browser.close(); next?.remove(); }
+  process.exit(code);
+}
+
+async function capture(ids, check, h) {
+  const {next} = h;
   const results = {};
   const queue = [...ids];
   // screens are independent (own server, own port), so a few run side by side
@@ -716,7 +841,7 @@ async function main() {
       results[id] = {[`${id}.facts.json`]: stable(id, facts), [`${id}.md`]: doc};
     }
   };
-  try { await Promise.all(Array.from({length: Math.min(4, ids.length)}, worker)); } finally { await h.browser.close(); }
+  await Promise.all(Array.from({length: Math.min(4, ids.length)}, worker));
   h.skipped.sort();
   const files = Object.assign({}, ...ids.map((id) => results[id]));
   for (const note of h.skipped) console.error(`could not drive: ${note}`);
@@ -725,21 +850,25 @@ async function main() {
     for (const [name, content] of Object.entries(files)) {
       const path = join(OUT, name);
       const committed = existsSync(path) ? readFileSync(path, 'utf8') : '';
-      if (committed !== content) problems.push(lineDiff(name, committed, content));
+      const diff = next && name.endsWith('.facts.json') ? factDiff(name, committed, content) : committed !== content ? lineDiff(name, committed, content) : null;
+      if (diff) problems.push(diff);
     }
-    if (problems.length) { console.error(`behavior facts differ in ${problems.length} file(s):\n${problems.join('\n')}`); process.exit(1); }
+    if (problems.length) { console.error(`behavior facts differ in ${problems.length} file(s)${next ? ' (next vs committed legacy facts)' : ''}:\n${problems.join('\n')}`); return 1; }
     console.log(`behavior facts match (${Object.keys(files).length} files)`);
-    return;
+    return 0;
   }
   mkdirSync(OUT, {recursive: true});
   for (const [name, content] of Object.entries(files)) {
     writeFileSync(join(OUT, name), content);
     console.log(`${name}\t${content.split('\n').length - 1} lines`);
   }
+  return 0;
 }
 
-main().catch((e) => {
-  if (e instanceof SetupError) { console.error(`capture-behavior: ${e.message}`); process.exit(2); }
-  console.error(e);
-  process.exit(3);
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    if (e instanceof SetupError) { console.error(`capture-behavior: ${e.message}`); process.exit(2); }
+    console.error(e);
+    process.exit(3);
+  });
+}
