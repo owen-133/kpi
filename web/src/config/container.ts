@@ -16,6 +16,7 @@ import { accessRoutes } from '../access/adapter/in/web/routes.ts';
 import { createGuardPipeline } from '../access/adapter/in/web/guardPipeline.ts';
 import type { GuardPipeline } from '../access/adapter/in/web/guardPipeline.ts';
 import { requestRoutes } from '../request/adapter/in/web/routes.ts';
+import { createRequestUseCases } from '../request/application/service/createRequestUseCases.ts';
 import { assignmentRoutes } from '../assignment/adapter/in/web/routes.ts';
 import { attachmentRoutes } from '../attachment/adapter/in/web/routes.ts';
 import { reportRoutes } from '../report/adapter/in/web/routes.ts';
@@ -72,7 +73,7 @@ export function createContainer(env: Environment = {}, options: ContainerOptions
   const authorize = new AuthorizeRequestService(configuration, new Sha256SecretComparator());
   const routes: RouteDefinition[] = [
     ...accessRoutes(authorize),
-    ...requestRoutes,
+    ...requestRoutes(createRequestUseCases(() => database.open())),
     ...assignmentRoutes,
     ...attachmentRoutes,
     ...reportRoutes,
