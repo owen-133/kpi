@@ -2,8 +2,8 @@
 // Run: node --test scripts/verify.test.mjs
 //
 // Layers are faked (injected into main()), so no real suite runs and nothing here
-// calls `node --test` again. The only real layer commands used are agents-size
-// (a file size) and product-untouched (git diff) inside throw-away temp repos.
+// calls `node --test` again. The only real layer commands used are agents-docs
+// (a document check) and product-untouched (git diff) inside throw-away temp repos.
 // untested: the real root-tests / web-* / generated / graft layer commands (they
 // run the whole suites; see the Done-when run of `node scripts/verify.mjs`), and
 // impact's graft blast branch (needs the pinned graft installed).
@@ -109,7 +109,7 @@ test('the real CLI exits 2 on a usage error and lists the known layers', () => {
 });
 
 test('the layer table names the required layers in order', () => {
-  assert.deepEqual(LAYERS.map((l) => l.id), ['root-tests', 'web-tests', 'web-types', 'web-build', 'generated', 'graft', 'audit', 'agents-size', 'product-untouched']);
+  assert.deepEqual(LAYERS.map((l) => l.id), ['root-tests', 'web-tests', 'web-types', 'web-build', 'generated', 'graft', 'audit', 'agents-docs', 'product-untouched']);
 });
 
 // The audit layer runs `npm --prefix web audit ...`; a fake `npm` first on PATH stands for the registry's answer.
@@ -158,22 +158,24 @@ test('audit: a failure that is neither a finding nor a network error still fails
   assert.equal(r.state, 'FAIL');
 });
 
-test('agents-size: below the limit passes, padded over 32768 bytes fails and the table shows it', () => {
+test('agents-docs: a clean tree passes and an oversized AGENTS.md fails and the table shows it', () => {
   const root = tmp();
-  const cli = (...extra) => spawnSync('node', [join(here, 'verify.mjs'), '--only', 'agents-size', '--root', root, ...extra], {encoding: 'utf8'});
+  const cli = (...extra) => spawnSync('node', [join(here, 'verify.mjs'), '--only', 'agents-docs', '--root', root, ...extra], {encoding: 'utf8'});
+  writeFileSync(join(root, 'CLAUDE.md'), '@AGENTS.md\n');
   writeFileSync(join(root, 'AGENTS.md'), 'x'.repeat(32767));
   const ok = cli();
   assert.equal(ok.status, 0, ok.stdout);
-  assert.match(ok.stdout, /^agents-size\s+\| PASS\s+\|.*32767 bytes/m);
+  assert.match(ok.stdout, /^agents-docs\s+\| PASS\s+\|.*agents-docs: ok/m);
   writeFileSync(join(root, 'AGENTS.md'), 'x'.repeat(32768));
   const bad = cli();
   assert.equal(bad.status, 1, bad.stdout);
-  assert.match(bad.stdout, /^agents-size\s+\| FAIL\s+\|.*32768 bytes/m);
-  assert.match(bad.stdout, /VERIFY: FAIL \(agents-size\)/);
+  assert.match(bad.stdout, /^agents-docs\s+\| FAIL\s+\|/m);
+  assert.match(bad.stdout, /AGENTS\.md:1 S1 chain is 32768 bytes/);
+  assert.match(bad.stdout, /VERIFY: FAIL \(agents-docs\)/);
 });
 
-test('agents-size: a missing AGENTS.md fails instead of passing', () => {
-  const r = spawnSync('node', [join(here, 'verify.mjs'), '--only', 'agents-size', '--root', tmp()], {encoding: 'utf8'});
+test('agents-docs: a missing root AGENTS.md fails instead of passing', () => {
+  const r = spawnSync('node', [join(here, 'verify.mjs'), '--only', 'agents-docs', '--root', tmp()], {encoding: 'utf8'});
   assert.equal(r.status, 1);
   assert.match(r.stdout, /AGENTS\.md not found/);
 });

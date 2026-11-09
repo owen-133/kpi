@@ -146,7 +146,7 @@ DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기�
 node scripts/verify.mjs --base origin/main
 ```
 
-모든 층(`root-tests`·`web-tests`·`web-types`·`web-build`·`generated`·`graft`·`agents-size`·`product-untouched`)을 끝까지 돌려 층별 PASS/FAIL 표를 낸다. 종료코드 0 PASS, 1 FAIL, 2 사용법 오류. 환경이 없어 건너뛴 층은 비고에 이유가 적힌다. 브라우저·PGlite·PDF 환경은 `eval "$(node scripts/env-for-tests.mjs)"` 가 만들고, Playwright 는 저장소 밖에 설치해 `ORBIT_PLAYWRIGHT_REAL` 로 가리킨다.
+모든 층(`root-tests`·`web-tests`·`web-types`·`web-build`·`generated`·`graft`·`agents-docs`·`product-untouched`)을 끝까지 돌려 층별 PASS/FAIL 표를 낸다. 종료코드 0 PASS, 1 FAIL, 2 사용법 오류. 환경이 없어 건너뛴 층은 비고에 이유가 적힌다. 브라우저·PGlite·PDF 환경은 `eval "$(node scripts/env-for-tests.mjs)"` 가 만들고, Playwright 는 저장소 밖에 설치해 `ORBIT_PLAYWRIGHT_REAL` 로 가리킨다. `agents-docs` 층은 `node scripts/agents-docs.mjs [--report]` 이며 AGENTS.md 사슬의 크기(32 KiB 미만)·문장 중복·`CLAUDE.md` 스텁·규칙 문서의 저널식 문장을 검사한다.
 
 변경이 어느 요구사항·녹화·시험에 걸리는지는 `node scripts/impact.mjs --base origin/main` 이 보고한다.
 
