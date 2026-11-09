@@ -254,14 +254,16 @@ describe('purging a request', () => {
 });
 
 describe('the trash and the deletion history', () => {
-  it('the trash lists the newest deletion first and the history lists the newest event first without copying the title', async () => {
+  it('the trash is ordered by deletion time, newest first, and the history lists the newest event first without copying the title', async () => {
     const first = await newId({ title: '먼저 삭제' });
     const second = await newId({ title: '나중 삭제' });
     await lifecycle(first, 'delete', { reason: '첫째' });
     await lifecycle(second, 'delete', { reason: '둘째' });
     const trash = (await send('GET', '/api/trash')).body as any[];
-    const ids = trash.map((task) => task.id);
-    assert.ok(ids.indexOf(second) < ids.indexOf(first), 'newest deletion first');
+    assert.ok(trash.some((task) => task.id === first) && trash.some((task) => task.id === second), 'both are in the trash');
+    // deletions within one database clock tick tie, so the order is asserted on the times, not on which of two ties comes first
+    const times = trash.map((task) => Date.parse(task.deleted_at));
+    assert.deepEqual(times, [...times].sort((a, b) => b - a), 'deleted_at never increases down the list');
     const history = (await send('GET', '/api/lifecycle-history')).body as any[];
     const mine = history.filter((row) => row.task_id === first || row.task_id === second);
     assert.deepEqual(mine.map((row) => [row.task_id, row.action, row.reason]), [[second, 'delete', '둘째'], [first, 'delete', '첫째']]);
