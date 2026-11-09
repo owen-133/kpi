@@ -17,8 +17,8 @@ import { createGuardPipeline } from '../access/adapter/in/web/guardPipeline.ts';
 import type { GuardPipeline } from '../access/adapter/in/web/guardPipeline.ts';
 import { requestRoutes } from '../request/adapter/in/web/routes.ts';
 import { createRequestUseCases } from '../request/application/service/createRequestUseCases.ts';
-import { assignmentRoutes } from '../assignment/adapter/in/web/routes.ts';
-import { attachmentRoutes } from '../attachment/adapter/in/web/routes.ts';
+import { assignmentModule } from '../assignment/assignmentModule.ts';
+import { attachmentModule } from '../attachment/attachmentModule.ts';
 import { reportRoutes } from '../report/adapter/in/web/routes.ts';
 import { createReportUseCases } from '../report/application/service/createReportUseCases.ts';
 import { NodeReportRuntime } from '../report/adapter/out/system/NodeReportRuntime.ts';
@@ -79,8 +79,8 @@ export function createContainer(env: Environment = {}, options: ContainerOptions
   const routes: RouteDefinition[] = [
     ...accessRoutes(authorize),
     ...requestRoutes(createRequestUseCases(() => database.open())),
-    ...assignmentRoutes,
-    ...attachmentRoutes,
+    ...assignmentModule(() => database.open()),
+    ...attachmentModule(() => database.open()),
     ...reportRoutes(createReportUseCases(() => database.open(), new NodeReportRuntime())),
     ...improvementRoutes(createImprovementUseCases(() => database.open())),
     ...settingsRoutes(createSettingsUseCases(() => database.open())),
