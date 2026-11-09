@@ -88,13 +88,30 @@ app/api/[...path]/route.ts → 가드 파이프라인(인증·조회 권한·출
 
 ## 4. 영속 계층과 정규화
 
-도메인 모델과 테이블 설계는 별개다. 스키마의 정본은 `supabase/*.sql` 이고 앱은 테이블을 직접 읽거나 쓰지 않는다. 앱 전용 DB 역할은 함수 실행 권한만 가진다(`web/db/app-role.sql`, 소유자가 SQL 편집기에서 한 번 실행한다). 정규화 규칙은 `AGENTS.md` §4 가 소유한다.
+도메인 모델과 테이블 설계는 별개다. 스키마의 정본은 `supabase/*.sql` 이고 앱은 테이블을 직접 읽거나 쓰지 않는다. 앱 전용 DB 역할은 함수 실행 권한만 가진다(`web/db/app-role.sql`, 소유자가 SQL 편집기에서 한 번 실행한다). ORM 선택과 import 허용 범위는 `web/AGENTS.md` 「DB 접근」 이 소유한다.
 
 테이블 목록: `/usr/bin/grep -nEio "create table (if not exists )?[a-z_.]+" supabase/schema.sql supabase/kpi.sql supabase/deletion.sql supabase/settings.sql` (`supabase/upgrade.sql` 은 같은 정의를 이미 배포된 DB 에 맞추는 스크립트라 뺀다).
 
 - 이력 테이블 다섯(`events`·`task_lifecycle_events`·`improvement_events`·`monthly_reports`·`settings_events`)은 모두 `before update or delete` 트리거로 수정·삭제를 막는다. 판정: `/usr/bin/grep -nEi "before update or delete" supabase/schema.sql supabase/kpi.sql supabase/deletion.sql supabase/settings.sql` 가 다섯 줄이다.
 - 테이블끼리는 id 외래키로만 가리킨다(`events`·`task_extras`·`task_files` 는 `tasks(id)`, `improvement_events` 는 `improvements(id)`). 판정: 같은 파일들에서 `/usr/bin/grep -nEi -e references -e "foreign key"` 가 참조 컬럼마다 줄을 낸다.
-- 접근 경로 하나(`web/src/shared/port/OrbitFunctions.ts`)와 SQL 함수 정의(`supabase/*.sql`)가 한 요청의 트랜잭션 경계다. ORM 선택과 import 허용 범위는 `AGENTS.md` §4 가 소유한다.
+- 접근 경로 하나(`web/src/shared/port/OrbitFunctions.ts`)와 SQL 함수 정의(`supabase/*.sql`)가 한 요청의 트랜잭션 경계다.
+
+### 정규화 규칙
+
+`<스키마>` 는 `supabase/schema.sql supabase/kpi.sql supabase/deletion.sql supabase/settings.sql` 네 파일이다. 이 파일들을 고치면 `node scripts/build-upgrade.js` 로 `supabase/upgrade.sql` 을 다시 만든다(`node scripts/check-generated.mjs` 가 같은지 본다).
+
+| # | 규칙 | 검사 |
+|---|---|---|
+| 1 | 1NF: 컬럼은 원자값이다. 반복 컬럼 묶음(memo1, memo2 …)과 한 컬럼에 담은 목록을 두지 않는다 | 플래그(판정 아님): `/usr/bin/grep -nEi -e 'jsonb?' -e 'text\[\]' -e 'array' -e '[a-z]+[0-9] ' <스키마>` 에 걸린 컬럼을 사람이 읽어 판정한다 |
+| 2 | 2NF: 복합키 테이블에서 키 일부에만 종속된 컬럼이 없다 | 리뷰에서 본다: 복합 `primary key` 마다 나머지 컬럼이 키 전체로 정해지는지 읽는다 |
+| 3 | 3NF: 키가 아닌 컬럼이 다른 키 아닌 컬럼에 종속되지 않는다. 참조 데이터는 자기 테이블에 둔다 | 리뷰에서 본다 |
+| 4 | 파생값(소요 시간, 누적 실적)은 저장하지 않고 저장된 사실에서 계산한다. 추정 숫자는 저장하지 않는다 | 리뷰에서 본다. 보조: `/usr/bin/grep -nEi -e 'total' -e 'sum' -e 'elapsed' -e 'duration' -e 'avg' <스키마>` 로 파생 컬럼 후보를 플래그한다 |
+| 5 | 애그리거트끼리는 ID 로 참조하고 DB 는 그것을 외래키로 지닌다(`web/AGENTS.md` 「헥사고날 규칙 여덟」 규칙 7) | `/usr/bin/grep -nEi -e 'references' -e 'foreign key' <스키마>` 가 참조 컬럼마다 하나씩 나온다 |
+| 6 | 이력·감사 테이블은 추가 전용이다(update·delete 차단. `events_immutable` 트리거 설계). 애그리거트 하나는 자기 테이블 묶음에 대응한다(`web/AGENTS.md` 「헥사고날 규칙 여덟」 규칙 8) | `/usr/bin/grep -nEi 'before update or delete' <스키마>` 가 이력 테이블마다 하나씩 나온다 |
+| 7 | 비정규화는 잰 이유가 있을 때만 하고, 그 이유를 테이블 옆 주석에 적는다 | 리뷰에서 본다: 중복 컬럼 옆에 측정값을 적은 주석이 있다 |
+| 8 | 새 쿼리는 실행 전에 순수 `EXPLAIN` 으로 본다(라이브에서 `EXPLAIN ANALYZE` 금지). `WHERE` 주조건은 인덱스 컬럼이고 함수로 감싸지 않는다. DDL 은 엔진이 지원하면 온라인 알고리즘을 명시하고, 인덱스·제약 이름은 64자 이하다 | `EXPLAIN <쿼리>` 의 출력에서 인덱스 사용을 본다. 이름 길이 플래그: `/usr/bin/grep -nEio -e 'index [a-z0-9_]{65,}' -e 'constraint [a-z0-9_]{65,}' <스키마>` 가 비어 있다 |
+
+DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기고 실행하지 않는다. 스키마 변경은 `supabase/*.sql` 에서 하고 적용은 DB 쓰기라 사용자가 직접 한다.
 
 ## 5. 새 동작이 들어가는 곳
 
