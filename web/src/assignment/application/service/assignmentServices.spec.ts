@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { AssignTaskService } from './AssignTaskService.ts';
 import { GetKpiStatusService } from './GetKpiStatusService.ts';
 import { MarkTestDataService } from './MarkTestDataService.ts';
-import { KpiMigrationRequiredError, TaskRejectedError } from '../TaskRejectedError.ts';
+import { KpiMigrationRequiredError, TaskRejectedError } from '../port/in/TaskRejectedError.ts';
 import { AssigneeName } from '../../domain/AssigneeName.ts';
 import { OrbitFunctionError } from '../../../shared/port/OrbitFunctions.ts';
 import type { OrbitFunctionArguments, OrbitFunctionName, OrbitFunctions } from '../../../shared/port/OrbitFunctions.ts';

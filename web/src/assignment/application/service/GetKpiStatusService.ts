@@ -1,6 +1,6 @@
 import type { OrbitFunctions } from '../../../shared/port/OrbitFunctions.ts';
 import type { GetKpiStatusQuery, KpiStatus } from '../port/in/GetKpiStatusQuery.ts';
-import { KpiMigrationRequiredError } from '../TaskRejectedError.ts';
+import { KpiMigrationRequiredError } from '../port/in/TaskRejectedError.ts';
 import { callKpi } from './callKpi.ts';
 
 export class GetKpiStatusService implements GetKpiStatusQuery {

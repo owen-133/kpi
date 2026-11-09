@@ -1,6 +1,6 @@
 import { OrbitFunctionError } from '../../../shared/port/OrbitFunctions.ts';
 import type { OrbitFunctions } from '../../../shared/port/OrbitFunctions.ts';
-import { AttachmentRejectedError, KpiMigrationRequiredError } from '../AttachmentRejectedError.ts';
+import { AttachmentRejectedError, KpiMigrationRequiredError } from '../port/in/AttachmentRejectedError.ts';
 
 const UNDEFINED_FUNCTION = '42883';
 

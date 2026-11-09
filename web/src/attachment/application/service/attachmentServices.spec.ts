@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { UploadAttachmentService } from './UploadAttachmentService.ts';
 import { DownloadAttachmentService } from './DownloadAttachmentService.ts';
 import { DeleteAttachmentService } from './DeleteAttachmentService.ts';
-import { AttachmentRejectedError, KpiMigrationRequiredError } from '../AttachmentRejectedError.ts';
+import { AttachmentRejectedError, KpiMigrationRequiredError } from '../port/in/AttachmentRejectedError.ts';
 import { AttachmentUpload } from '../../domain/AttachmentUpload.ts';
 import { OrbitFunctionError } from '../../../shared/port/OrbitFunctions.ts';
 import type { OrbitFunctionArguments, OrbitFunctionName, OrbitFunctions } from '../../../shared/port/OrbitFunctions.ts';

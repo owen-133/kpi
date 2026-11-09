@@ -1,5 +1,5 @@
 import { HttpError } from '../../../../shared/adapter/in/web/http.ts';
-import { KpiMigrationRequiredError, TaskRejectedError } from '../../../application/TaskRejectedError.ts';
+import { KpiMigrationRequiredError, TaskRejectedError } from '../../../application/port/in/TaskRejectedError.ts';
 
 /**
  * Message-to-status mapping of this context's routes (the legacy server.js sends `{error: message}` with the status):

@@ -1,5 +1,5 @@
 import { HttpError } from '../../../../shared/adapter/in/web/http.ts';
-import { AttachmentRejectedError, KpiMigrationRequiredError } from '../../../application/AttachmentRejectedError.ts';
+import { AttachmentRejectedError, KpiMigrationRequiredError } from '../../../application/port/in/AttachmentRejectedError.ts';
 
 /**
  * Message-to-status mapping of this context's routes (the legacy server.js sends `{error: message}` with the status):
