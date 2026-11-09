@@ -33,6 +33,12 @@ evidence:
 - public/kpi-model.js:3 ~ export function validDate(
 - local-store.js:36 ~ create:(v)=>transaction
 - supabase/deletion.sql:23-28 ~ elsif action='create' then
+- web/src/request/adapter/in/web/routes.ts:12 ~ handler: handlers.create
+- web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
+- web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/application/service/TaskServices.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/domain/TaskLimits.spec.ts:1 ~ // R-001 R-004
 golden:
 - secured/create-full
 - secured/create-minimal-trimmed
@@ -62,6 +68,12 @@ evidence:
 - local-store.js:37 ~ status:(id,status,reason)=>transaction
 - supabase/schema.sql:9 ~ check(status in
 - supabase/deletion.sql:40-46 ~ elsif action='status' then
+- web/src/request/adapter/in/web/routes.ts:14 ~ handler: handlers.changeStatus
+- web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
+- web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/application/service/TaskServices.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/domain/TaskStatus.spec.ts:1 ~ // R-002 R-003
 golden:
 - secured/status-invalid
 - secured/status-unknown-task
@@ -86,6 +98,10 @@ evidence:
 - server.js:62 ~ reason.length>10000
 - supabase/deletion.sql:44 ~ t.status='완료' and reason=''
 - README.md:42 ~ 완료 후 재개 사유가 필요합니다
+- web/src/request/domain/TaskStatus.spec.ts:1 ~ // R-002 R-003
+- web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/application/service/TaskServices.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 golden:
 - secured/reopen-without-reason-400
 - secured/reopen-reason-too-long
@@ -107,6 +123,12 @@ evidence:
 - local-store.js:38 ~ note:(id,note)=>transaction
 - supabase/deletion.sql:47-49 ~ elsif action='note' then
 - README.md:37 ~ 등록·상태 변경·메모는 DB 함수
+- web/src/request/adapter/in/web/routes.ts:15 ~ handler: handlers.addNote
+- web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
+- web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/application/service/TaskServices.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/domain/TaskLimits.spec.ts:1 ~ // R-001 R-004
 golden:
 - secured/note-add
 - secured/note-empty
@@ -154,6 +176,12 @@ evidence:
 - local-store.js:34-35 ~ list:()=>db.prepare('SELECT * FROM tasks WHERE deleted_at IS NULL
 - supabase/deletion.sql:21-22 ~ if action='list' then
 - supabase/deletion.sql:36-39 ~ if t.deleted_at is not null and (action<>'detail'
+- web/src/request/adapter/in/web/routes.ts:11 ~ handler: handlers.list
+- web/src/request/adapter/in/web/routes.ts:13 ~ handler: handlers.detail
+- web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
+- web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
+- web/src/request/application/service/TaskServices.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 golden:
 - secured/list-empty
 - secured/list-after-flow
@@ -268,6 +296,11 @@ evidence:
 - frontend/src/board/format.js:10 ~ export function groupsFor
 - frontend/src/Board.svelte:15-16 ~ aria-label="업무 상태 필터"
 - public/app.js:26 ~ mountBoard($('#claude-board-root')
+- web/src/board/domain/taskStatus.spec.ts:1 ~ // R-011
+- web/src/board/domain/boardFacts.spec.ts:1 ~ // R-011
+- web/src/board/domain/elapsedLabel.spec.ts:1 ~ // R-011
+- web/src/board/domain/groupTasks.spec.ts:1 ~ // R-011
+- web/src/board/domain/taskSearch.spec.ts:1 ~ // R-011
 golden:
 test-name:
 - 검색과 상태를 함께 적용하고 부서별로 재분류
@@ -319,23 +352,13 @@ accept:
 
 ### R-014 웹 골격의 Request 예시
 layer: supporting
-status: current
+status: dropped
 evidence:
-- web/src/request/domain/Request.ts:38 ~ export class Request
-- web/src/request/domain/Request.ts:65-79 ~ static register(
-- web/src/request/domain/Request.ts:114-138 ~ changeStatus(newStatus
-- web/src/request/domain/RequestStatus.ts:1 ~ REQUEST_STATUSES
-- web/src/request/domain/RequestStatus.ts:9-11 ~ export function isFinishedStatus
 golden:
 test-name:
-- register trims title and requester and starts as received
-- changeStatus to the same status throws and changes nothing
-- reopening a finished request without a reason throws and keeps it finished
 accept:
-- Given 새로 등록한 Request / When 상태를 보면 / Then received 이고 변경 이력 첫 줄이 남아 있다
-- Given done 이나 rejected 상태의 Request / When 사유 없이 다른 상태로 바꾸면 / Then 오류를 던지고 상태는 그대로다
 
-새 앱의 `Request` 는 기존 포털과 다르다. 상태는 received·inProgress·done·rejected 넷이고(`RequestStatus.ts:1`), 같은 상태로 바꾸면 오류를 던진다(`Request.ts:118-120`). 기존 포털은 접수·진행 중·대기·완료 넷이고 같은 상태 변경을 아무 일도 하지 않는 성공으로 다룬다(R-002). 재개 사유는 새 앱이 done·rejected 에서 벗어날 때, 기존 포털이 완료에서 벗어날 때 요구한다. 어느 쪽으로 맞출지는 이식할 때 정하고, 정하기 전까지 이식하는 동작은 기존 포털 동작이 이긴다.
+폐기했다. 이 요구사항은 `web/` 이 비어 있을 때 헥사고날 배치를 보이려고 둔 예시 애그리거트 `Request` 였고, 기존 포털의 어떤 동작도 아니다. 실제 업무 유스케이스(`web/src/request/application/service/createRequestUseCases.ts`)가 같은 컨텍스트에서 기존 포털의 동작을 DB 함수 호출로 옮기므로 예시는 쓰이지 않는다. 상태 넷(received·inProgress·done·rejected)과 같은 상태 변경 오류는 기존 포털 규칙(R-002)과 갈렸고 어떤 화면도 쓰지 않았다. 코드·시험·컨테이너 연결을 지웠고 번호는 다시 쓰지 않는다.
 
 ## 후속 기능
 
@@ -349,6 +372,12 @@ evidence:
 - supabase/kpi.sql:45-55 ~ elsif action='file_add' then
 - public/kpi-ui.js:38 ~ <h3>담당자 · 첨부파일</h3>
 - public/kpi-ui.js:41-42 ~ data-file-delete
+- web/src/attachment/adapter/in/web/routes.ts:21 ~ /files$/,
+- web/src/attachment/adapter/in/web/attachment.parity.spec.ts:1 ~ attachment routes (R-015)
+- web/src/attachment/adapter/in/web/attachment.scenario.spec.ts:48 ~ uploading an attachment over HTTP [R-015]
+- web/src/attachment/adapter/in/web/attachment.scenario.spec.ts:137 ~ downloading and deleting an attachment over HTTP [R-015]
+- web/src/attachment/application/service/attachmentServices.spec.ts:27 ~ UploadAttachmentService [R-015]
+- web/src/attachment/domain/AttachmentUpload.spec.ts:18 ~ AttachmentUpload [R-015]
 golden:
 test-name:
 - 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
@@ -381,6 +410,9 @@ evidence:
 - public/kpi-ui.js:14 ~ #report-month').onchange
 - server.js:47 ~ path==='/api/report-preview'
 - public/kpi-model.js:6-9 ~ 조회 월을 확인하세요
+- web/src/report/adapter/in/web/routes.ts:21 ~ pattern: '/api/report-preview'
+- web/src/report/domain/ReportMonth.spec.ts:1 ~ // R-017
+- web/src/report/adapter/in/web/report.parity.spec.ts:1 ~ (R-013, R-017, R-022..R-024)
 golden:
 test-name:
 - KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
@@ -422,6 +454,11 @@ evidence:
 - public/kpi-ui.js:38 ~ <h3>담당자 · 첨부파일</h3>
 - public/kpi-ui.js:40 ~ /assign
 - frontend/src/board/TaskRow.svelte:9 ~ 담당 {task.assignee||'미배정'}
+- web/src/assignment/adapter/in/web/routes.ts:34 ~ /assign$/
+- web/src/assignment/adapter/in/web/assignment.scenario.spec.ts:37 ~ assigning a task over HTTP [R-020]
+- web/src/assignment/application/service/assignmentServices.spec.ts:27 ~ AssignTaskService [R-020]
+- web/src/assignment/domain/AssigneeName.spec.ts:5 ~ AssigneeName [R-020]
+- web/src/assignment/adapter/in/web/assignment.parity.spec.ts:1 ~ (R-020, R-021, kpi-status)
 golden:
 test-name:
 - 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
@@ -447,6 +484,11 @@ evidence:
 - public/app.js:20 ~ const real=tasks.filter(t=>!t.is_test)
 - public/kpi-ui.js:38-39 ~ data.is_test?
 - frontend/src/board/TaskRow.svelte:9 ~ [테스트] 
+- web/src/assignment/adapter/in/web/routes.ts:25 ~ /test-data$/
+- web/src/assignment/adapter/in/web/assignment.scenario.spec.ts:97 ~ marking test data over HTTP [R-021]
+- web/src/assignment/application/service/assignmentServices.spec.ts:60 ~ MarkTestDataService [R-021]
+- web/src/assignment/domain/TestDataFlag.spec.ts:5 ~ TestDataFlag [R-021]
+- web/src/assignment/adapter/in/web/assignment.parity.spec.ts:1 ~ (R-020, R-021, kpi-status)
 golden:
 test-name:
 - KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
@@ -472,6 +514,10 @@ evidence:
 - public/kpi-ui.js:13 ~ id="report-month"
 - public/kpi-ui.js:16 ~ #metrics-csv
 - public/app.js:68 ~ function dashboardKpi()
+- web/src/report/adapter/in/web/routes.ts:21 ~ pattern: '/api/report-preview'
+- web/src/report/domain/MonthlyMetrics.spec.ts:1 ~ // R-022
+- web/src/report/adapter/in/web/report.scenario.spec.ts:1 ~ // R-022, R-023: from the HTTP handler through the services to the real SQL functions (in-memory PGlite).
+- web/src/report/adapter/in/web/report.parity.spec.ts:1 ~ (R-013, R-017, R-022..R-024)
 golden:
 test-name:
 - KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
@@ -499,6 +545,12 @@ evidence:
 - supabase/kpi.sql:30-31 ~ if action='reports' then
 - public/kpi-ui.js:13 ~ id="monthly-draft"
 - public/kpi-ui.js:20 ~ #publish-report
+- web/src/report/adapter/in/web/routes.ts:29-30 ~ method: 'POST'
+- web/src/report/domain/ReportDraft.spec.ts:1 ~ // R-023
+- web/src/report/domain/ReportFingerprint.spec.ts:1 ~ // R-023
+- web/src/report/application/service/PublishReportService.spec.ts:1 ~ // R-023
+- web/src/report/adapter/in/web/report.scenario.spec.ts:1 ~ // R-022, R-023: from the HTTP handler through the services to the real SQL functions (in-memory PGlite).
+- web/src/report/adapter/in/web/report.parity.spec.ts:1 ~ (R-013, R-017, R-022..R-024)
 golden:
 test-name:
 - 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
@@ -546,6 +598,11 @@ evidence:
 - supabase/kpi.sql:12-13 ~ drop trigger if exists improvement_audit
 - supabase/kpi.sql:22-29 ~ if action='improvements' then
 - public/kpi-ui.js:22-33 ~ export async function renderImprovements
+- web/src/improvement/adapter/in/web/routes.ts:19 ~ pattern: '/api/improvements'
+- web/src/improvement/adapter/in/web/improvement.scenario.spec.ts:1 ~ // R-025: from the HTTP handler through the services to the real SQL functions (in-memory PGlite).
+- web/src/improvement/adapter/in/web/improvement.parity.spec.ts:1 ~ (R-025)
+- web/src/improvement/application/service/ImprovementServices.spec.ts:1 ~ // R-025
+- web/src/improvement/domain/ImprovementValue.spec.ts:1 ~ // R-025
 golden:
 test-name:
 - 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
@@ -579,6 +636,14 @@ evidence:
 - supabase/deletion.sql:79-80 ~ update orbit_private.tasks set deleted_at=case
 - public/app.js:35 ~ $('#delete-task').onclick
 - public/app.js:57-62 ~ $('#open-trash').onclick
+- web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/application/service/LifecycleServices.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/domain/TaskEdit.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/routes.ts:17 ~ handlers.lifecycle('delete')
+- web/src/request/adapter/in/web/routes.ts:18 ~ handlers.lifecycle('restore')
+- web/src/request/domain/TaskLifecycle.ts:1 ~ R-026 delete and restore
 golden:
 test-name:
 - 모든 상태 삭제·조회 차단·복원·제목 확인 후 영구 삭제 및 최소 감사 기록
@@ -606,6 +671,13 @@ evidence:
 - supabase/deletion.sql:70-77 ~ if action='purge' and coalesce(payload->>'confirmation'
 - supabase/kpi.sql:2-3 ~ create table if not exists orbit_private.task_extras
 - public/app.js:62-63 ~ [data-restore],[data-purge]
+- web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/application/service/LifecycleServices.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/domain/TaskEdit.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/routes.ts:19 ~ handlers.lifecycle('purge')
+- web/src/request/domain/TaskLifecycle.ts:1 ~ R-027 purge
 golden:
 test-name:
 - 모든 상태 삭제·조회 차단·복원·제목 확인 후 영구 삭제 및 최소 감사 기록
@@ -633,6 +705,11 @@ evidence:
 - public/app.js:44-55 ~ function applySettings()
 - public/app.js:41 ~ $('#admin-settings').onclick
 - public/app.js:42-52 ~ config=await api('settings')
+- web/src/settings/adapter/in/web/routes.ts:26 ~ pattern: '/api/settings',
+- web/src/settings/adapter/in/web/settings.parity.spec.ts:1 ~ // R-028 R-029
+- web/src/settings/adapter/in/web/settings.scenario.spec.ts:1 ~ // R-028 R-029
+- web/src/settings/application/service/SettingsServices.spec.ts:1 ~ // R-028 R-029
+- web/src/settings/domain/PortalSettings.spec.ts:1 ~ // R-029 R-028
 golden:
 test-name:
 - 설정 API 권한·버전 충돌·이력과 재시작 후 공통 설정 보존
@@ -654,6 +731,11 @@ evidence:
 - public/settings-model.js:14-26 ~ export function validateSettings
 - server.js:32 ~ validateSettings(body.values)
 - server.js:69 ~ if(e.status)return send(e.status
+- web/src/settings/adapter/in/web/routes.ts:26 ~ pattern: '/api/settings',
+- web/src/settings/adapter/in/web/settings.parity.spec.ts:1 ~ // R-028 R-029
+- web/src/settings/adapter/in/web/settings.scenario.spec.ts:1 ~ // R-028 R-029
+- web/src/settings/application/service/SettingsServices.spec.ts:1 ~ // R-028 R-029
+- web/src/settings/domain/PortalSettings.spec.ts:1 ~ // R-029 R-028
 golden:
 test-name:
 - 설정 입력 검증: 색상·이미지·중복·빈 항목·임의 필드 차단
@@ -674,6 +756,11 @@ evidence:
 - public/kpi-model.js:17-20 ~ const keywords=
 - public/app.js:69 ~ id="accept-category"
 - public/index.html:4 ~ id="automate-request"
+- web/src/automation/adapter/in/web/routes.ts:29 ~ pattern: '/api/automation'
+- web/src/automation/adapter/in/web/automation.scenario.spec.ts:1 ~ // R-030
+- web/src/automation/adapter/in/web/automation.parity.spec.ts:1 ~ // R-030
+- web/src/automation/application/service/SuggestForRequestService.spec.ts:1 ~ // R-030
+- web/src/automation/domain/automation.spec.ts:1 ~ // R-030
 golden:
 test-name:
 - 무료 자동 분류·유사도는 설정 분류를 존중하고 테스트 기록 제외
@@ -694,6 +781,13 @@ evidence:
 - local-store.js:26-29 ~ edit_revision
 - supabase/edit.sql:3-28 ~ create or replace function public.orbit_edit_task
 - test/task-edit.test.js:12-20 ~ for(const status of
+- web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/application/service/LifecycleServices.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/domain/TaskEdit.spec.ts:1 ~ // R-031 R-026 R-027
+- web/src/request/adapter/in/web/routes.ts:16 ~ /edit$/
+- web/src/request/domain/TaskEdit.ts:1 ~ (R-031)
 golden:
 test-name:
 - 업무 수정: 모든 상태·권한·원본시각 보존·감사·충돌·유효성·삭제 업무 차단
@@ -738,6 +832,10 @@ evidence:
 - public/settings-model.js:7
 - public/app.js:32-42
 - frontend/src/Board.svelte:1-24
+- web/src/board/domain/boardFacts.spec.ts:3 ~ // R-033
+- web/src/board/domain/groupTasks.spec.ts:2 ~ // R-033
+- web/src/shared/domain/categories.spec.ts:1 ~ // R-033
+- web/src/shared/domain/kstDates.spec.ts:1 ~ // R-033
 golden:
 test-name:
 - [R-033] 기존 설정에도 고정업무를 제공하고 날짜 그룹은 KST 경계·기간·미완료를 구분
@@ -758,6 +856,8 @@ home: legacy — 기존 포털에 이미 구현된 기능이라 이식 전까지
 evidence:
 - frontend/src/board/format.js:10-16
 - frontend/src/Board.svelte:6-20
+- web/src/board/domain/boardFacts.spec.ts:4 ~ // R-034
+- web/src/board/domain/groupTasks.spec.ts:3 ~ // R-034
 golden:
 test-name:
 - [R-034] 완료 업무는 한국 완료일로 이동하고 재개 업무는 요청일로 돌아온다

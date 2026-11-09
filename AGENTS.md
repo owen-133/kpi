@@ -9,7 +9,7 @@ Codex 는 git 루트부터 이 파일을 읽고(상한 32 KiB), Claude Code 는 
 |---|---|---|
 | 저장소 루트 | 기존 총무 업무 포털(orbit.ops). 바닐라 Node. `server.js`, `local-store.js`, `supabase-store.js`, `public/`, `supabase/`, `test/`, `render.yaml`, `DEPLOY.md` | `npm start` / `npm test` |
 | `web/` | 새 Next.js 앱. 헥사고날 + DDD | `cd web && npm test` |
-| `docs/architecture.md` | `web/` 의 계층 배치, 폴더 트리, 예시 애그리거트 `Request` | 읽기 |
+| `docs/architecture.md` | `web/` 의 계층 배치, 폴더 트리, 업무 요청 한 건이 지나는 실제 길 | 읽기 |
 | `docs/ssot/requirements.md` | 요구사항 정본(id·계층·상태·인수 기준). 형식은 이 파일 머리말이 소유한다(§10) | 읽기 |
 | `web/src/ssot.spec.ts` | 요구사항 정본의 정합성 검사 | `cd web && npm test` |
 | `scripts/setup-graft.sh`, `scripts/graft` | 코드 지도 도구의 저장소 소유 설치와 래퍼(§11) | `sh scripts/setup-graft.sh` / `sh scripts/graft` |
@@ -58,30 +58,30 @@ Codex 는 git 루트부터 이 파일을 읽고(상한 32 KiB), Claude Code 는 
 
 ## 3. 헥사고날 규칙 여덟
 
-`web/src/<컨텍스트>/{domain,application/{port/in,port/out,service},adapter/{in/web,out/*}}` 와 `web/src/config/container.ts` 가 뼈대다. 자세한 배치는 `docs/architecture.md` 에 있다.
+`web/src/<컨텍스트>/{domain,application/{port/in,port/out,service},adapter/{in/web,out/*}}` 와 `web/src/config/container.ts` 가 뼈대다. 컨텍스트 사이에 공유하는 것은 `web/src/shared/` 에 둔다. 자세한 배치는 `docs/architecture.md` 에 있다.
 
 | # | 규칙 | 이름 | 검사 명령 |
 |---|---|---|---|
 | 1 | `domain` 은 외부(프레임워크·DB·`application`·`adapter`)를 import 하지 않는다 | Dependency Rule | `cd web && npm test` (`web/src/architecture.spec.ts`) |
 | 2 | 상태 변경은 엔티티·애그리거트 메서드로만 한다. setter 를 두지 않는다 | Tell, Don't Ask | `cd web && npm test` (`web/src/architecture.spec.ts`) |
-| 3 | 서비스에 변경 로직을 중복해 쓰지 않는다. 도메인 메서드를 재사용한다 | Rich Domain Model | 리뷰: `/usr/bin/grep -rn "status =" web/src/*/application` 이 비어 있다 |
+| 3 | 서비스에 규칙을 중복해 쓰지 않는다. 도메인 코드나 DB 함수가 이미 가진 규칙을 재사용한다 | Rich Domain Model | 리뷰: `/usr/bin/grep -rn "status =" web/src/*/application` 이 비어 있다(종료코드 1) |
 | 4 | 애플리케이션 서비스는 흐름만 조립한다. 비즈니스 규칙을 넣지 않는다 | Thin Application Service | 리뷰: 서비스의 분기문이 규칙이 아니라 흐름(없으면 오류)인지 읽는다 |
 | 5 | 외부 연동은 포트로 정의하고 어댑터가 구현한다 | Ports and Adapters / DIP | `cd web && npm test` 중 규칙 1 검사가 `application` 의 외부 import 도 막는다 |
 | 6 | 어댑터는 서로 호출하지 않는다. 항상 포트를 거친다 | Ports and Adapters | `cd web && npm test` (`web/src/architecture.spec.ts`) |
-| 7 | 애그리거트는 다른 애그리거트를 ID 로만 참조한다 | Aggregate Reference by ID | 리뷰: 애그리거트 필드 타입에 다른 애그리거트 클래스가 없다 |
-| 8 | 트랜잭션 하나에서 애그리거트 하나만 바꾸고 나머지는 이벤트로 맞춘다 | Eventual Consistency | 리뷰: 서비스 한 메서드의 `save` 호출이 애그리거트 하나뿐이다 |
+| 7 | 애그리거트는 다른 애그리거트를 ID 로만 참조한다 | Aggregate Reference by ID | 리뷰: `/usr/bin/grep -rn "^export class" web/src/*/domain` 로 나온 클래스의 필드 타입에 다른 애그리거트 클래스가 없다 |
+| 8 | 트랜잭션 하나에서 애그리거트 하나만 바꾸고 나머지는 이벤트로 맞춘다 | Eventual Consistency | 리뷰: 쓰기 서비스 한 메서드의 `functions.call(` 이 DB 함수 하나뿐이다(DB 함수 하나가 트랜잭션 하나다) |
 
 기계 검사(`web/src/architecture.spec.ts`)가 보는 것은 규칙 1·2·6 과 `app/` 경계다. 3·4·7·8 은 리뷰가 본다. 5 는 1 의 검사가 `application` 쪽 외부 import 를 막는 범위까지만 기계가 본다.
 
 Next.js 대응:
 - `app/` 의 라우트·페이지·컴포넌트는 `adapter/in/web` 에 해당한다. `adapter/in/web` 과 `config/container` 만 import 한다. 판정: `cd web && npm test`
 - `*/adapter/in/web/ui/**`(브라우저 화면)의 시험 아닌 파일은 같은 `ui/**`·`*/domain/**`·`*.css`·UI 패키지(`react`, `react-dom`, `@tanstack/react-query`, `pdf-lib`, `@pdf-lib/fontkit`)만 import 하고, `src` 의 `.tsx` 는 `style={` 을 쓰지 않는다(CSP). 판정: `cd web && npm test` 의 규칙 `UI`·`STYLE`
-- `actions.ts`(`'use server'`)는 일반 핸들러를 감싸는 얇은 껍데기다. 로직은 핸들러에 둔다
-- `adapter/out` 을 import 하는 파일은 `config/container.ts` 뿐이다. 판정: `/usr/bin/grep -rln "adapter/out" web/src --include=*.ts --include=*.tsx` 의 결과가 `config/container.ts` 와 `adapter/out` 자신과 테스트뿐이다
+- 서버 액션(`'use server'`)은 쓰지 않는다. 액션은 `/api/*` 의 가드 파이프라인(인증·조회 권한·출처·본문 한도)을 거치지 않아 조회 계정이 검사를 우회한다. 판정: `/usr/bin/grep -rln "use server" web/src` 가 비어 있다(종료코드 1)
+- `adapter/out` 을 import 하는 파일은 `config/container.ts` 뿐이다. 판정: `/usr/bin/grep -rln "adapter/out" web/src --include=*.ts --include=*.tsx` 의 결과가 `config/container.ts` 와 `adapter/out` 자신, 시험 도구(`parity/`, `architecture.*`)뿐이다
 
 ## 4. DB 정규화
 
-테이블 설계는 도메인 모델과 별개다. 매핑은 `adapter/out/persistence` 의 매퍼가 한다(`docs/architecture.md`). 스키마 파일 경로 `web/src/request/adapter/out/persistence/schema.ts` 를 `<스키마>` 로 쓴다(기존 `supabase/schema.sql` 은 고치지 않는다).
+테이블 설계는 도메인 모델과 별개다. 스키마의 정본은 `supabase/*.sql` 이고 앱은 테이블에 닿지 않고 DB 함수만 부른다(`docs/architecture.md`). `<스키마>` 는 `supabase/schema.sql supabase/kpi.sql supabase/deletion.sql supabase/settings.sql` 네 파일이다(`supabase/upgrade.sql` 은 이미 배포된 DB 를 맞추는 스크립트라 뺀다). 이 파일들을 고치는 일은 §7 의 레거시 규칙을 따른다.
 
 | # | 규칙 | 검사 |
 |---|---|---|
@@ -90,17 +90,18 @@ Next.js 대응:
 | 3 | 3NF: 키가 아닌 컬럼이 다른 키 아닌 컬럼에 종속되지 않는다. 참조 데이터는 자기 테이블에 둔다 | 리뷰에서 본다 |
 | 4 | 파생값(소요 시간, 누적 실적)은 저장하지 않고 저장된 사실에서 계산한다. 추정 숫자는 저장하지 않는다 | 리뷰에서 본다. 보조: `/usr/bin/grep -nEi -e 'total' -e 'sum' -e 'elapsed' -e 'duration' -e 'avg' <스키마>` 로 파생 컬럼 후보를 플래그한다 |
 | 5 | 애그리거트끼리는 ID 로 참조하고 DB 는 그것을 외래키로 지닌다(§3 규칙 7) | `/usr/bin/grep -nEi -e 'references' -e 'foreign key' <스키마>` 가 참조 컬럼마다 하나씩 나온다 |
-| 6 | 이력·감사 테이블은 추가 전용이다(update·delete 차단. 기존 `supabase/schema.sql` 의 `events_immutable` 트리거 설계와 같다). 애그리거트 하나는 자기 테이블 묶음에 대응한다(§3 규칙 8) | `/usr/bin/grep -nEi 'before update or delete' <스키마>` 가 이력 테이블마다 하나씩 나온다 |
+| 6 | 이력·감사 테이블은 추가 전용이다(update·delete 차단. `events_immutable` 트리거 설계). 애그리거트 하나는 자기 테이블 묶음에 대응한다(§3 규칙 8) | `/usr/bin/grep -nEi 'before update or delete' <스키마>` 가 이력 테이블마다 하나씩 나온다 |
 | 7 | 비정규화는 잰 이유가 있을 때만 하고, 그 이유를 테이블 옆 주석에 적는다 | 리뷰에서 본다: 중복 컬럼 옆에 측정값을 적은 주석이 있다 |
 | 8 | 새 쿼리는 실행 전에 순수 `EXPLAIN` 으로 본다(라이브에서 `EXPLAIN ANALYZE` 금지). `WHERE` 주조건은 인덱스 컬럼이고 함수로 감싸지 않는다. DDL 은 엔진이 지원하면 온라인 알고리즘을 명시하고, 인덱스·제약 이름은 64자 이하다 | `EXPLAIN <쿼리>` 의 출력에서 인덱스 사용을 본다. 이름 길이 플래그: `/usr/bin/grep -nEio -e 'index [a-z0-9_]{65,}' -e 'constraint [a-z0-9_]{65,}' <스키마>` 가 비어 있다 |
 
-### ORM 과 마이그레이션
+### DB 접근
 
-- ORM 은 Drizzle(`drizzle-orm`, `drizzle-kit`), 운영 드라이버는 `postgres`, 테스트는 인메모리 PGlite(`@electric-sql/pglite`)다. 스키마는 TypeScript 로 쓴다.
-- ORM·드라이버 import 는 `adapter/out/persistence/**` 와 `config/{container,database}.ts` 에서만 한다. 판정: `cd web && npm test` (`web/src/architecture.spec.ts` 의 ORM 규칙)
-- 마이그레이션 SQL 은 `web/drizzle/` 에 있다. 스키마를 고치면 `cd web && npx drizzle-kit generate` 로 만들고, 트리거처럼 스키마 파일로 못 쓰는 DDL 은 `npx drizzle-kit generate --custom` 의 빈 파일에 손으로 쓴다. 판정: 스키마를 고치지 않은 상태에서 `npx drizzle-kit generate && git status --porcelain web/drizzle` 이 비어 있다.
-- 마이그레이션 적용은 직접 연결 또는 세션 연결(`DATABASE_URL`)로 `npx drizzle-kit migrate` 를 한다. 트랜잭션 풀러로는 하지 않는다. 적용은 DB 쓰기라 사용자가 직접 한다.
-- 실행 시 저장소는 환경변수 `PERSISTENCE=memory|postgres`(기본 `memory`)로 고른다. `postgres` 인데 `DATABASE_URL` 이 없으면 컨테이너를 만들 때 예외가 난다. 판정: `cd web && PERSISTENCE=postgres node -e "import('./src/config/container.ts').then((m) => m.createContainer())"` 가 `DATABASE_URL is required` 로 종료코드 1 이다.
+- 앱은 Drizzle(`drizzle-orm`)의 `sql` 실행으로 기존 DB 함수 다섯(`web/src/shared/port/OrbitFunctions.ts`)만 부른다. TypeScript 스키마 정의, `drizzle-kit`, 앱이 만드는 마이그레이션은 없다. 판정: `ls web/drizzle web/drizzle.config.ts` 가 `No such file` 이고 `/usr/bin/grep -c drizzle-kit web/package.json` 이 0 이다.
+- 운영 드라이버는 `postgres`(검증된 TLS, `web/src/config/databaseSecurity.ts`), 개발·시험은 인메모리 PGlite(`@electric-sql/pglite`)이고 PGlite 는 `supabase/*.sql` 을 읽어 올린다. `DATABASE_URL` 이 있으면 운영 어댑터, 없으면 PGlite 다.
+- 운영(`NODE_ENV=production`)에 `DATABASE_URL` 이 없으면 시작을 거부한다. 판정: `cd web && node -e "import('./src/config/container.ts').then((m) => m.createContainer({ NODE_ENV: 'production', ADMIN_PASSWORD: 'a', VIEWER_PASSWORD: 'b' }))"` 가 `운영 배포에는 DATABASE_URL이 필요합니다.` 로 종료코드 1 이다.
+- ORM·드라이버 import 는 `*/adapter/out/**`, `shared/adapter/out/**`, `config/**` 에서만 한다. 판정: `cd web && npm test` (`web/src/architecture.spec.ts` 의 ORM 규칙)
+- 앱 전용 DB 역할(`web/db/app-role.sql`)은 함수 실행 권한만 갖는다. 소유자가 SQL 편집기에서 직접 한 번 실행한다. 판정: `cd web && node --test src/security/roles.security.spec.ts`
+- 스키마 변경은 `supabase/*.sql` 에서 하고 적용은 DB 쓰기라 사용자가 직접 한다.
 
 DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기고 실행하지 않는다.
 

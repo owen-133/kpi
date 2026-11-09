@@ -1,14 +1,6 @@
 // Composition root: the only place that wires adapters to use cases and routes.
 // Database: DATABASE_URL set -> postgres-js over verified TLS (production); unset and not production -> an in-memory
 // PGlite loaded with supabase/*.sql (development and tests); production without DATABASE_URL throws.
-import { ChangeRequestStatusService } from '../request/application/service/ChangeRequestStatusService.ts';
-import { ListRequestsService } from '../request/application/service/ListRequestsService.ts';
-import { RegisterRequestService } from '../request/application/service/RegisterRequestService.ts';
-import type { ChangeRequestStatusUseCase } from '../request/application/port/in/ChangeRequestStatusUseCase.ts';
-import type { ListRequestsQuery } from '../request/application/port/in/ListRequestsQuery.ts';
-import type { RegisterRequestUseCase } from '../request/application/port/in/RegisterRequestUseCase.ts';
-import { InMemoryDomainEventPublisher } from '../request/adapter/out/persistence/InMemoryDomainEventPublisher.ts';
-import { InMemoryRequestRepository } from '../request/adapter/out/persistence/InMemoryRequestRepository.ts';
 import { AccessConfiguration } from '../access/domain/AccessConfiguration.ts';
 import { AuthorizeRequestService } from '../access/application/service/AuthorizeRequestService.ts';
 import { Sha256SecretComparator } from '../access/adapter/out/crypto/Sha256SecretComparator.ts';
@@ -33,9 +25,6 @@ import type { OrbitFunctions } from '../shared/port/OrbitFunctions.ts';
 import type { Environment } from './startupChecks.ts';
 
 export type Container = {
-  readonly registerRequest: RegisterRequestUseCase;
-  readonly changeRequestStatus: ChangeRequestStatusUseCase;
-  readonly listRequests: ListRequestsQuery;
   readonly pipeline: GuardPipeline;
   /** Opens the database on first use; the guard itself never needs it. */
   readonly orbitFunctions: () => Promise<OrbitFunctions>;
@@ -87,13 +76,8 @@ export function createContainer(env: Environment = {}, options: ContainerOptions
     ...automationRoutes(createAutomationUseCases(() => database.open())),
     ...(options.extraRoutes ?? []),
   ];
-  const requestRepository = new InMemoryRequestRepository();
-  const eventPublisher = new InMemoryDomainEventPublisher();
   const database = openOrbitFunctions(env);
   return {
-    registerRequest: new RegisterRequestService(requestRepository, eventPublisher),
-    changeRequestStatus: new ChangeRequestStatusService(requestRepository, eventPublisher),
-    listRequests: new ListRequestsService(requestRepository),
     pipeline: createGuardPipeline({ authorize, routes, log: options.log ?? ((line) => console.error(line)) }),
     orbitFunctions: database.open,
     stop: database.close,
