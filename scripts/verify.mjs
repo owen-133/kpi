@@ -17,7 +17,6 @@ import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const USAGE = 'usage: node scripts/verify.mjs [--only <layer>[,<layer>...]] [--skip <layer>[,<layer>...]] [--base <ref>] [--root <dir>]';
-const AGENTS_LIMIT = 32768;
 const PRODUCT_PATHS = ['render.yaml', 'supabase', 'package.json', 'README.md', 'DEPLOY.md', 'KPI_GUIDE.md'];
 
 class UsageError extends Error {}
@@ -76,12 +75,10 @@ export const LAYERS = [
   },
   {id: 'audit', run: audit},
   {
-    id: 'agents-size',
+    id: 'agents-docs',
     run: ({root}) => {
-      const file = join(root, 'AGENTS.md');
-      if (!existsSync(file)) return {ok: false, note: 'AGENTS.md not found', output: ''};
-      const bytes = statSync(file).size;
-      return {ok: bytes < AGENTS_LIMIT, note: `${bytes} bytes (limit ${AGENTS_LIMIT - 1})`, output: ''};
+      const r = exec('node', [join(dirname(fileURLToPath(import.meta.url)), 'agents-docs.mjs'), '--root', root]);
+      return r.ok ? {...r, note: r.output.trim().split('\n').pop()} : r;
     },
   },
   {
