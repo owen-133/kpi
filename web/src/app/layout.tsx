@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
-import { SITE_TITLE } from "./site.ts";
+import "../portal/adapter/in/web/ui/portal.css";
+import "../portal/adapter/in/web/ui/nextAnnouncer.css";
+import { PAGE_TITLE } from "./site.ts";
 
-export const metadata = { title: SITE_TITLE };
+export const metadata = { title: PAGE_TITLE };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

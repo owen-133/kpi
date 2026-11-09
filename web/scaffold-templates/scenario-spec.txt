@@ -1,0 +1,10 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+
+// Scenario: handler -> service -> real adapters, told in the user's words.
+// A todo stays visible in the report without failing; remove `todo` once the use case is wired in config/container.ts.
+describe('{{UseCase}} scenario ({{context}})', () => {
+  it('TODO tell the {{UseCase}} story from request to result', { todo: true }, () => {
+    assert.fail('not implemented: drive the wired use case through {{useCase}}Handler');
+  });
+});

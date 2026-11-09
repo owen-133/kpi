@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export type RuleId = 'R1' | 'R2' | 'R6' | 'APP' | 'CONTAINER' | 'ORM';
+export type RuleId = 'R1' | 'R2' | 'R6' | 'APP' | 'CONTAINER' | 'ORM' | 'FRAMEWORK' | 'SERVER_ONLY' | 'BANNED' | 'USE_CLIENT' | 'UI' | 'STYLE';
 
 export interface Violation {
   rule: RuleId;
@@ -350,24 +350,129 @@ export function checkContainerOnly(file: string, source: string): Violation[] {
   return out;
 }
 
-// ORM and database driver packages: importable only under adapter/out/persistence and in config/{container,database}.ts.
+// ORM and database driver packages: importable only under */adapter/out/**, shared/adapter/out/** and config/**.
 const ORM_PACKAGES = ['drizzle-orm', 'postgres', '@electric-sql/pglite'];
 
 function isOrmPackage(spec: string): boolean {
   return ORM_PACKAGES.some((name) => spec === name || spec.startsWith(`${name}/`));
 }
 
+function isInWebAdapter(rel: string): boolean {
+  return /(^|\/)adapter\/in\/web\//.test(rel);
+}
+
+function isConfig(rel: string): boolean {
+  return rel.startsWith('config/');
+}
+
+function isOutAdapter(rel: string): boolean {
+  return /(^|\/)adapter\/out\//.test(rel);
+}
+
+// Where framework code (react, next, tanstack) may live: driving web adapters, the Next app folder, proxy and instrumentation.
+function isFrameworkPlace(rel: string): boolean {
+  return isInWebAdapter(rel) || rel.startsWith('app/') || rel === 'proxy.ts' || rel === 'instrumentation.ts';
+}
+
 export function checkOrmOnlyInPersistence(file: string, source: string): Violation[] {
   const rel = relFromSrc(toPosix(path.resolve(file)));
   if (rel === null) return [];
-  if (rel === 'config/container.ts' || rel === 'config/database.ts') return [];
-  const where = classify(rel, false);
-  if (where.layer === 'adapter' && where.side === 'out' && where.pkg === 'persistence') return [];
+  if (isOutAdapter(rel) || isConfig(rel)) return [];
   const out: Violation[] = [];
   for (const ref of extractImports(source)) {
     if (isOrmPackage(ref.spec)) {
-      out.push(violation('ORM', file, ref.line, `only adapter/out/persistence and config/{container,database}.ts may import '${ref.spec}'`));
+      out.push(violation('ORM', file, ref.line, `only */adapter/out/**, shared/adapter/out/** and config/** may import '${ref.spec}'`));
     }
+  }
+  return out;
+}
+
+const isFrameworkPackage = (spec: string): boolean =>
+  spec === 'react' || spec === 'react-dom' || spec === 'next' || /^(react|react-dom|next)\//.test(spec) || spec.startsWith('@tanstack/');
+
+export function checkFrameworkPlacement(file: string, source: string): Violation[] {
+  const rel = relFromSrc(toPosix(path.resolve(file)));
+  if (rel === null || isFrameworkPlace(rel)) return [];
+  const out: Violation[] = [];
+  for (const ref of extractImports(source)) {
+    if (isFrameworkPackage(ref.spec)) {
+      out.push(violation('FRAMEWORK', file, ref.line, `only */adapter/in/web/**, src/app/**, src/proxy.ts and src/instrumentation.ts may import '${ref.spec}'`));
+    }
+  }
+  return out;
+}
+
+export function checkServerOnlyPlacement(file: string, source: string): Violation[] {
+  const rel = relFromSrc(toPosix(path.resolve(file)));
+  if (rel === null || isFrameworkPlace(rel) || rel.startsWith('shared/adapter/out/') || isConfig(rel)) return [];
+  return extractImports(source)
+    .filter((ref) => ref.spec === 'server-only')
+    .map((ref) => violation('SERVER_ONLY', file, ref.line, "'server-only' belongs in */adapter/in/web/**, src/app/**, proxy, instrumentation, shared/adapter/out/** and config/**"));
+}
+
+// Tokens that never appear in src (tests excluded: they spell them out to prove the bans).
+const BANNED_TOKENS = ['dangerouslySetInnerHTML', 'sql.raw', '.unsafe(', 'NEXT_PUBLIC_'];
+
+export function checkBannedTokens(file: string, source: string): Violation[] {
+  if (relFromSrc(toPosix(path.resolve(file))) === null || isTestFile(file)) return [];
+  const code = mask(source, false);
+  const out: Violation[] = [];
+  for (const token of BANNED_TOKENS) {
+    let at = code.indexOf(token);
+    while (at !== -1) {
+      out.push(violation('BANNED', file, lineOf(code, at), `banned token '${token}'`));
+      at = code.indexOf(token, at + token.length);
+    }
+  }
+  return out;
+}
+
+export function checkUseClientPlacement(file: string, source: string): Violation[] {
+  const rel = relFromSrc(toPosix(path.resolve(file)));
+  if (rel === null || isInWebAdapter(rel) || rel.startsWith('app/')) return [];
+  const match = /^\s*(['"])use client\1/m.exec(source);
+  return match === null ? [] : [violation('USE_CLIENT', file, lineOf(source, match.index), "'use client' only in */adapter/in/web/** and src/app/**")];
+}
+
+// Packages a ui file may import (plus their subpaths).
+const UI_PACKAGES = ['react', 'react-dom', '@tanstack/react-query', 'pdf-lib', '@pdf-lib/fontkit'];
+
+function isUiPackage(spec: string): boolean {
+  return UI_PACKAGES.some((name) => spec === name || spec.startsWith(`${name}/`));
+}
+
+const isUiFolder = (rel: string): boolean => /(^|\/)adapter\/in\/web\/ui\//.test(rel);
+
+// UI rule: non-test files under */adapter/in/web/ui/** import only ui files, domain, css and the UI packages.
+export function checkUiBoundary(file: string, source: string): Violation[] {
+  const rel = relFromSrc(toPosix(path.resolve(file)));
+  if (rel === null || isTestFile(file) || !isUiFolder(rel)) return [];
+  const out: Violation[] = [];
+  for (const ref of extractImports(source)) {
+    if (/\.css$/.test(ref.spec)) continue;
+    if (!isRelative(ref.spec) && !ref.spec.startsWith('@/')) {
+      if (!isUiPackage(ref.spec)) out.push(violation('UI', file, ref.line, `ui imports package '${ref.spec}'`));
+      continue;
+    }
+    const target = resolveImport(file, ref.spec);
+    if (target === null) {
+      out.push(violation('UI', file, ref.line, `ui imports a path outside src ('${ref.spec}')`));
+      continue;
+    }
+    const placed = classify(target, true);
+    const allowed = placed.layer === 'domain' || (placed.layer === 'adapter' && isUiFolder(`${target}/`));
+    if (!allowed) out.push(violation('UI', file, ref.line, `ui imports outside ui and domain ('${ref.spec}')`));
+  }
+  return out;
+}
+
+// STYLE rule: no style prop in non-test tsx files (CSP drops style attributes in server-rendered HTML).
+export function checkNoStyleProp(file: string, source: string): Violation[] {
+  if (relFromSrc(toPosix(path.resolve(file))) === null || isTestFile(file) || !/\.tsx$/.test(file)) return [];
+  const code = mask(source, true);
+  const out: Violation[] = [];
+  for (const m of code.matchAll(/\bstyle\s*=\s*\{/g)) {
+    out.push(violation('STYLE', file, lineOf(code, m.index ?? 0), "style prop 'style={' (use CSS classes or set styles from an effect)"));
   }
   return out;
 }
@@ -380,6 +485,12 @@ export function checkAll(file: string, source: string): Violation[] {
     ...checkAppBoundary(file, source),
     ...checkContainerOnly(file, source),
     ...checkOrmOnlyInPersistence(file, source),
+    ...checkFrameworkPlacement(file, source),
+    ...checkServerOnlyPlacement(file, source),
+    ...checkBannedTokens(file, source),
+    ...checkUseClientPlacement(file, source),
+    ...checkUiBoundary(file, source),
+    ...checkNoStyleProp(file, source),
   ];
 }
 

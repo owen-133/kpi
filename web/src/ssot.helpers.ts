@@ -2,21 +2,28 @@
 // Pure parsing + file reads: no dependencies, TypeScript type-strippable, no node:test import.
 //
 // docs/ssot/requirements.md holds one `### R-NNN <title>` heading per requirement followed by key lines
-// (layer, status, evidence, golden, test-name, accept). Rules, each reported with its code:
+// (layer, status, home, evidence, golden, test-name, accept). Rules, each reported with its code:
 //   C1  IDs run R-001, R-002, ... in order with no gap and no repeat; the file has at least one requirement
 //   C2  layer is core|supporting|out and status is current|planned|dropped
 //   C3  a current requirement has an accept line and proof: a tag R-NNN in a test file, a golden label that
-//       exists in test/golden/legacy-portal.json, or a test-name found verbatim in a test file.
+//       is a `scenario/label` key of a committed recording (web/src/parity/recorded/*.json) or of the request corpus
+//       (test/golden/requests.js), or a test-name found verbatim in a test file (web/src/**/*.spec.ts, scripts/**/*.test.mjs).
 //       Every golden label and test-name a current requirement cites must resolve (a stale pointer fires)
-//   C4  every evidence entry names an existing file and a line inside it (planned and current; dropped is history)
+//   C4  every evidence entry names an existing file and a line inside it (planned and current; dropped is history).
+//       An entry may carry an anchor, `path:N[-M] ~ <literal text>`: then the literal must occur inside the cited
+//       lines (inside the file when no lines are cited), and the message names where the literal is now
 //   C5  a test tag R-NNN points to a known requirement that is current
 //   C6  no requirement title appears verbatim in AGENTS.md or docs/** outside docs/ssot/;
 //       AGENTS.md mentions docs/ssot/requirements.md. README.md is upstream product documentation, not one
 //       of our rule documents, so it is not scanned
+//   C7  `home:` names where the requirement lives in the hexagonal tree: a path under web/src/<context>/ that exists
+//       (a trailing `…`, `...`, `/*` or `/**` marks a prefix). Required from R-033 up;
+//       R-001..R-032 are grandfathered and need none, but a home they do give is checked too
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
-export type RuleCode = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6';
+export type RuleCode = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7';
 
 export interface Violation {
   code: RuleCode;
@@ -27,6 +34,7 @@ export interface Violation {
 export const LAYERS = ['core', 'supporting', 'out'];
 export const STATUSES = ['current', 'planned', 'dropped'];
 export const SSOT_PATH = 'docs/ssot/requirements.md';
+export const FIRST_ID_NEEDING_HOME = 33; // R-001..R-032 are grandfathered
 
 export interface Requirement {
   id: string; // as written, e.g. R-014
@@ -34,6 +42,7 @@ export interface Requirement {
   line: number; // heading line, 1-based
   layer: string; // '' when absent
   status: string; // '' when absent
+  home: string; // '' when absent
   evidence: string[];
   golden: string[];
   testName: string[];
@@ -56,7 +65,7 @@ export interface Corpus {
 const FENCE = /^\s*(```|~~~)/;
 const HEADING = /^###\s+(R-\d+)\b\s*(.*?)\s*$/;
 const ANY_HEADING = /^#{1,3}\s/;
-const KEY_LINE = /^\s*(?:[-*+]\s+)?(\*\*|__|`)?(layer|status|evidence|golden|test-name|accept)(?:\1)?\s*:(?:\1)?\s*(.*?)\s*$/;
+const KEY_LINE = /^\s*(?:[-*+]\s+)?(\*\*|__|`)?(layer|status|home|evidence|golden|test-name|accept)(?:\1)?\s*:(?:\1)?\s*(.*?)\s*$/;
 const BULLET = /^\s*(?:[-*+]|\d+[.)])\s+(.*?)\s*$/;
 const NONE_VALUES = new Set(['-', '—', 'none', '(none)', 'n/a']);
 const TAG = /\bR-(\d{3})\b/g;
@@ -87,7 +96,7 @@ export function parseRequirements(text: string): Requirement[] {
     if (inFence) continue;
     const heading = HEADING.exec(line);
     if (heading !== null) {
-      current = { id: heading[1], title: unwrap(heading[2]), line: i + 1, layer: '', status: '', evidence: [], golden: [], testName: [], accept: [] };
+      current = { id: heading[1], title: unwrap(heading[2]), line: i + 1, layer: '', status: '', home: '', evidence: [], golden: [], testName: [], accept: [] };
       out.push(current);
       listKey = null;
       continue;
@@ -104,7 +113,7 @@ export function parseRequirements(text: string): Requirement[] {
     if (key !== null) {
       const name: string = key[2];
       const value: string = key[3];
-      if (name === 'layer' || name === 'status') {
+      if (name === 'layer' || name === 'status' || name === 'home') {
         if (current[name] === '') current[name] = unwrap(value);
         listKey = null;
         continue;
@@ -123,7 +132,9 @@ export function parseRequirements(text: string): Requirement[] {
 
 function addItems(req: Requirement, key: 'evidence' | 'golden' | 'testName' | 'accept', value: string, inline: boolean): void {
   // evidence and golden entries never contain commas, so an inline list may be comma separated
-  const parts = inline && (key === 'evidence' || key === 'golden') ? value.split(',') : [value];
+  // except an anchored entry, whose literal text may contain commas
+  const splittable = inline && (key === 'evidence' || key === 'golden') && !value.includes('~');
+  const parts = splittable ? value.split(',') : [value];
   for (const part of parts) {
     const item = unwrap(part);
     if (item === '') continue;
@@ -203,18 +214,70 @@ function countLines(text: string): number {
   return text.endsWith('\n') ? n - 1 : n;
 }
 
+export interface EvidencePointer {
+  file: string;
+  from: number | null; // first cited line, 1-based; null when no line is cited
+  to: number | null; // last cited line
+  literal: string | null; // the text after `~`, null when the entry has no anchor
+}
+
+function stripBackticks(value: string): string {
+  const m = /^(`+)(.*)\1$/.exec(value);
+  return m === null ? value : m[2].trim();
+}
+
+// `file[:N[-M]] [~ literal]`. Returns null when the pointer part is malformed. The first `~` separates the
+// pointer from the literal; spaces around it are trimmed and wrapping backticks are removed from both sides.
+export function parseEvidencePointer(entry: string): EvidencePointer | null {
+  const tilde = entry.indexOf('~');
+  const pointer = stripBackticks((tilde === -1 ? entry : entry.slice(0, tilde)).trim());
+  const literal = tilde === -1 ? null : stripBackticks(entry.slice(tilde + 1).trim());
+  const m = /^([^\s:]+)(?::(\d+)(?:-(\d+))?)?$/.exec(pointer);
+  if (m === null) return null;
+  const from = m[2] === undefined ? null : Number(m[2]);
+  const to = m[3] === undefined ? from : Number(m[3]);
+  return { file: m[1], from, to, literal };
+}
+
+export function formatPointer(file: string, from: number | null, to: number | null): string {
+  if (from === null) return file;
+  return to === null || to === from ? `${file}:${from}` : `${file}:${from}-${to}`;
+}
+
+// 1-based numbers of the lines where `literal` starts, one entry per occurrence.
+export function findLiteralLines(text: string, literal: string): number[] {
+  const found: number[] = [];
+  if (literal === '') return found;
+  let at = text.indexOf(literal);
+  while (at !== -1) {
+    found.push(text.slice(0, at).split('\n').length);
+    at = text.indexOf(literal, at + literal.length);
+  }
+  return found;
+}
+
+// The text of lines from..to (1-based, inclusive); the whole text when no lines are cited.
+export function citedText(text: string, from: number | null, to: number | null): string {
+  if (from === null || to === null) return text;
+  return text.split('\n').slice(from - 1, to).join('\n');
+}
+
+function where(file: string, lines: number[]): string {
+  return lines.map((line) => `${file}:${line}`).join(', ');
+}
+
 export function checkEvidence(reqs: Requirement[], corpus: Corpus): Violation[] {
   const out: Violation[] = [];
   const root = path.resolve(corpus.root);
   for (const req of reqs) {
     if (req.status === 'dropped') continue; // dropped keeps its number; its evidence may be gone
     for (const entry of req.evidence) {
-      const m = /^([^\s:]+)(?::(\d+)(?:-(\d+))?)?$/.exec(entry);
-      if (m === null) {
-        out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' is not file[:N[-M]]` });
+      const pointer = parseEvidencePointer(entry);
+      if (pointer === null) {
+        out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' is not file[:N[-M]] [~ literal]` });
         continue;
       }
-      const [, file, from, to] = m;
+      const { file, from, to, literal } = pointer;
       const full = path.resolve(root, file);
       if (path.isAbsolute(file) || (full !== root && !full.startsWith(root + path.sep))) {
         out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' points outside the repository` });
@@ -224,16 +287,60 @@ export function checkEvidence(reqs: Requirement[], corpus: Corpus): Violation[] 
         out.push({ code: 'C4', id: req.id, message: `${req.id} evidence file '${file}' is missing` });
         continue;
       }
-      if (from === undefined) continue;
-      const first = Number(from);
-      const last = to === undefined ? first : Number(to);
-      const total = countLines(fs.readFileSync(full, 'utf8'));
-      if (first < 1 || last < first) {
-        out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' has an invalid line range` });
-      } else if (last > total) {
-        out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' is beyond the end of ${file} (${total} lines)` });
+      if (literal === '') {
+        out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' has an anchor with an empty literal` });
+        continue;
       }
+      const text = fs.readFileSync(full, 'utf8');
+      if (from !== null && to !== null) {
+        const total = countLines(text);
+        if (from < 1 || to < from) {
+          out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' has an invalid line range` });
+          continue;
+        }
+        if (to > total) {
+          out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' is beyond the end of ${file} (${total} lines)` });
+          continue;
+        }
+      }
+      if (literal === null) continue;
+      if (citedText(text, from, to).includes(literal)) continue;
+      const now = findLiteralLines(text, literal);
+      const detail = now.length === 0 ? `the literal is not found anywhere in ${file}` : `the literal is now at ${where(file, now)}`;
+      out.push({ code: 'C4', id: req.id, message: `${req.id} evidence '${entry}' does not contain its literal '${literal}' at the cited lines; ${detail}` });
     }
+  }
+  return out;
+}
+
+const PREFIX_MARK = /(?:…|\.\.\.|\/\*\*?)$/;
+
+function homeProblem(home: string, root: string): string | null {
+  if (!home.startsWith('web/src/')) return `home '${home}' is not a path under web/src/<context>/…`;
+  const target = home.replace(PREFIX_MARK, '');
+  const segments = target.split('/').filter((part) => part !== '');
+  if (segments.includes('..') || segments.includes('.')) return `home '${home}' must stay under web/src`;
+  if (segments.length < 3) return `home '${home}' names no context directory under web/src`;
+  const full = path.resolve(root, ...segments);
+  if (fs.existsSync(full)) return null;
+  if (PREFIX_MARK.test(home) && fs.existsSync(path.dirname(full))) {
+    const stem = path.basename(full);
+    if (fs.readdirSync(path.dirname(full)).some((name) => name.startsWith(stem))) return null;
+  }
+  return `home '${home}' does not exist in the repository`;
+}
+
+export function checkHomes(reqs: Requirement[], corpus: Corpus): Violation[] {
+  const out: Violation[] = [];
+  const root = path.resolve(corpus.root);
+  for (const req of reqs) {
+    const number = Number(req.id.slice(2));
+    if (req.home === '') {
+      if (number >= FIRST_ID_NEEDING_HOME) out.push({ code: 'C7', id: req.id, message: `${req.id} has no home (required from R-${pad3(FIRST_ID_NEEDING_HOME)}; web/src/<context>/…)` });
+      continue;
+    }
+    const problem = homeProblem(req.home, root);
+    if (problem !== null) out.push({ code: 'C7', id: req.id, message: `${req.id} ${problem}` });
   }
   return out;
 }
@@ -273,6 +380,7 @@ export function checkAll(reqs: Requirement[], corpus: Corpus): Violation[] {
     ...checkEvidence(reqs, corpus),
     ...checkTags(reqs, corpus),
     ...checkNoDuplicatedTitles(reqs, corpus),
+    ...checkHomes(reqs, corpus),
   ];
 }
 
@@ -286,14 +394,24 @@ export function unclaimedGoldenLabels(reqs: Requirement[], goldenLabels: Set<str
   return [...goldenLabels].filter((label) => !claimed.has(label)).sort();
 }
 
-export function loadGoldenLabels(goldenPath: string): Set<string> {
-  if (!fs.existsSync(goldenPath)) throw new Error(`missing golden file ${goldenPath}`);
-  const golden = JSON.parse(fs.readFileSync(goldenPath, 'utf8')) as Record<string, Record<string, unknown>>;
+// Golden labels are `scenario/label` keys. They come from the committed recordings (the legacy portal's answers,
+// web/src/parity/recorded/*.json) and from the request corpus (test/golden/requests.js), which also holds the
+// scenarios no recording covers.
+export function loadGoldenLabels(repoRoot: string): Set<string> {
   const labels = new Set<string>();
-  for (const [group, entries] of Object.entries(golden)) {
-    for (const label of Object.keys(entries)) labels.add(`${group}/${label}`);
+  const recorded = path.join(repoRoot, 'web', 'src', 'parity', 'recorded');
+  if (fs.existsSync(recorded)) {
+    for (const name of fs.readdirSync(recorded).filter((n) => n.endsWith('.json')).sort()) {
+      const recording = JSON.parse(fs.readFileSync(path.join(recorded, name), 'utf8')) as { results?: { key?: unknown }[] };
+      for (const result of recording.results ?? []) if (typeof result.key === 'string') labels.add(result.key);
+    }
   }
-  if (labels.size === 0) throw new Error(`golden file ${goldenPath} has no labels`);
+  const corpusFile = path.join(repoRoot, 'test', 'golden', 'requests.js');
+  if (fs.existsSync(corpusFile)) {
+    const corpus = createRequire(corpusFile)(corpusFile) as { scenarios?: { name: string; steps: { label: string }[] }[] };
+    for (const scenario of corpus.scenarios ?? []) for (const step of scenario.steps) labels.add(`${scenario.name}/${step.label}`);
+  }
+  if (labels.size === 0) throw new Error(`no labels: neither web/src/parity/recorded/*.json nor the request corpus ${corpusFile} gave any under ${repoRoot}`);
   return labels;
 }
 
@@ -315,8 +433,8 @@ function readSources(root: string, files: string[]): SourceFile[] {
   return files.map((full) => ({ file: path.relative(root, full).split(path.sep).join('/'), text: fs.readFileSync(full, 'utf8') }));
 }
 
-// Fixture case dir: requirements.md, tests.txt (one test file), docs.md (AGENTS.md and the only doc).
-export function loadFixtureCorpus(dir: string, goldenPath: string): { corpus: Corpus; requirements: Requirement[] } {
+// Fixture case dir: requirements.md, tests.txt (one test file), docs.md (AGENTS.md and the only doc); labels come from repoRoot.
+export function loadFixtureCorpus(dir: string, repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
   const need = (name: string): string => {
     const full = path.join(dir, name);
     if (!fs.existsSync(full)) throw new Error(`missing ${full}`);
@@ -329,13 +447,13 @@ export function loadFixtureCorpus(dir: string, goldenPath: string): { corpus: Co
     testFiles: [{ file: 'tests.txt', text: need('tests.txt') }],
     docFiles: [{ file: 'docs.md', text: docs }],
     agentsText: docs,
-    goldenLabels: loadGoldenLabels(goldenPath),
+    goldenLabels: loadGoldenLabels(repoRoot),
   };
   return { corpus, requirements };
 }
 
 // Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts, which mentions tags as examples)
-// and test/**/*.test.js; docs scanned for restated titles are AGENTS.md and docs/** outside docs/ssot/.
+// and the root tooling tests scripts/**/*.test.mjs; docs scanned for restated titles are AGENTS.md and docs/** outside docs/ssot/.
 export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
   const ssot = path.join(repoRoot, SSOT_PATH);
   if (!fs.existsSync(ssot)) throw new Error(`missing ${SSOT_PATH}`);
@@ -343,15 +461,15 @@ export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements
   const agents = path.join(repoRoot, 'AGENTS.md');
   if (!fs.existsSync(agents)) throw new Error('missing AGENTS.md');
   const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => path.basename(f) !== 'ssot.spec.ts');
-  const jsTests = walk(path.join(repoRoot, 'test'), (n) => n.endsWith('.test.js'));
+  const toolTests = walk(path.join(repoRoot, 'scripts'), (n) => n.endsWith('.test.mjs'));
   const ssotDir = path.join(repoRoot, 'docs', 'ssot');
   const docs = walk(path.join(repoRoot, 'docs'), (n) => n.endsWith('.md'), (full) => full === ssotDir);
   const corpus: Corpus = {
     root: repoRoot,
-    testFiles: readSources(repoRoot, [...specs, ...jsTests]),
+    testFiles: readSources(repoRoot, [...specs, ...toolTests]),
     docFiles: readSources(repoRoot, [agents, ...docs]),
     agentsText: fs.readFileSync(agents, 'utf8'),
-    goldenLabels: loadGoldenLabels(path.join(repoRoot, 'test', 'golden', 'legacy-portal.json')),
+    goldenLabels: loadGoldenLabels(repoRoot),
   };
   return { corpus, requirements };
 }

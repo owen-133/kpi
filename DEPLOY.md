@@ -1,86 +1,67 @@
-# 무료 배포: Render Free + Supabase Free
+# 배포: Render Free + Supabase Free
 
-Claude Board 기반 카드 화면 추가 후에도 이 배포 설정은 같습니다. DB 스키마·키·비밀번호를 다시 만들 필요가 없습니다. `public/board/`에 빌드한 Svelte 화면을 소스와 함께 배포합니다. UI 수정 후에는 로컬에서 `npm run build`를 실행해 생성물을 포함해야 합니다. 기존 Render 서비스는 `main` 새 커밋으로 배포하면 됩니다.
-
-## 관리자 설정 기능 추가 시 1회 DB 초기화
-
-기존 Supabase 프로젝트의 SQL Editor에서 `supabase/settings.sql` 전체를 실행하세요. 기존 업무·이력은 삭제하지 않습니다. 새 프로젝트라면 먼저 `supabase/schema.sql`, 다음 `supabase/settings.sql` 순서입니다. 설정 SQL은 재실행해도 기존 설정을 초기화하지 않습니다.
-
-관리자 `admin`으로 포털에 로그인하면 오른쪽 상단 ⚙ 설정에서 문구·메뉴·업무 분류·접수 경로·우선순위·로고·색상·배너를 저장할 수 있습니다. 최초 SQL 실행 전에는 기본 화면은 유지되지만 설정 저장은 비활성화되고 초기화 안내가 표시됩니다. DB 연결 오류를 기본값으로 덮어쓰지 않습니다.
-
-설정은 모든 사용자에게 공유되며 다른 사용자 화면에는 새로고침 후 반영됩니다. 최근 설정 이력 30건을 화면에 표시하고 전체 이력은 DB에 보존합니다. 현재 관리자 공용 계정은 `admin`으로 기록되므로 개별 사람까지 식별하지 않습니다. 상태 단계는 업무 이력과의 호환성을 위해 고정이며, 계정 비밀번호·DB 키는 계속 Render에서만 관리합니다. 새 설정은 기존 업무의 분류나 내용을 소급 수정하지 않습니다.
-
-유료 디스크는 사용하지 않습니다. `render.yaml`에도 `plan: free`를 지정했습니다. 기존 Render 수동 생성 화면에서는 반드시 **Instance Type: Free**를 선택하세요. Blueprint를 사용하지 않는 경우 yaml 값은 자동으로 적용되지 않습니다.
-
-무료는 영구적인 무제한 제공을 뜻하지 않습니다. 공급자 정책 변경, 사용량 한도, 비활성 중지, 첫 접속 지연이 있을 수 있습니다. 유료 플랜으로 전환하지 말고 Free로 생성 가능한지 가입 화면에서 확인하세요. 최신 공식 요금·상업 이용 약관은 이 작업 환경의 네트워크 차단 때문에 재확인하지 못했습니다. 참고: https://render.com/docs/free , https://supabase.com/pricing , https://supabase.com/terms . 무료 운영에 별도 AI 유료 API는 필요하지 않습니다.
+Render는 `web/`의 Next 앱을 실행합니다. 루트 `npm run build`가 `web` 의존성(개발 의존성 포함)을 설치하고 빌드합니다. 루트 `npm start`가 `web`을 시작합니다. 서버는 `HOST`와 `PORT`에 바인딩합니다. 값이 없으면 `127.0.0.1:3000`입니다. Render는 `HOST=0.0.0.0`을 설정하고 `PORT`를 직접 주입합니다.
 
 ## 1. Supabase
 
-1. https://supabase.com/dashboard 에서 GitHub로 가입합니다.
-2. **Free** 조직에 `orbit-ops` 프로젝트를 만듭니다. 프로젝트 DB 비밀번호는 안전하게 보관합니다.
-3. 프로젝트 **SQL Editor**에서 저장소의 `supabase/upgrade.sql` 전체를 실행합니다. 이 스크립트는 테이블과 서버 전용 RPC를 만듭니다. 재실행해도 기존 업무는 지우지 않습니다.
-4. 프로젝트 설정/Connect에서 **Project URL**을 확인합니다 (`https://프로젝트ID.supabase.co`).
-5. 프로젝트 설정의 API Keys에서 **New secret key**를 확인합니다. `anon`/publishable 키나 DB 비밀번호가 아닙니다. `New secret key`로 만든 `sb_secret_` 키를 사용합니다. 이름은 `orbit-render`로 지정하면 됩니다. 키는 Render 환경변수에만 입력하고 채팅, GitHub, 브라우저 JS에 넣지 않습니다.
+1. https://supabase.com/dashboard 에서 **Free** 조직에 `orbit-ops` 프로젝트를 만듭니다. 프로젝트 DB 비밀번호는 안전하게 보관합니다.
+2. 프로젝트 **SQL Editor**에서 저장소의 `supabase/upgrade.sql` 전체를 실행합니다. `schema.sql`, `settings.sql`, `deletion.sql`, `kpi.sql`, `edit.sql`을 이 순서로 합친 누적본(`node scripts/build-upgrade.js`로 생성)이고, 테이블과 DB 함수 다섯 개를 만듭니다. 새 프로젝트도 기존 프로젝트도 같은 파일 하나를 쓰며, 재실행해도 기존 업무·이력은 지우지 않습니다. 개별 파일을 직접 실행하려면 위 순서를 지킵니다.
+3. 같은 SQL Editor에서 `web/db/app-role.sql`을 실행합니다. 2단계의 함수가 있어야 합니다. 파일 안의 비밀번호 자리 표시자를 긴 임의 값으로 바꾼 뒤 실행합니다. 이 역할(`orbit_app`)은 DB 함수 다섯 개의 실행 권한만 가집니다.
+4. Connect 화면에서 **연결 풀러** 주소를 확인합니다. 직접 연결 주소는 IPv6 전용이라 Render에서 닿지 않을 수 있습니다. 풀러의 사용자 이름은 `orbit_app.<프로젝트 ref>` 형식입니다. 이 사용자와 3단계 비밀번호로 `DATABASE_URL`을 만듭니다.
+5. 데이터베이스 CA 인증서를 PEM으로 받아 둡니다(`DATABASE_CA`에 넣습니다).
+
+앱은 테이블이 아니라 DB 함수만 부르므로 Supabase의 서비스 키(`sb_secret_`)나 프로젝트 URL이 필요하지 않습니다.
 
 ## 2. Render Web Service
 
-GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다.
+GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다. Blueprint를 쓰면 `render.yaml`이 적용됩니다. Blueprint를 쓰지 않는 수동 생성에서는 yaml 값이 자동 적용되지 않으므로 아래 표를 직접 입력하고 **Instance Type: Free**를 선택합니다.
 
 | 항목 | 값 |
 |---|---|
 | Language | Node |
 | Root Directory | 비워두기 |
 | Instance Type | **Free** |
-| Build Command | `node --check server.js && node --check public/app.js` |
+| Build Command | `npm run build` |
 | Start Command | `npm start` |
 | Health Check Path | `/health` |
 
-환경변수는 다음과 같습니다. `SUPABASE_SECRET_KEY`와 비밀번호는 비밀 값으로 관리합니다.
+### 환경변수
 
-| Key | Value |
+| Key | 내용 |
 |---|---|
 | NODE_VERSION | 24 |
 | NODE_ENV | production |
 | HOST | 0.0.0.0 |
-| STORAGE_BACKEND | supabase |
-| SUPABASE_URL | Supabase Project URL |
-| SUPABASE_SECRET_KEY | Supabase Secret key (`sb_secret_`로 시작) |
-| ADMIN_PASSWORD | 본인이 정한 관리자 비밀번호 |
-| VIEWER_PASSWORD | 관리자와 다른 조회용 비밀번호 |
+| DATABASE_URL | `orbit_app` 역할의 Postgres 접속 URL. 비밀 값 |
+| DATABASE_CA | 데이터베이스 CA 인증서의 PEM 전문. 비밀 값은 아니지만 Render에서만 관리 |
+| ADMIN_PASSWORD | 관리자 비밀번호 |
+| VIEWER_PASSWORD | 조회용 비밀번호. 관리자와 달라야 함 |
 
-`DATA_DIR`나 유료 디스크는 필요하지 않습니다. 값을 설정한 후 Deploy합니다. 필요한 값이 없으면 서버는 시작을 거부합니다. Supabase 오류가 나도 임시 파일이나 브라우저로 저장을 우회하지 않습니다.
+`STORAGE_BACKEND`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`는 앱이 읽지 않습니다. 남아 있어도 동작에는 영향이 없습니다. 이전 배포(옛 서버)로 되돌릴 가능성을 남기려면 새 앱이 안정적인 것을 확인할 때까지 두고, 확인한 뒤 Render와 `render.yaml`에서 지웁니다. 지우면 옛 서버로는 되돌릴 수 없습니다.
 
-## 3. 실제 배포 후 확인
+### 값이 없을 때
 
-- 발급받은 HTTPS 주소에서 `admin`으로 로그인해 업무 등록 → 상태 변경 → 메모 → 완료를 실행합니다.
-- 팀장용 `viewer` 계정은 조회만 되고 변경할 수 없는지 확인합니다.
-- Render를 재시작해도 업무와 이력이 남는지 확인합니다.
-- 유휴 후 재접속 지연, 무료 DB 일시 중지 상태가 있다면 공급자 대시보드에서 확인합니다. 제한 회피용 자동 호출은 사용하지 않습니다.
+운영(`NODE_ENV=production`)에서 `DATABASE_URL`이 없으면 서버가 시작을 거부하고 `운영 배포에는 DATABASE_URL이 필요합니다.`를 출력합니다. 비밀번호가 없거나 두 비밀번호가 같을 때도 거부합니다. 접속 URL이 TLS 검증을 끄면(`sslmode=disable` 등) 접속을 거부합니다. 파일 저장소나 임시 저장으로 대체하지 않습니다.
+
+## 3. 배포 후 확인
+
+1. `/health`가 200을 줍니다.
+2. 발급받은 HTTPS 주소에서 `admin`으로 로그인해 업무 등록 → 상태 변경 → 메모 → 완료를 실행합니다.
+3. `viewer`는 조회만 되고 변경이 거부되는지 확인합니다.
+4. 담당자 배정 → 파일 첨부 → 월간 지표 대조 → 보고서 검토·발행 → 월간 보고서 PDF 내려받기 → 개선 기록 흐름을 확인합니다.
+5. 관리자만 상세 화면의 업무 삭제와 상단 휴지통을 쓸 수 있는지, 휴지통의 업무가 통계·CSV와 viewer에서 빠지고 복원하면 이전 상태가 유지되는지 확인합니다. 영구 삭제는 제목 확인을 거치며 앱에서 복구할 수 없습니다.
+6. 설정(⚙)에서 문구를 저장하면 다른 브라우저에서 새로고침 후 반영되는지 확인합니다.
+7. Render를 재시작해도 업무와 이력이 남는지 확인합니다.
+8. 유휴 후 재접속 지연, 무료 DB 일시 중지 상태가 있으면 공급자 대시보드에서 확인합니다. 제한 회피용 자동 호출은 사용하지 않습니다.
+
+## 4. 되돌리기
+
+저장소에는 이전 서버가 더 이상 없습니다. 문제가 있으면 Render 대시보드에서 이전 배포를 다시 배포합니다. 코드 되돌리기가 필요하면 문제가 된 커밋을 `git revert <커밋>` 하고 `main`에 배포합니다. 이 방법은 Render가 이전 배포를 보관하는 동안에만 쓸 수 있고, DB 변경(SQL 실행)은 되돌리지 않습니다.
 
 ## 범위와 보존
 
-로컬 SQLite에 이미 들어간 데이터는 자동 이전하지 않습니다. 현재 클라우드 DB는 새로 시작하므로 기존 데이터가 있다면 별도 이전 작업을 해야 합니다. 이력은 앱에서 수정·삭제할 수 없지만 DB 관리자까지 막는 외부 공증은 아닙니다. 개인 로그인, 백업/복구, 보존 정책은 운영 강화 과제로 남아 있습니다. 무료 한도와 중단 가능성이 있는 서비스이므로 업무에 중요한 자료의 유일한 사본으로 사용하기 전 백업 절차가 필요합니다.
-
-로컬 PostgreSQL 호환 엔진 검증과 실제 Supabase/Render 배포 검증은 다릅니다. 사용자 계정에 프로젝트를 만들고 연결하기 전에는 배포 완료로 볼 수 없습니다.
-
-## 삭제 기능 추가 시 1회 초기화
-
-Supabase SQL Editor에서 `supabase/deletion.sql` 전체를 실행합니다. 기존 업무를 삭제하지 않고 휴지통 열·삭제 감사 테이블과 서버 RPC를 추가/갱신합니다. 새 DB는 schema.sql, settings.sql, deletion.sql 순서로 실행하세요. 아직 초기화하지 않은 경우 기존 업무 조회는 유지되지만 삭제·휴지통 요청은 초기화 안내 오류로 차단됩니다.
-
-배포 후 관리자만 상세 화면의 업무 삭제와 상단 휴지통을 사용할 수 있는지 확인합니다. 휴지통에 넣은 업무가 통계·CSV와 viewer에서 제외되고, 복원하면 기존 상태가 유지되는지 테스트하세요. 영구 삭제는 제목 확인을 거친 경우에만 수행하며 앱에서 복구할 수 없습니다. API 키·접속 비밀번호·유료 플랜 설정 변경은 없습니다.
-
-## KPI 기능 누적 업그레이드 (권장)
-
-이번 버전은 `supabase/upgrade.sql` 전체를 SQL Editor에서 실행하면 기존 설정·삭제 기능과 새 KPI 기능을 한 번에 준비합니다. 새 프로젝트도 같은 파일을 사용합니다. 이전 버전의 개별 schema.sql/settings.sql/deletion.sql을 다시 실행할 필요가 없고, 이미 실행한 상태에서 누적본을 실행해도 기록을 지우지 않습니다. task_extras(배정/테스트 표시), task_files(비공개 첨부), improvements/이력, monthly_reports(발행본), 서버 전용 RPC를 추가합니다. 유료 디스크·새 API 키·추가 계정은 필요하지 않습니다.
-
-첨부파일은 Supabase DB에 base64로 저장되므로 파일 크기보다 실제 저장량이 큽니다. 파일당 1MB, 업무당 10개로 제한하지만 무료 DB 전체 사용량도 확인하세요. 공개 Storage 버킷은 만들지 않습니다. 키가 없는 외부 AI 서비스는 호출하지 않습니다.
-
-배포 후 실제 업무 접수 → 배정 → 첨부 → 완료 → 월간 지표 대조 → 보고서 검토·발행 → 개선 기록 흐름과 조회 계정의 변경 차단을 확인합니다. 기본 중요도는 중/상/하이나 기존에 관리자가 저장한 선택지는 보존됩니다. 자동화와 소요시간 정의는 KPI_GUIDE.md를 참고하세요.
-
-## PDF 내려받기 업데이트
-
-기존 발행본의 출력도 PDF로 바뀝니다. DB/환경변수/호스팅 요금제/SQL 변경은 필요하지 않습니다. public/pdf/와 public/fonts/의 생성 번들·글꼴을 소스와 함께 배포하면 됩니다. PDF 생성은 브라우저에서 수행하며 서버에 Chromium이나 PDF 생성 프로세스를 설치하지 않습니다. 공개 글꼴 CDN이나 외부 문서 변환 서비스에도 보고서 내용을 보내지 않습니다.
-
-## 업무 정보 수정 업데이트
-
-기존 운영 DB는 `supabase/edit.sql` 전체를 SQL Editor에서 한 번 실행하면 됩니다. 최신 누적본 `supabase/upgrade.sql`에도 포함되어 있습니다. 수정 버전 열과 서버 전용 수정 함수를 추가하며 기존 업무는 삭제하지 않습니다. 계정·API 키·요금제 변경은 없습니다. 새 커밋 배포 후 관리자 상세에서 업무 수정 → 사유 입력 → 저장을 확인하세요. 조회 계정의 수정 요청은 차단됩니다.
+- 이력은 앱에서 수정·삭제할 수 없지만 DB 관리자까지 막는 외부 공증은 아닙니다. 개인 로그인, 백업/복구, 보존 정책은 운영 강화 과제로 남아 있습니다.
+- 첨부파일은 DB에 base64로 저장되므로 파일 크기보다 실제 저장량이 큽니다. 파일당 1MB, 업무당 10개로 제한하지만 무료 DB 전체 사용량도 확인하세요. 공개 Storage 버킷은 만들지 않습니다.
+- 무료는 영구적인 무제한 제공을 뜻하지 않습니다. 공급자 정책 변경, 사용량 한도, 비활성 중지, 첫 접속 지연이 있을 수 있습니다. 업무에 중요한 자료의 유일한 사본으로 쓰기 전에 백업 절차를 마련합니다. 요금·약관은 공급자 사이트에서 확인합니다: https://render.com/docs/free , https://supabase.com/pricing , https://supabase.com/terms
+- 로컬 PostgreSQL 호환 엔진(PGlite) 검증과 실제 Supabase/Render 배포 검증은 다릅니다. 실제 서비스에서 위 확인을 마치기 전에는 배포 완료로 보지 않습니다.
+- 외부 AI 유료 API는 쓰지 않습니다. 유료 디스크·새 API 키·추가 계정은 필요하지 않습니다.

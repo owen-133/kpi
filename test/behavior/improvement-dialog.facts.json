@@ -1,0 +1,943 @@
+{
+ "screen": "improvement-dialog",
+ "variants": {
+  "admin/empty/new": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "새 개선 기록"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "개선 기록 저장",
+     "type": "submit"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "개선 제목",
+     "required": true,
+     "maxlength": "5000"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "source",
+     "label": "피드백 출처 / 시연 대상",
+     "maxlength": "5000"
+    },
+    {
+     "kind": "select",
+     "name": "stage",
+     "label": "수행 단계",
+     "value": "본인 실사용",
+     "options": [
+      {
+       "text": "MVP 구축"
+      },
+      {
+       "text": "본인 실사용",
+       "selected": true
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "status",
+     "label": "상태",
+     "value": "접수",
+     "options": [
+      {
+       "text": "접수",
+       "selected": true
+      },
+      {
+       "text": "개선 중"
+      },
+      {
+       "text": "검증 완료"
+      }
+     ]
+    },
+    {
+     "kind": "textarea",
+     "name": "feedback",
+     "label": "문제·요청·피드백 (개선 전)",
+     "required": true,
+     "maxlength": "5000"
+    },
+    {
+     "kind": "textarea",
+     "name": "action",
+     "label": "개선 내용·조치 (개선 후)",
+     "maxlength": "5000"
+    },
+    {
+     "kind": "textarea",
+     "name": "result",
+     "label": "검증 결과·전후 비교·근거 위치",
+     "maxlength": "5000"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - heading \"새 개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\"",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\" [selected]",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\" [selected]",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\"",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\"",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\"",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\"",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"개선 기록 저장\""
+   ]
+  },
+  "admin/populated/new": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "새 개선 기록"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "개선 기록 저장",
+     "type": "submit"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "개선 제목",
+     "required": true,
+     "maxlength": "5000"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "source",
+     "label": "피드백 출처 / 시연 대상",
+     "maxlength": "5000"
+    },
+    {
+     "kind": "select",
+     "name": "stage",
+     "label": "수행 단계",
+     "value": "본인 실사용",
+     "options": [
+      {
+       "text": "MVP 구축"
+      },
+      {
+       "text": "본인 실사용",
+       "selected": true
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "status",
+     "label": "상태",
+     "value": "접수",
+     "options": [
+      {
+       "text": "접수",
+       "selected": true
+      },
+      {
+       "text": "개선 중"
+      },
+      {
+       "text": "검증 완료"
+      }
+     ]
+    },
+    {
+     "kind": "textarea",
+     "name": "feedback",
+     "label": "문제·요청·피드백 (개선 전)",
+     "required": true,
+     "maxlength": "5000"
+    },
+    {
+     "kind": "textarea",
+     "name": "action",
+     "label": "개선 내용·조치 (개선 후)",
+     "maxlength": "5000"
+    },
+    {
+     "kind": "textarea",
+     "name": "result",
+     "label": "검증 결과·전후 비교·근거 위치",
+     "maxlength": "5000"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - heading \"새 개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\"",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\" [selected]",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\" [selected]",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\"",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\"",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\"",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\"",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"개선 기록 저장\""
+   ]
+  },
+  "viewer/empty/new": {
+   "opened": false,
+   "reason": "the add button is not visible for this role"
+  },
+  "viewer/populated/new": {
+   "opened": false,
+   "reason": "the add button is not visible for this role"
+  },
+  "admin/empty/existing": {
+   "opened": false,
+   "reason": "there is no record row to open"
+  },
+  "admin/populated/existing": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "개선 기록"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "수정 이력",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "개선 기록 저장",
+     "type": "submit"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "개선 제목",
+     "required": true,
+     "maxlength": "5000",
+     "value": "기한 초과 표시"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "source",
+     "label": "피드백 출처 / 시연 대상",
+     "maxlength": "5000"
+    },
+    {
+     "kind": "select",
+     "name": "stage",
+     "label": "수행 단계",
+     "value": "MVP 구축",
+     "options": [
+      {
+       "text": "MVP 구축",
+       "selected": true
+      },
+      {
+       "text": "본인 실사용"
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "status",
+     "label": "상태",
+     "value": "검증 완료",
+     "options": [
+      {
+       "text": "접수"
+      },
+      {
+       "text": "개선 중"
+      },
+      {
+       "text": "검증 완료",
+       "selected": true
+      }
+     ]
+    },
+    {
+     "kind": "textarea",
+     "name": "feedback",
+     "label": "문제·요청·피드백 (개선 전)",
+     "required": true,
+     "maxlength": "5000",
+     "value": "기한이 지난 업무를 한눈에 구분하기 어렵다"
+    },
+    {
+     "kind": "textarea",
+     "name": "action",
+     "label": "개선 내용·조치 (개선 후)",
+     "maxlength": "5000",
+     "value": "기한 초과 업무를 강조"
+    },
+    {
+     "kind": "textarea",
+     "name": "result",
+     "label": "검증 결과·전후 비교·근거 위치",
+     "maxlength": "5000",
+     "value": "시연에서 구분이 쉬워졌다는 의견"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 시연에서 구분이 쉬워졌다는 의견",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\"",
+    "  - button \"개선 기록 저장\""
+   ]
+  },
+  "viewer/empty/existing": {
+   "opened": false,
+   "reason": "there is no record row to open"
+  },
+  "viewer/populated/existing": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "개선 기록"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "수정 이력",
+     "type": "button"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "개선 제목",
+     "required": true,
+     "readonly": true,
+     "maxlength": "5000",
+     "value": "기한 초과 표시"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "source",
+     "label": "피드백 출처 / 시연 대상",
+     "readonly": true,
+     "maxlength": "5000"
+    },
+    {
+     "kind": "select",
+     "name": "stage",
+     "label": "수행 단계",
+     "disabled": true,
+     "value": "MVP 구축",
+     "options": [
+      {
+       "text": "MVP 구축",
+       "selected": true
+      },
+      {
+       "text": "본인 실사용"
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "status",
+     "label": "상태",
+     "disabled": true,
+     "value": "검증 완료",
+     "options": [
+      {
+       "text": "접수"
+      },
+      {
+       "text": "개선 중"
+      },
+      {
+       "text": "검증 완료",
+       "selected": true
+      }
+     ]
+    },
+    {
+     "kind": "textarea",
+     "name": "feedback",
+     "label": "문제·요청·피드백 (개선 전)",
+     "required": true,
+     "readonly": true,
+     "maxlength": "5000",
+     "value": "기한이 지난 업무를 한눈에 구분하기 어렵다"
+    },
+    {
+     "kind": "textarea",
+     "name": "action",
+     "label": "개선 내용·조치 (개선 후)",
+     "readonly": true,
+     "maxlength": "5000",
+     "value": "기한 초과 업무를 강조"
+    },
+    {
+     "kind": "textarea",
+     "name": "result",
+     "label": "검증 결과·전후 비교·근거 위치",
+     "readonly": true,
+     "maxlength": "5000",
+     "value": "시연에서 구분이 쉬워졌다는 의견"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\" [disabled]:",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\" [disabled]:",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 시연에서 구분이 쉬워졌다는 의견",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\""
+   ]
+  }
+ },
+ "interactions": [
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "new record: click 개선 기록 저장 with nothing filled",
+   "before": [
+    "- dialog:",
+    "  - heading \"새 개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\"",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\" [selected]",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\" [selected]",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\"",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\"",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\"",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\"",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"개선 기록 저장\""
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "새 개선 기록"
+    ],
+    "toast": null
+   },
+   "invalidFields": [
+    "title",
+    "feedback"
+   ]
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "new record: fill title and feedback and save",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"알림 문구 개선 본인 실사용 · 본인 · <TS> · v1\":",
+    "      - strong: 알림 문구 개선",
+    "      - text: 본인 실사용 · 본인 · <TS> · v1",
+    "    - text: 접수",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": "개선 기록을 저장했습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "new record: choose 검증 완료 without a result and save",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - heading \"새 개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 검증 없이 완료",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\" [selected]",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 피드백",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\"",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\"",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"개선 기록 저장\""
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "새 개선 기록"
+    ],
+    "toast": "검증 완료에는 검증 결과가 필요합니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "new record: choose 검증 완료 with a result and save",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"검증 포함 완료 본인 실사용 · 본인 · <TS> · v1\":",
+    "      - strong: 검증 포함 완료",
+    "      - text: 본인 실사용 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": "개선 기록을 저장했습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "existing record: click 수정 이력 before any edit",
+   "before": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 시연에서 구분이 쉬워졌다는 의견",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\"",
+    "  - button \"개선 기록 저장\""
+   ],
+   "after": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 시연에서 구분이 쉬워졌다는 의견",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\"",
+    "  - button \"개선 기록 저장\"",
+    "  - text: <TS> · admin",
+    "  - paragraph: \"title: — → 기한 초과 표시 stage: — → MVP 구축 source: — → — feedback: — → 기한이 지난 업무를 한눈에 구분하기 어렵다 action: — → 기한 초과 업무를 강조 result: — → 시연에서 구분이 쉬워졌다는 의견 status: — → 검증 완료\""
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "개선 기록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "existing record: change the status and save then reopen the history",
+   "before": {
+    "sameAsBeforeOfInteraction": 4
+   },
+   "after": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\":",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\":",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 검증 결과 입력",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\"",
+    "  - button \"개선 기록 저장\"",
+    "  - text: <TS> · admin",
+    "  - paragraph: \"title: — → 기한 초과 표시 stage: — → MVP 구축 source: — → — feedback: — → 기한이 지난 업무를 한눈에 구분하기 어렵다 action: — → 기한 초과 업무를 강조 result: — → 시연에서 구분이 쉬워졌다는 의견 status: — → 검증 완료\"",
+    "  - text: <TS> · admin",
+    "  - paragraph: \"result: 시연에서 구분이 쉬워졌다는 의견 → 검증 결과 입력\""
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "개선 기록"
+    ],
+    "toast": "개선 기록을 저장했습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "existing record: click × close",
+   "before": {
+    "sameAsBeforeOfInteraction": 4
+   },
+   "after": [],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: try to type in the title field",
+   "before": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\" [disabled]:",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\" [disabled]:",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 시연에서 구분이 쉬워졌다는 의견",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\""
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "개선 기록"
+    ],
+    "toast": null
+   },
+   "titleReadonly": true
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: click 수정 이력",
+   "before": {
+    "sameAsBeforeOfInteraction": 7
+   },
+   "after": [
+    "- dialog:",
+    "  - heading \"개선 기록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - text: 개선 제목",
+    "  - textbox \"개선 제목\": 기한 초과 표시",
+    "  - text: 피드백 출처 / 시연 대상",
+    "  - textbox \"피드백 출처 / 시연 대상\"",
+    "  - text: 수행 단계",
+    "  - combobox \"수행 단계\" [disabled]:",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - text: 상태",
+    "  - combobox \"상태\" [disabled]:",
+    "    - option \"접수\"",
+    "    - option \"개선 중\"",
+    "    - option \"검증 완료\" [selected]",
+    "  - text: 문제·요청·피드백 (개선 전)",
+    "  - textbox \"문제·요청·피드백 (개선 전)\": 기한이 지난 업무를 한눈에 구분하기 어렵다",
+    "  - text: 개선 내용·조치 (개선 후)",
+    "  - textbox \"개선 내용·조치 (개선 후)\": 기한 초과 업무를 강조",
+    "  - text: 검증 결과·전후 비교·근거 위치",
+    "  - textbox \"검증 결과·전후 비교·근거 위치\": 시연에서 구분이 쉬워졌다는 의견",
+    "  - paragraph: 검증 완료에는 검증 결과가 필수입니다. 공용 admin 계정의 수정 전후 내용과 시각을 보존합니다.",
+    "  - button \"수정 이력\"",
+    "  - text: <TS> · admin",
+    "  - paragraph: \"title: — → 기한 초과 표시 stage: — → MVP 구축 source: — → — feedback: — → 기한이 지난 업무를 한눈에 구분하기 어렵다 action: — → 기한 초과 업무를 강조 result: — → 시연에서 구분이 쉬워졌다는 의견 status: — → 검증 완료\""
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "개선 기록"
+    ],
+    "toast": null
+   }
+  }
+ ]
+}

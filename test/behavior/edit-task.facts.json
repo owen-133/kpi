@@ -1,0 +1,826 @@
+{
+ "screen": "edit-task",
+ "variants": {
+  "admin/empty": {
+   "applicable": false
+  },
+  "admin/populated": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "업무 정보 수정"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "취소",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "수정 저장",
+     "type": "submit"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "업무명 *",
+     "required": true,
+     "maxlength": "200",
+     "value": "신규 입사자 노트북 준비"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "requester",
+     "label": "요청자 *",
+     "required": true,
+     "maxlength": "100",
+     "value": "홍길동"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "department",
+     "label": "부서",
+     "maxlength": "100",
+     "value": "인사팀"
+    },
+    {
+     "kind": "select",
+     "name": "channel",
+     "label": "접수 경로",
+     "value": "메신저",
+     "options": [
+      {
+       "text": "메신저",
+       "selected": true
+      },
+      {
+       "text": "구두"
+      },
+      {
+       "text": "이메일"
+      },
+      {
+       "text": "전화"
+      },
+      {
+       "text": "기타"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "category",
+     "label": "업무 분류",
+     "value": "비품·자산",
+     "options": [
+      {
+       "text": "비품·자산",
+       "selected": true
+      },
+      {
+       "text": "일반 총무"
+      },
+      {
+       "text": "고정업무"
+      },
+      {
+       "text": "구매·지출"
+      },
+      {
+       "text": "시설·환경"
+      },
+      {
+       "text": "계약"
+      },
+      {
+       "text": "복리후생"
+      },
+      {
+       "text": "기타"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "priority",
+     "label": "중요도",
+     "value": "높음",
+     "options": [
+      {
+       "text": "높음",
+       "selected": true
+      },
+      {
+       "text": "중"
+      },
+      {
+       "text": "상"
+      },
+      {
+       "text": "하"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "name": "requested_at",
+     "label": "요청일 *",
+     "required": true,
+     "maxlength": "100",
+     "value": "2026-11-03"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "name": "due_date",
+     "label": "처리 기한",
+     "maxlength": "100",
+     "value": "2026-11-05"
+    },
+    {
+     "kind": "textarea",
+     "name": "description",
+     "label": "상세내용",
+     "maxlength": "10000",
+     "value": "노트북 1대 준비"
+    },
+    {
+     "kind": "textarea",
+     "name": "reason",
+     "label": "수정 사유 *",
+     "placeholder": "예: 요청자 오기 정정, 협의에 따른 기한 변경",
+     "required": true,
+     "maxlength": "1000"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - paragraph: EDIT REQUEST",
+    "  - heading \"업무 정보 수정\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 등록 시각·상태·완료 시각·배정·첨부는 유지됩니다. 변경한 항목과 수정 사유를 이력에 기록합니다. 기한·요청 시각 변경은 현재 지표에 반영되며 이미 발행한 보고서는 유지됩니다.",
+    "  - text: 업무명 *",
+    "  - textbox \"업무명 *\": 신규 입사자 노트북 준비",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\": 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\": 인사팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"비품·자산\" [selected]",
+    "    - option \"일반 총무\"",
+    "    - option \"고정업무\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"높음\" [selected]",
+    "    - option \"중\"",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-03",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\": 2026-11-05",
+    "  - text: 상세내용",
+    "  - textbox \"상세내용\": 노트북 1대 준비",
+    "  - text: 수정 사유 *",
+    "  - textbox \"수정 사유 *\":",
+    "    - /placeholder: \"예: 요청자 오기 정정, 협의에 따른 기한 변경\"",
+    "  - button \"취소\"",
+    "  - button \"수정 저장\""
+   ]
+  },
+  "viewer/empty": {
+   "applicable": false
+  },
+  "viewer/populated": {
+   "opened": false,
+   "reason": "the edit control is not visible for this role"
+  }
+ },
+ "interactions": [
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 수정 저장 without a reason",
+   "before": [
+    "- dialog:",
+    "  - paragraph: EDIT REQUEST",
+    "  - heading \"업무 정보 수정\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 등록 시각·상태·완료 시각·배정·첨부는 유지됩니다. 변경한 항목과 수정 사유를 이력에 기록합니다. 기한·요청 시각 변경은 현재 지표에 반영되며 이미 발행한 보고서는 유지됩니다.",
+    "  - text: 업무명 *",
+    "  - textbox \"업무명 *\": 신규 입사자 노트북 준비",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\": 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\": 인사팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"비품·자산\" [selected]",
+    "    - option \"일반 총무\"",
+    "    - option \"고정업무\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"높음\" [selected]",
+    "    - option \"중\"",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-03",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\": 2026-11-05",
+    "  - text: 상세내용",
+    "  - textbox \"상세내용\": 노트북 1대 준비",
+    "  - text: 수정 사유 *",
+    "  - textbox \"수정 사유 *\":",
+    "    - /placeholder: \"예: 요청자 오기 정정, 협의에 따른 기한 변경\"",
+    "  - button \"취소\"",
+    "  - button \"수정 저장\""
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "업무 정보 수정",
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   },
+   "invalidFields": [
+    "reason"
+   ]
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "clear the title and click 수정 저장",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: EDIT REQUEST",
+    "  - heading \"업무 정보 수정\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 등록 시각·상태·완료 시각·배정·첨부는 유지됩니다. 변경한 항목과 수정 사유를 이력에 기록합니다. 기한·요청 시각 변경은 현재 지표에 반영되며 이미 발행한 보고서는 유지됩니다.",
+    "  - text: 업무명 *",
+    "  - textbox \"업무명 *\"",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\": 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\": 인사팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"비품·자산\" [selected]",
+    "    - option \"일반 총무\"",
+    "    - option \"고정업무\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"높음\" [selected]",
+    "    - option \"중\"",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-03",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\": 2026-11-05",
+    "  - text: 상세내용",
+    "  - textbox \"상세내용\": 노트북 1대 준비",
+    "  - text: 수정 사유 *",
+    "  - textbox \"수정 사유 *\":",
+    "    - /placeholder: \"예: 요청자 오기 정정, 협의에 따른 기한 변경\"",
+    "    - text: 정정",
+    "  - button \"취소\"",
+    "  - button \"수정 저장\""
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "업무 정보 수정",
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   },
+   "invalidFields": [
+    "title"
+   ]
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "change the title with a reason and save",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"신규 입사자 노트북 2대 준비\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 홍길동 부서 인사팀 접수 경로 메신저 분류 · 우선순위 비품·자산 · 높음 요청일 2026-11-03 시스템 등록 시각 <TS> 처리 기한 2026-11-05 완료 시각 —",
+    "  - paragraph: 노트북 1대 준비",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\"",
+    "    - option \"진행 중\" [selected]",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 <TS>",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "    - text: 박지원",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · admin",
+    "  - strong: 업무 정보 수정",
+    "  - paragraph: \"수정 사유: 수량 정정 업무명: 신규 입사자 노트북 준비 → 신규 입사자 노트북 2대 준비\"",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 담당자 배정",
+    "  - paragraph: 미배정 → 박지원",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 처리 메모",
+    "  - paragraph: 장비 준비 및 계정 설정 완료",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 상태 변경",
+    "  - paragraph: 접수 → 진행 중",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 2대 준비"
+    ],
+    "toast": "업무 정보를 수정했습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "change the due date and the priority with a reason and save",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"신규 입사자 노트북 준비\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 홍길동 부서 인사팀 접수 경로 메신저 분류 · 우선순위 비품·자산 · 하 요청일 2026-11-03 시스템 등록 시각 <TS> 처리 기한 2026-11-12 완료 시각 —",
+    "  - paragraph: 노트북 1대 준비",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\"",
+    "    - option \"진행 중\" [selected]",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 <TS>",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "    - text: 박지원",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · admin",
+    "  - strong: 업무 정보 수정",
+    "  - paragraph: \"수정 사유: 협의에 따른 기한 변경 중요도: 높음 → 하 처리 기한: 2026-11-05 → 2026-11-12\"",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 담당자 배정",
+    "  - paragraph: 미배정 → 박지원",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 처리 메모",
+    "  - paragraph: 장비 준비 및 계정 설정 완료",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 상태 변경",
+    "  - paragraph: 접수 → 진행 중",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": "업무 정보를 수정했습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "change the request date with a reason and save",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"신규 입사자 노트북 준비\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 홍길동 부서 인사팀 접수 경로 메신저 분류 · 우선순위 비품·자산 · 높음 요청일 2026-11-02 시스템 등록 시각 <TS> 처리 기한 2026-11-05 완료 시각 —",
+    "  - paragraph: 노트북 1대 준비",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\"",
+    "    - option \"진행 중\" [selected]",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 <TS>",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "    - text: 박지원",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · admin",
+    "  - strong: 업무 정보 수정",
+    "  - paragraph: \"수정 사유: 요청일 정정 요청받은 시각: <TS> → <TS>\"",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 담당자 배정",
+    "  - paragraph: 미배정 → 박지원",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 처리 메모",
+    "  - paragraph: 장비 준비 및 계정 설정 완료",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 상태 변경",
+    "  - paragraph: 접수 → 진행 중",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": "업무 정보를 수정했습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "enter a reason only and save (nothing changed)",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"신규 입사자 노트북 준비\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 홍길동 부서 인사팀 접수 경로 메신저 분류 · 우선순위 비품·자산 · 높음 요청일 2026-11-03 시스템 등록 시각 <TS> 처리 기한 2026-11-05 완료 시각 —",
+    "  - paragraph: 노트북 1대 준비",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\"",
+    "    - option \"진행 중\" [selected]",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 <TS>",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "    - text: 박지원",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 담당자 배정",
+    "  - paragraph: 미배정 → 박지원",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 처리 메모",
+    "  - paragraph: 장비 준비 및 계정 설정 완료",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 상태 변경",
+    "  - paragraph: 접수 → 진행 중",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": "변경된 항목이 없습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 취소",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"신규 입사자 노트북 준비\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 홍길동 부서 인사팀 접수 경로 메신저 분류 · 우선순위 비품·자산 · 높음 요청일 2026-11-03 시스템 등록 시각 <TS> 처리 기한 2026-11-05 완료 시각 —",
+    "  - paragraph: 노트북 1대 준비",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\"",
+    "    - option \"진행 중\" [selected]",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 <TS>",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "    - text: 박지원",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 담당자 배정",
+    "  - paragraph: 미배정 → 박지원",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 처리 메모",
+    "  - paragraph: 장비 준비 및 계정 설정 완료",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 상태 변경",
+    "  - paragraph: 접수 → 진행 중",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click × close",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"신규 입사자 노트북 준비\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 홍길동 부서 인사팀 접수 경로 메신저 분류 · 우선순위 비품·자산 · 높음 요청일 2026-11-03 시스템 등록 시각 <TS> 처리 기한 2026-11-05 완료 시각 —",
+    "  - paragraph: 노트북 1대 준비",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\"",
+    "    - option \"진행 중\" [selected]",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 <TS>",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "    - text: 박지원",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 담당자 배정",
+    "  - paragraph: 미배정 → 박지원",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 처리 메모",
+    "  - paragraph: 장비 준비 및 계정 설정 완료",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 상태 변경",
+    "  - paragraph: 접수 → 진행 중",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "save an edit for a task that another edit already changed (stale version)",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: EDIT REQUEST",
+    "  - heading \"업무 정보 수정\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 등록 시각·상태·완료 시각·배정·첨부는 유지됩니다. 변경한 항목과 수정 사유를 이력에 기록합니다. 기한·요청 시각 변경은 현재 지표에 반영되며 이미 발행한 보고서는 유지됩니다.",
+    "  - text: 업무명 *",
+    "  - textbox \"업무명 *\": 충돌 제목",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\": 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\": 인사팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"비품·자산\" [selected]",
+    "    - option \"일반 총무\"",
+    "    - option \"고정업무\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"높음\" [selected]",
+    "    - option \"중\"",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-03",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\": 2026-11-05",
+    "  - text: 상세내용",
+    "  - textbox \"상세내용\": 노트북 1대 준비",
+    "  - text: 수정 사유 *",
+    "  - textbox \"수정 사유 *\":",
+    "    - /placeholder: \"예: 요청자 오기 정정, 협의에 따른 기한 변경\"",
+    "    - text: 내 수정",
+    "  - alert: 다른 화면에서 업무가 수정됐습니다. 상세를 다시 열어 확인하세요.",
+    "  - button \"취소\"",
+    "  - button \"수정 저장\""
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "업무 정보 수정",
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   }
+  }
+ ]
+}

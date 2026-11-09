@@ -1,0 +1,125 @@
+/* Colors, sizes and spacing follow the rendered board (screenshots), written fresh for this screen. */
+.waiting { --tone: 255, 168, 92; }
+.working { --tone: 113, 163, 255; }
+.blocked { --tone: 242, 204, 89; }
+.idle { --tone: 107, 217, 153; }
+
+.board {
+  background: #202633;
+  border: 1px solid #303a4f;
+  border-radius: 22px;
+  padding: 28px;
+  color: #eaf0fc;
+  font-size: 14px;
+  line-height: normal;
+  font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+}
+.board button, .board input, .board select { font-family: inherit; }
+.board input, .board select { color-scheme: dark; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+.eyebrow { margin: 0 0 16px; font-size: 9px; letter-spacing: 2px; color: #8da0c1; font-weight: 400; }
+.title { margin: 0 0 12px; font-size: 23px; font-weight: 700; letter-spacing: -0.6px; color: #eaf0fc; }
+.lead { font-size: 12px; color: #a5b4ce; }
+.role { font-size: 10px; color: #a7d8bc; background: #33413b; border-radius: 20px; padding: 8px 12px; white-space: nowrap; }
+
+.statusRow { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  display: flex; align-items: center; gap: 8px; padding: 10px 13px; font-size: 12px;
+  color: #bbc8de; background: #2b3342; border: 1px solid #3b4558; border-radius: 30px; cursor: pointer;
+}
+.pill[aria-pressed='true'] { color: #fff; background: #43516b; border-color: #7186aa; }
+.pill b { font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.047); }
+.pillIcon { display: block; flex: none; width: 14.4px; height: 14.4px; color: rgb(var(--tone, 187, 200, 222)); }
+.pillIcon svg { display: block; width: 100%; height: 100%; }
+
+.toolRow { display: flex; gap: 8px; margin-top: 20px; }
+.rangeRow { display: flex; align-items: flex-end; gap: 10px; margin-top: 14px; }
+.field { display: flex; flex-direction: column; gap: 7px; font-size: 10px; color: #a5b4ce; }
+.search { flex: 1; min-width: 180px; }
+.control, .search {
+  width: auto; padding: 10px; font-size: 11px; color: #d3def0; background: #2b3342; border: 1px solid #414c61; border-radius: 8px;
+}
+.toolRow .control, .search { padding: 11px; }
+.control { cursor: pointer; }
+input.control { cursor: text; }
+.control[aria-pressed='true'] { color: #fff; background: #43516b; border-color: #7186aa; }
+.control:focus-visible, .search:focus-visible, .pill:focus-visible, .cardHeader:focus-visible, .row:focus-visible, .compactRow:focus-visible, .history:focus-visible {
+  outline: 2px solid #7186aa; outline-offset: 2px;
+}
+.search::placeholder { color: #7e8da8; }
+
+.summary { display: flex; justify-content: space-between; gap: 12px; margin: 24px 0 16px; font-size: 11px; color: #a5b4ce; }
+.summary small { font-size: 10px; }
+
+.card {
+  background-image: linear-gradient(135deg, rgba(var(--tone), 0.1), rgba(255, 255, 255, 0.03));
+  box-shadow: inset 0 0 0 1px rgba(var(--tone), 0.22), 0 3px 8px rgba(0, 0, 0, 0.25);
+  border-radius: 16px; position: relative; padding: 12px; margin-bottom: 16px;
+}
+.card:last-child { margin-bottom: 0; }
+.urgent { box-shadow: inset 0 0 0 1px rgba(var(--tone), 0.25); }
+.urgent::after {
+  content: ''; position: absolute; inset: 0; border-radius: 16px; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(var(--tone), 0.55), 0 3px 12px rgba(var(--tone), 0.35);
+}
+.cardHeader {
+  display: flex; align-items: center; gap: 10px; width: calc(100% + 12px); margin: -6px; padding: 6px; text-align: left;
+  color: #e7edfa; background: transparent; border: 0; border-radius: 10px; cursor: pointer;
+}
+.cardHeader:hover { background: rgba(255, 255, 255, 0.04); }
+.chevron { display: grid; width: 10px; height: 11px; color: #a4b1ca; }
+.chevron svg { display: block; width: 11px; height: 11px; }
+.folder { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; color: rgb(var(--tone)); background: rgba(var(--tone), 0.16); }
+.folder svg { display: block; width: 14px; height: 14px; }
+.cardTitles { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 1px; }
+.cardName { font-size: 14px; font-weight: 600; color: #e7edfa; }
+.cardSub { font-size: 10px; line-height: 16px; color: #9daec9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; gap: 7px; }
+.chip { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #a4b1ca; }
+.chip i { display: block; width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--tone)); }
+
+.rows { display: flex; flex-direction: column; gap: 6px; padding-top: 8px; }
+.row {
+  display: flex; align-items: center; gap: 13px; width: 100%; padding: 17px 12px; text-align: left; font-size: 14px;
+  color: #e9edf7; background: rgba(255, 255, 255, 0.043); border: 1px solid transparent; border-radius: 11px; cursor: pointer;
+}
+.row:hover { background: rgba(255, 255, 255, 0.075); border-color: rgba(var(--tone), 0.3); }
+.rowIcon { display: block; flex: none; width: 18px; height: 18px; color: rgb(var(--tone)); }
+.rowIcon svg { display: block; width: 18px; height: 18px; }
+.rowMain { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 8px; }
+.rowMain strong { font-size: 13px; font-weight: 700; line-height: 1.6; color: #e9edf7; overflow-wrap: anywhere; }
+.rowMeta { font-size: 11px; color: #a7b3ca; }
+.rowSide { display: flex; flex-direction: column; flex: none; gap: 6px; text-align: right; }
+.rowStatus { font-size: 11px; font-weight: 600; color: #e9edf7; }
+.rowSide small { font-size: 10px; color: #93a3bf; }
+.rowSide .overdue { color: rgb(255, 168, 92); }
+.compactRow {
+  display: block; width: 100%; padding: 10px 12px; text-align: left; font-size: 12px; color: #e9edf7;
+  background: rgba(255, 255, 255, 0.043); border: 1px solid transparent; border-left: 3px solid rgb(var(--tone)); border-radius: 8px; cursor: pointer;
+}
+.compactRow:hover { background: rgba(255, 255, 255, 0.075); }
+.history {
+  display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px 7px; font-size: 11px;
+  color: #9fafc7; background: transparent; border: 0; border-radius: 8px; cursor: pointer;
+}
+.history:hover { color: #d3def0; }
+
+.empty { padding: 55px 20px; text-align: center; color: #a6b6d1; }
+.empty strong { font-size: 18px; font-weight: 700; color: #d9e3f5; }
+.empty p { margin: 12px 0; font-size: 12px; line-height: 21.6px; color: #a6b6d1; }
+
+@media (max-width: 650px) {
+  .board { padding: 20px 14px; }
+  .title { font-size: 19px; }
+  .role { display: none; }
+  .statusRow { gap: 5px; }
+  .pill { padding: 8px; font-size: 10px; }
+  .pill b { font-size: 10px; }
+  .toolRow, .rangeRow { flex-wrap: wrap; }
+  .field { flex: 1; min-width: 0; }
+  .rangeRow > button { flex: 1 0 100%; }
+  .row { gap: 8px; padding: 13px 8px; }
+  .rowMain strong { font-size: 12px; }
+  .rowSide small { font-size: 9px; }
+  .summary { flex-direction: column; }
+}

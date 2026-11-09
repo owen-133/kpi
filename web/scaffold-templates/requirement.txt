@@ -1,0 +1,9 @@
+
+### {{requirementId}} {{UseCase}} 유스케이스 ({{context}})
+layer: supporting
+status: planned
+home: web/src/{{context}}/…
+evidence:
+golden:
+test-name:
+accept:

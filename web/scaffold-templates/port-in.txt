@@ -1,0 +1,14 @@
+// Input port of the {{context}} context: what the outside may ask of the use case {{UseCase}}.
+export type {{UseCase}}Command = {
+  // TODO replace with the fields this use case needs
+  readonly input: string;
+};
+
+export type {{UseCase}}Result = {
+  // TODO replace with what the caller gets back
+  readonly output: string;
+};
+
+export interface {{UseCase}}UseCase {
+  execute(command: {{UseCase}}Command): Promise<{{UseCase}}Result>;
+}
