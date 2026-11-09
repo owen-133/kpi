@@ -319,23 +319,13 @@ accept:
 
 ### R-014 웹 골격의 Request 예시
 layer: supporting
-status: current
+status: dropped
 evidence:
-- web/src/request/domain/Request.ts:38 ~ export class Request
-- web/src/request/domain/Request.ts:65-79 ~ static register(
-- web/src/request/domain/Request.ts:114-138 ~ changeStatus(newStatus
-- web/src/request/domain/RequestStatus.ts:1 ~ REQUEST_STATUSES
-- web/src/request/domain/RequestStatus.ts:9-11 ~ export function isFinishedStatus
 golden:
 test-name:
-- register trims title and requester and starts as received
-- changeStatus to the same status throws and changes nothing
-- reopening a finished request without a reason throws and keeps it finished
 accept:
-- Given 새로 등록한 Request / When 상태를 보면 / Then received 이고 변경 이력 첫 줄이 남아 있다
-- Given done 이나 rejected 상태의 Request / When 사유 없이 다른 상태로 바꾸면 / Then 오류를 던지고 상태는 그대로다
 
-새 앱의 `Request` 는 기존 포털과 다르다. 상태는 received·inProgress·done·rejected 넷이고(`RequestStatus.ts:1`), 같은 상태로 바꾸면 오류를 던진다(`Request.ts:118-120`). 기존 포털은 접수·진행 중·대기·완료 넷이고 같은 상태 변경을 아무 일도 하지 않는 성공으로 다룬다(R-002). 재개 사유는 새 앱이 done·rejected 에서 벗어날 때, 기존 포털이 완료에서 벗어날 때 요구한다. 어느 쪽으로 맞출지는 이식할 때 정하고, 정하기 전까지 이식하는 동작은 기존 포털 동작이 이긴다.
+폐기했다. 이 요구사항은 `web/` 이 비어 있을 때 헥사고날 배치를 보이려고 둔 예시 애그리거트 `Request` 였고, 기존 포털의 어떤 동작도 아니다. 실제 업무 유스케이스(`web/src/request/application/service/createRequestUseCases.ts`)가 같은 컨텍스트에서 기존 포털의 동작을 DB 함수 호출로 옮기므로 예시는 쓰이지 않는다. 상태 넷(received·inProgress·done·rejected)과 같은 상태 변경 오류는 기존 포털 규칙(R-002)과 갈렸고 어떤 화면도 쓰지 않았다. 코드·시험·컨테이너 연결을 지웠고 번호는 다시 쓰지 않는다.
 
 ## 후속 기능
 
