@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Shows what a change touches, from `git diff --name-only <base>` plus untracked new files:
 //   - SSOT requirements whose evidence lines sit in a changed file
-//   - golden labels that could be affected (a possibility, not a measurement)
+//   - recordings of the old portal's answers (web/src/parity/recorded/*.json) that a change breaks or touches
 //   - tests that carry the id of an affected requirement (`R-NNN` in test/ and web/src/)
 //   - the pinned graft's `blast` output (first 40 lines) when graft is installed
 //
@@ -14,7 +14,8 @@ import {fileURLToPath} from 'node:url';
 
 const USAGE = 'usage: node scripts/impact.mjs [--base <ref>] [--root <dir>]';
 const REQUIREMENTS = 'docs/ssot/requirements.md';
-const GOLDEN = 'test/golden/legacy-portal.json';
+const CORPUS = 'test/golden/requests.js';
+const RECORDED = 'web/src/parity/recorded';
 const GRAFT_BIN = 'tools/graft/node_modules/.bin/graft';
 const BLAST_LINES = 40;
 
@@ -86,19 +87,14 @@ function testMentions(root) {
   return new Map([...found].map(([id, perFile]) => [id, [...perFile].map(([name, v]) => `${name}:${v.line}${v.count > 1 ? ` (x${v.count})` : ''}`)]));
 }
 
-function goldenLabels(root, changed) {
-  const path = join(root, GOLDEN);
-  if (!existsSync(path)) return [`(${GOLDEN} not found)`];
-  const golden = JSON.parse(readFileSync(path, 'utf8'));
-  const entries = Object.entries(golden).flatMap(([group, labels]) => Object.entries(labels).map(([label, v]) => ({key: `${group}/${label}`, label, request: String(v.request ?? '')})));
+// The recordings are frozen. A changed corpus makes every recording refuse to replay (its corpusSha256 no longer matches);
+// a changed recording file is reported because nothing should write one.
+function recordings(root, changed) {
+  const dir = join(root, RECORDED);
+  const names = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.json')).sort() : [];
   const lines = [];
-  if (changed.some((f) => f.startsWith('public/'))) {
-    lines.push(`possible (public/ changed): ${entries.filter((e) => e.label.startsWith('static-')).map((e) => e.key).join(', ') || 'none'}`);
-  }
-  if (changed.includes('server.js')) {
-    const api = entries.filter((e) => /^\S+ \/(api|health)(\/|\?|$)/.test(e.request));
-    lines.push(`possible (server.js changed): ${api.length} API labels: ${api.map((e) => e.key).join(', ')}`);
-  }
+  if (changed.includes(CORPUS)) lines.push(`${CORPUS} changed: ${names.length ? names.join(', ') : 'no recordings found'} may no longer match (corpusSha256)`);
+  for (const f of changed.filter((f) => f.startsWith(`${RECORDED}/`))) lines.push(`${f} changed: the recordings are frozen`);
   return lines;
 }
 
@@ -133,7 +129,7 @@ export function main(argv, {out = (s) => process.stdout.write(s), err = (s) => p
   const hit = reqs.map((r) => ({...r, files: [...new Set(r.evidence.filter((e) => changed.includes(e.file)).map((e) => e.file))]})).filter((r) => r.files.length);
   out(`\n${section(`SSOT requirements with evidence in changed files (${REQUIREMENTS})`, existsSync(reqPath) ? hit.map((r) => `${r.id} ${r.title}: ${r.files.join(', ')}`) : [`(${REQUIREMENTS} not found)`])}`);
 
-  out(`\n${section('golden labels', goldenLabels(opts.root, changed))}`);
+  out(`\n${section('recordings of the old portal', recordings(opts.root, changed))}`);
 
   const mentions = testMentions(opts.root);
   out(`\n${section('tests tagged with those requirement ids', hit.map((r) => `${r.id}: ${(mentions.get(r.id) ?? ['(no test mentions this id)']).join(', ')}`))}`);

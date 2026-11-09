@@ -141,16 +141,20 @@ test('product-untouched: not-requested without --base, usage error when forced, 
 
   const root = tmp();
   git(root, 'init', '-q');
-  writeFileSync(join(root, 'server.js'), 'a\n');
+  writeFileSync(join(root, 'render.yaml'), 'a\n');
   writeFileSync(join(root, 'notes.txt'), 'a\n');
   git(root, 'add', '.');
   git(root, 'commit', '-qm', 'init');
   writeFileSync(join(root, 'notes.txt'), 'b\n');
   assert.equal(layer.run({root, base: 'HEAD'}).ok, true, 'a non-product change is allowed');
-  writeFileSync(join(root, 'server.js'), 'b\n');
+  writeFileSync(join(root, 'render.yaml'), 'b\n');
   const changed = layer.run({root, base: 'HEAD'});
   assert.equal(changed.ok, false);
-  assert.match(changed.output, /server\.js/);
+  assert.match(changed.output, /render\.yaml/);
+  writeFileSync(join(root, 'render.yaml'), 'a\n');
+  mkdirSync(join(root, 'public'));
+  writeFileSync(join(root, 'public/app.js'), 'x');
+  assert.equal(layer.run({root, base: 'HEAD'}).ok, true, 'public/ is no longer a product path');
   assert.equal(layer.run({root, base: 'no-such-ref'}).ok, false, 'a bad ref is a failure, not a pass');
 });
 
@@ -163,14 +167,14 @@ test('impact: parseRequirements reads evidence bullets and ignores other keys', 
 
 function impactRepo() {
   const root = tmp();
-  for (const dir of ['docs/ssot', 'test/golden', 'web/src']) mkdirSync(join(root, dir), {recursive: true});
+  for (const dir of ['docs/ssot', 'test/golden', 'web/src/parity/recorded']) mkdirSync(join(root, dir), {recursive: true});
   git(root, 'init', '-q');
   writeFileSync(join(root, 'docs/ssot/requirements.md'), [
     '## 핵심', '', '### R-001 서버 요구', 'evidence:', '- server.js:1-2', '', '### R-002 다른 요구', 'evidence:', '- other.js:1', '',
   ].join('\n'));
-  writeFileSync(join(root, 'test/golden/legacy-portal.json'), JSON.stringify({
-    secured: {'static-index-admin': {request: 'GET /'}, health: {request: 'GET /health'}, 'api-list': {request: 'GET /api/tasks'}, 'page-not-found': {request: 'GET /nope'}},
-  }));
+  writeFileSync(join(root, 'test/golden/requests.js'), 'export default [];\n');
+  writeFileSync(join(root, 'web/src/parity/recorded/settings.json'), '{}\n');
+  writeFileSync(join(root, 'web/src/parity/recorded/report.json'), '{}\n');
   writeFileSync(join(root, 'test/char.test.js'), "// R-001\ntest('[R-002] x', () => {});\n");
   writeFileSync(join(root, 'server.js'), 'one\ntwo\n');
   writeFileSync(join(root, 'other.js'), 'one\n');
@@ -183,7 +187,7 @@ const runImpact = (argv) => {
   return {code: impactMain(argv, io), ...buf};
 };
 
-test('impact: lists the requirement whose evidence file is in the diff, its tests, and possible golden labels', () => {
+test('impact: lists the requirement whose evidence file is in the diff, its tests, and the recordings a corpus change breaks', () => {
   const root = impactRepo();
   writeFileSync(join(root, 'server.js'), 'one\nchanged\n');
   const r = runImpact(['--base', 'HEAD', '--root', root]);
@@ -191,22 +195,25 @@ test('impact: lists the requirement whose evidence file is in the diff, its test
   assert.match(r.out, /R-001 서버 요구: server\.js/);
   assert.doesNotMatch(r.out, /R-002 다른 요구/);
   assert.match(r.out, /R-001: test\/char\.test\.js:1/);
-  assert.match(r.out, /possible \(server\.js changed\): 2 API labels: secured\/health, secured\/api-list/);
-  assert.doesNotMatch(r.out, /static-index-admin/);
+  assert.match(r.out, /== recordings of the old portal ==\n\(none\)/);
   assert.match(r.out, /graft: not installed \(run sh scripts\/setup-graft\.sh\)/);
 });
 
-test('impact: a public/ change lists static labels; no change lists nothing', () => {
+test('impact: a corpus change lists every recording, a changed recording is called frozen, no change lists nothing', () => {
   const root = impactRepo();
-  mkdirSync(join(root, 'public'));
-  writeFileSync(join(root, 'public/app.js'), 'x');
+  writeFileSync(join(root, 'test/golden/requests.js'), 'export default [1];\n');
   const r = runImpact(['--base', 'HEAD', '--root', root]);
-  assert.match(r.out, /possible \(public\/ changed\): secured\/static-index-admin/);
+  assert.match(r.out, /test\/golden\/requests\.js changed: report\.json, settings\.json may no longer match \(corpusSha256\)/);
   assert.doesNotMatch(r.out, /R-001 서버/);
+
+  writeFileSync(join(root, 'web/src/parity/recorded/report.json'), '{"x":1}\n');
+  const frozen = runImpact(['--base', 'HEAD', '--root', root]);
+  assert.match(frozen.out, /web\/src\/parity\/recorded\/report\.json changed: the recordings are frozen/);
 
   const clean = runImpact(['--base', 'HEAD', '--root', impactRepo()]);
   assert.match(clean.out, /0 changed file/);
   assert.doesNotMatch(clean.out, /R-001 서버/);
+  assert.doesNotMatch(clean.out, /may no longer match|are frozen/);
 });
 
 test('impact: unknown base, unknown flag and a non-git root exit 2', () => {

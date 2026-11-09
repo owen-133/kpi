@@ -4,7 +4,7 @@
 // Usage: node scripts/verify.mjs [--only <layer>[,<layer>...]] [--skip <layer>[,<layer>...]]
 //                                [--base <ref>] [--root <dir>]
 //   --only   run just these layers          --skip  leave these layers out
-//   --base   enables product-untouched: public/, server.js, stores, supabase/... must equal <ref>
+//   --base   enables product-untouched: the deploy and database files (PRODUCT_PATHS) must equal <ref>
 //   --root   repo root to verify (default: the repo containing this script)
 // Layers run one after another (the heavy ones share ports) and never stop at the
 // first failure. Output: a table `layer | result | seconds | note`, the last 15
@@ -18,11 +18,7 @@ import {fileURLToPath} from 'node:url';
 
 const USAGE = 'usage: node scripts/verify.mjs [--only <layer>[,<layer>...]] [--skip <layer>[,<layer>...]] [--base <ref>] [--root <dir>]';
 const AGENTS_LIMIT = 32768;
-const PRODUCT_PATHS = [
-  'public', 'frontend', 'server.js', 'local-store.js', 'supabase-store.js', 'kpi-store.js',
-  'kpi-store-local.js', 'task-edit.js', 'supabase', 'render.yaml', 'package.json',
-  'README.md', 'DEPLOY.md', 'KPI_GUIDE.md',
-];
+const PRODUCT_PATHS = ['render.yaml', 'supabase', 'package.json', 'README.md', 'DEPLOY.md', 'KPI_GUIDE.md'];
 
 class UsageError extends Error {}
 
@@ -38,11 +34,11 @@ function exec(command, args, {cwd, env, okNote = ''} = {}) {
 function rootTests({root}) {
   const helper = join(root, 'scripts/env-for-tests.mjs');
   let skipped = '';
-  let command = ['node', ['--test']];
+  let command = ['npm', ['test']];
   if (!existsSync(helper)) skipped = 'scripts/env-for-tests.mjs not found';
   else {
     const probe = exec('node', [helper], {cwd: root});
-    if (probe.ok) command = ['sh', ['-c', 'eval "$(node scripts/env-for-tests.mjs)" && exec node --test']];
+    if (probe.ok) command = ['sh', ['-c', 'eval "$(node scripts/env-for-tests.mjs)" && exec npm test']];
     else skipped = (probe.output.trim().split('\n')[0] || `env helper exit ${probe.status}`).replace(/^env-for-tests: /, '').slice(0, 110);
   }
   const r = exec(command[0], command[1], {cwd: root});
