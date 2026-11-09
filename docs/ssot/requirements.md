@@ -336,24 +336,23 @@ accept:
 ### R-013 누적 실적과 소요 시간
 layer: supporting
 status: current
+home: web/src/portal
 evidence:
-- public/app.js:21 ~ function stats()
-- public/app.js:19 ~ async function refresh()
-- public/app.js:20 ~ const percent=
-- public/app.js:68 ~ function dashboardKpi()
-- public/app.js:72 ~ setInterval(async()=>{if(view!=='overview'
-- public/kpi-model.js:12 ~ const hours=completed.map
-- README.md:42 ~ 소요 시간은 대기·주말을 포함한
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:24 ~ export function statCards(
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:30 ~ t.due_date && t.due_date < today && t.status !== '완료'
+- web/src/shared/adapter/in/web/ui/format.ts:35 ~ export function completionPercent(
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:70 ~ export function kpiStrip(
+- web/src/portal/adapter/in/web/ui/overview/autoRefresh.ts:4 ~ export const AUTO_REFRESH_MS = 30000
+- web/src/report/domain/MonthlyMetrics.ts:52 ~ const hours = completed.map
 golden:
-- secured/static-app-js-admin
 test-name:
 accept:
 - Given 업무가 여럿 쌓인 상태 / When 대시보드 위쪽 통계를 보면 / Then 전체 업무는 휴지통·테스트 업무를 뺀 누적 접수 건수, 진행 중·완료 업무는 같은 범위의 현재 상태 건수, 기한 초과는 기한이 오늘(한국 시간)보다 앞서면서 완료가 아닌 건수다
 - Given 이번 달에 완료된 업무가 있는 상태 / When 대시보드의 이번 달 운영 지표를 보면 / Then 평균 경과는 그 업무들의 요청 시각부터 완료 시각까지 달력 시간(대기·주말 포함)을 시간 단위로 평균한 값이다
 
-통계는 누적 기준이다. 소요 시간은 현재 완료 상태인 업무만 센다. 재개하면 완료 시각이 비워지므로 그 업무는 다시 완료될 때까지 빠진다. 평균 경과는 월간 지표(R-022)와 같은 계산이다. 대시보드는 활성 화면에서 30초마다 목록을 다시 불러온다(`public/app.js` 의 `setInterval`).
+통계는 누적 기준이다. 소요 시간은 현재 완료 상태인 업무만 센다. 재개하면 완료 시각이 비워지므로 그 업무는 다시 완료될 때까지 빠진다. 평균 경과는 월간 지표(R-022)와 같은 계산이다. 대시보드는 활성 화면에서 30초마다 목록을 다시 불러온다(`autoRefresh.ts` 의 `AUTO_REFRESH_MS`).
 
-화면 동작 자체를 검사하는 시험은 없다. golden 은 `public/app.js` 바이트가 그대로인지만 고정한다(동작은 리뷰에서 본다). 월간 계산은 R-022 의 시험이 본다.
+카드 숫자는 `overviewStats.char.spec.ts` 가 요청 등록부터 목록·계산까지 고정하고, `overviewModel.spec.ts` 가 계산을, `autoRefresh.spec.ts` 가 30초 갱신의 조건을 본다. 월간 계산은 R-022 의 시험이 본다. 화면에 그려지는 모양은 검사하는 시험이 없다.
 
 ### R-014 웹 골격의 Request 예시
 layer: supporting
@@ -370,13 +369,12 @@ accept:
 ### R-015 첨부파일
 layer: supporting
 status: current
+home: web/src/attachment
 evidence:
-- server.js:50-54 ~ const fileRoute=path.match(
-- kpi-store-local.js:21-23 ~ action==='file_add'
 - supabase/kpi.sql:3 ~ orbit_private.task_files
 - supabase/kpi.sql:45-55 ~ elsif action='file_add' then
-- public/kpi-ui.js:38 ~ <h3>담당자 · 첨부파일</h3>
-- public/kpi-ui.js:41-42 ~ data-file-delete
+- web/src/attachment/adapter/in/web/ui/AttachmentSection.tsx:37 ~ 첨부파일 추가 (최대 1MB, 업무당 10개)
+- web/src/attachment/adapter/in/web/ui/AttachmentSection.tsx:25 ~ data-file-delete
 - web/src/attachment/adapter/in/web/routes.ts:21 ~ /files$/,
 - web/src/attachment/adapter/in/web/attachment.parity.spec.ts:1 ~ attachment routes (R-015)
 - web/src/attachment/adapter/in/web/attachment.scenario.spec.ts:48 ~ uploading an attachment over HTTP [R-015]
@@ -385,65 +383,69 @@ evidence:
 - web/src/attachment/domain/AttachmentUpload.spec.ts:18 ~ AttachmentUpload [R-015]
 golden:
 test-name:
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
+- each step answers as the legacy portal did and the published report survives the purge of its request
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
-- 10번째는 201 이고 11번째는 400 이며 다른 업무는 영향을 받지 않는다
-- 1바이트·1048575·1048576(정확히 1MB) 바이트는 201 로 받고 크기를 그대로 저장한다
-- 조회 계정은 올릴 수 없고(403) 이력도 늘지 않는다
+- the 10th file is 201 and the 11th is 400 with the limit message; another task is not affected
+- stores 1, 1048575 and 1048576 bytes as 201 with an id and keeps name, size and the octet-stream type
+- the viewer account cannot upload: 403 with the viewer message, and no row is added
 accept:
 - Given 관리자가 연 업무 / When 허용 확장자(pdf·png·jpg·jpeg·webp·txt·csv·xlsx·docx)의 1MB 이하 파일을 올리면 / Then 201 과 파일 id 가 돌아오고 업무 이력에 `첨부파일 등록` 이 남는다
 - Given 허용하지 않는 확장자(`.html`)의 파일 / When 올리면 / Then 400 으로 거절한다
 - Given 조회 계정 / When 첨부를 내려받으면 / Then 내용이 같은 파일이 `attachment` 헤더로 내려오고, 올리기나 삭제는 403 이다
 - Given 첨부가 달린 업무 / When 그 업무를 영구 삭제하면 / Then 첨부파일도 함께 사라진다
 
-첨부는 DB 행으로 저장하며 파일당 1MB, 업무당 10개다(`kpi-store-local.js:21`, `supabase/kpi.sql:46-47`). 삭제는 업무 이력에 `첨부파일 삭제` 를 남긴다. `첨부파일 등록`·`첨부파일 삭제` 이력, 업무당 10개(11번째는 400), 파일당 1MB(1048576바이트는 받고 1048577바이트부터 400)는 `test/char-kpi.test.js` 가 로컬 저장소에서 고정한다. 한도 값의 사본이 서로 같은지는 `test/parity.test.js` 가 본다. 관찰: base64 로 풀면 0바이트인 content 는 400 이고 메시지가 1MB 초과 문구로 나온다. 클라우드 경로는 `ORBIT_PGLITE_PATH` 가 있을 때만 도는 시험이 본다.
+첨부는 DB 행으로 저장하며 파일당 1MB, 업무당 10개다(`supabase/kpi.sql:46-47`). 삭제는 업무 이력에 `첨부파일 삭제` 를 남긴다. `첨부파일 등록`·`첨부파일 삭제` 이력, 업무당 10개(11번째는 400), 파일당 1MB(1048576바이트는 받고 1048577바이트부터 400)는 `attachmentHistory.char.spec.ts` 와 `attachment.scenario.spec.ts` 가 SQL 함수까지 가는 흐름으로 고정한다. 한도 값은 `AttachmentUpload.spec.ts` 가 본다. 관찰: base64 로 풀면 0바이트인 content 는 400 이고 메시지가 1MB 초과 문구로 나온다(`attachment.scenario.spec.ts` 의 두 번째 케이스).
 
 ### R-016 팀장 확인과 댓글
 layer: out
 status: planned
+home: web/src/request
 evidence:
-- README.md:44 ~ 팀장 승인·댓글
+- web/src/request/adapter/in/web/routes.ts:8 ~ export function requestRoutes(
 
-서버 라우트(`server.js` 의 `/api/` 분기)에 팀장 확인이나 댓글 경로가 없다.
+요청 라우트(`routes.ts` 의 `requestRoutes`)에 팀장 확인이나 댓글 경로가 없다.
 
 ### R-017 월별 기간 필터
 layer: supporting
 status: current
+home: web/src/report
 evidence:
-- public/kpi-ui.js:3 ~ let selectedMonth=currentMonth()
-- public/kpi-ui.js:13 ~ id="report-month"
-- public/kpi-ui.js:14 ~ #report-month').onchange
-- server.js:47 ~ path==='/api/report-preview'
-- public/kpi-model.js:6-9 ~ 조회 월을 확인하세요
+- web/src/report/adapter/in/web/ui/ReportView.tsx:45 ~ state.reportMonth ?? currentMonth(
+- web/src/report/adapter/in/web/ui/ReportView.tsx:115 ~ id="report-month"
+- web/src/report/adapter/in/web/ui/reportFlow.ts:24 ~ export function changeReportMonth(
+- web/src/report/domain/ReportErrors.ts:4 ~ 조회 월을 확인하세요.
 - web/src/report/adapter/in/web/routes.ts:21 ~ pattern: '/api/report-preview'
 - web/src/report/domain/ReportMonth.spec.ts:1 ~ // R-017
 - web/src/report/adapter/in/web/report.parity.spec.ts:1 ~ (R-013, R-017, R-022..R-024)
 golden:
 test-name:
-- KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
-- 형식이 어긋난 월(00·13·한 자리·두 자리 연도·일자 포함·문자·빈 값)은 400 이다
+- KST month boundaries, due dates, denominators, tests, deleted, bad times and the median
+- a month needs four digits, a dash and 01..12
+- Given the preview route, When the month is bad or absent, Then 400 with the month message; a future month answers 200
 accept:
 - Given 여러 달에 걸쳐 접수·완료된 업무 / When 업무 실적 화면에서 조회 월을 고르면 / Then 그 달(한국 시간)에 요청받은 업무와 그 달에 완료된 업무만 지표에 집계된다
 - Given `YYYY-MM` 형식이 아니거나 없는 달(`2026-13`) / When 그 월로 지표를 요청하면 / Then 400 `조회 월을 확인하세요.` 로 거절한다
 
-기간 필터는 업무 실적 화면의 월 입력 하나다. 기본값은 현재 월이고(`kpi-ui.js:3`), 업무 보드·목록·CSV 에는 기간 필터가 없다(필터는 검색어와 상태뿐이다, R-011). 월 경계 계산과 잘못된 월의 예외는 모델 시험이 본다. 서버가 그 예외를 400 으로 바꾸는 동작은 `test/char-kpi.test.js` 가 고정한다(00·13·한 자리·두 자리 연도·일자 포함·문자·빈 값, 월 매개변수 없음). 월 입력 칸 조작은 브라우저 시험에도 없다.
+기간 필터는 업무 실적 화면의 월 입력 하나다. 기본값은 현재 월이고(`ReportView.tsx:45`), 업무 보드·목록·CSV 에는 기간 필터가 없다(필터는 검색어와 상태뿐이다, R-011). 월 경계 계산과 잘못된 월의 예외는 `MonthlyMetrics.spec.ts`·`ReportMonth.spec.ts` 가 본다. 서버가 그 예외를 400 으로 바꾸는 동작은 `report.scenario.spec.ts` 가 고정한다(월 매개변수 없음 포함). 월 입력 칸이 값을 검사하고 화면을 다시 그리는 흐름은 `reportFlow.spec.ts` 가 본다.
 
 ### R-018 AI 요약
 layer: out
 status: planned
+home: web/src/report
 evidence:
-- README.md:44 ~ 생성형 AI
+- web/src/report/domain/MonthlyDraft.ts:1 ~ Not generative AI
 
-규칙 기반 자동 초안(R-023)과 자동 분류(R-030)는 생성형 AI 요약이 아니다. `server.js` 에는 외부 AI 호출이 없다.
+규칙 기반 자동 초안(R-023)과 자동 분류(R-030)는 생성형 AI 요약이 아니다. `web/src` 의 어느 코드에도 외부 AI 호출이 없다.
 
 ### R-019 개인별 인증
 layer: out
 status: planned
+home: web/src/access
 evidence:
-- README.md:35 ~ 개인별 SSO는 아직 없습니다
-- README.md:44 ~ 개인별 인증은 포함하지 않습니다
+- web/src/access/application/service/AuthorizeRequestService.ts:23 ~ credentials.user === 'admin'
+- web/src/access/domain/Role.ts:1 ~ export const ROLES = ['admin', 'viewer']
 
-공용 `admin`·`viewer` 비밀번호만 있고 개인별 계정은 없다(`server.js:18`).
+공용 `admin`·`viewer` 비밀번호만 있고 개인별 계정은 없다(`AuthorizeRequestService.ts` 의 `authorize`).
 
 ## 확장 기능
 
