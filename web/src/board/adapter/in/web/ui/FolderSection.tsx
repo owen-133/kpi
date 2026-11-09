@@ -20,7 +20,7 @@ type Props = {
 };
 
 // One group: a header that folds it, the open tasks, and a switch for the completed history.
-export function GroupCard(p: Props) {
+export function FolderSection(p: Props) {
   const { group } = p;
   const first: BoardTask | undefined = group.tasks[0];
   const state = representativeState(group);

@@ -9,7 +9,7 @@ import { countByStatus } from '../../../../domain/statusCounts.ts';
 import { emptyMessage, summaryLine } from './boardLabels.ts';
 import { boardReducer, groupKey, initialBoardState, visibleGroups } from './boardState.ts';
 import { BoardToolbar } from './BoardToolbar.tsx';
-import { GroupCard } from './GroupCard.tsx';
+import { FolderSection } from './FolderSection.tsx';
 import styles from './board.module.css';
 
 const LOCAL_MODE_NOTICE = '로컬 개발 모드입니다. 팀장과 공유하기 전 관리자·조회 계정 비밀번호와 HTTPS를 설정해 주세요.';
@@ -67,7 +67,7 @@ export function BoardView() {
           groups.map((group) => {
             const key = groupKey(state.groupBy, group.name);
             return (
-              <GroupCard
+              <FolderSection
                 key={key}
                 group={group}
                 now={state.now}

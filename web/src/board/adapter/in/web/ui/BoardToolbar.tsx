@@ -7,7 +7,7 @@ import type { DateField, GroupBy } from '../../../../domain/groupTasks.ts';
 import { ALL_STATUSES, type BoardAction, type BoardState } from './boardState.ts';
 import { DATE_FIELD_OPTIONS, GROUP_BY_OPTIONS } from './boardLabels.ts';
 import styles from './board.module.css';
-import { StateIcon } from './icons.tsx';
+import { StatusMark } from './icons.tsx';
 
 type Props = { state: BoardState; counts: StatusCounts; dispatch: Dispatch<BoardAction>; onExport: () => void; onRefresh: () => void };
 
@@ -24,7 +24,7 @@ export function BoardToolbar(p: Props) {
         {STATUS_ORDER.map((status) => (
           <button key={status} className={`${styles.pill} ${styles[taskState(status)]}`} aria-pressed={state.status === status} onClick={() => dispatch({ type: 'status', status })}>
             <span className={styles.pillIcon}>
-              <StateIcon state={taskState(status)} />
+              <StatusMark state={taskState(status)} />
             </span>
             {status}
             <b>{counts.byStatus[status]}</b>

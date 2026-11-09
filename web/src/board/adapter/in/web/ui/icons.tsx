@@ -6,7 +6,7 @@ const STATE_SVG = { viewBox: '0 0 18 18', fill: 'none', 'aria-hidden': true, foc
 const INK = '#1a2130';
 
 // Small pictures drawn for the board; they carry no text, so they never reach a button's name.
-export function StateIcon(p: { state: TaskState }) {
+export function StatusMark(p: { state: TaskState }) {
   switch (p.state) {
     case 'waiting':
       return (
