@@ -15,8 +15,8 @@
 - `layer` 는 셋 중 하나다. `core` 는 총무 업무의 핵심 동작, `supporting` 은 핵심을 받치는 인증·보안·화면·배포 요구, `out` 은 아직 범위 밖인 후속 기능이다.
 - `status` 는 `current`(지금 동작하고 증거가 있음), `planned`(아직 없음), `dropped`(하지 않기로 함) 중 하나다.
 - `evidence` 는 저장소 기준 상대경로의 `파일:줄` 또는 `파일:시작-끝` 이다.
-- `golden` 은 `test/golden/legacy-portal.json` 의 `그룹/라벨` 키다. 글롭(`create-*`)은 쓰지 않고 실제 키를 하나씩 적는다.
-- `test-name` 은 `test/` 또는 `web/src` 안 기존 테스트 제목을 글자 그대로 적는다.
+- `golden` 은 `시나리오/라벨` 키다. 커밋된 녹화(`web/src/parity/recorded/*.json`)의 `key` 이거나 요청 말뭉치(`test/golden/requests.js`)의 `시나리오 이름/단계 라벨` 이다. 글롭(`create-*`)은 쓰지 않고 실제 키를 하나씩 적는다.
+- `test-name` 은 `web/src/**/*.spec.ts` 또는 루트 도구 시험(`scripts/*.test.mjs`) 안 기존 테스트 제목을 글자 그대로 적는다.
 - `accept` 는 `Given … / When … / Then …` 한 줄이다.
 - 값이 없는 키는 키 줄만 두고 항목을 적지 않는다. `planned` 항목은 증거가 없어도 되고, 근거 문서가 있으면 그 줄을 적는다.
 
