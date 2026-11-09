@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { compare, formatDifferences, runCorpus } from '../../../../parity/runner.ts';
 import type { Corpus, Scenario, Session, Step } from '../../../../parity/runner.ts';
 import { jsonResponse } from '../../../../shared/adapter/in/web/http.ts';
-import { pgliteAvailable, startLegacyOracle, ADMIN_PASSWORD, VIEWER_PASSWORD } from '../../../../parity/legacyOracle.ts';
+import { pgliteAvailable, ADMIN_PASSWORD, VIEWER_PASSWORD } from '../../../../parity/credentials.ts';
+import { recordedResults } from '../../../../parity/recordedOracle.ts';
 import { startNextCandidate } from '../../../../parity/nextCandidate.ts';
 
 const admin = { user: 'admin', password: ADMIN_PASSWORD };
@@ -85,7 +86,7 @@ describe('automation parity: legacy oracle vs Next candidate', () => {
   it('answers the automation scenario like the legacy oracle', { skip, timeout: 300_000 }, async () => {
     const { loadCorpus } = await import('../../../../parity/runner.ts');
     const scenarioCorpus = corpus(await loadCorpus());
-    const expected = await runCorpus(startLegacyOracle, scenarioCorpus);
+    const expected = await recordedResults('automation', scenarioCorpus);
     const actual = await runCorpus(candidateWithTaskSeeding, scenarioCorpus);
     assert.equal(actual.length, steps.length);
     const similar = expected.find((r) => r.label === 'similar-laptop');

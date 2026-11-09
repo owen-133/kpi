@@ -8,7 +8,8 @@ import { createContainer } from '../../../../config/container.ts';
 import type { Container } from '../../../../config/container.ts';
 import { jsonResponse } from '../../../../shared/adapter/in/web/http.ts';
 import { candidateEnvironment } from '../../../../parity/nextCandidate.ts';
-import { pgliteAvailable, startLegacyOracle } from '../../../../parity/legacyOracle.ts';
+import { pgliteAvailable } from '../../../../parity/credentials.ts';
+import { recordedResults } from '../../../../parity/recordedOracle.ts';
 import { compare, formatDifferences, loadCorpus, runCorpus } from '../../../../parity/runner.ts';
 import type { Corpus, Result, Session } from '../../../../parity/runner.ts';
 
@@ -54,9 +55,9 @@ describe('report parity: legacy oracle vs Next candidate', () => {
     t.diagnostic(`covered (${steps.length}): ${steps.map((s) => s.label).join(', ')}`);
     assert.ok(steps.length >= 35, `expected the report labels, found ${steps.length}`);
     const corpus: Corpus = { ...full, scenarios: [{ ...source, steps }] };
-    const expected = await runCorpus(startLegacyOracle, corpus);
+    const expected = await recordedResults('report', corpus, { canonicalize: stableReportList });
     const actual = await runCorpus(startCandidate, corpus);
-    const diffs = compare(stableReportList(expected), stableReportList(actual));
+    const diffs = compare(expected, stableReportList(actual));
     assert.equal(diffs.length, 0, `${diffs.length} differences\n${formatDifferences(diffs)}`);
     // the fingerprint value itself is normalized away by the runner: check that a stale one is refused and a fresh one accepted
     assert.ok(actual.some((r) => r.label === 'ck-publish-current' && r.status === 201));

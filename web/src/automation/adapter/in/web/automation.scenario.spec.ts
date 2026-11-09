@@ -1,7 +1,7 @@
 // R-030
 import { after, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../../../../parity/legacyOracle.ts';
+import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../../../../parity/credentials.ts';
 import { startNextCandidate } from '../../../../parity/nextCandidate.ts';
 
 const ORIGIN = 'http://automation.test';

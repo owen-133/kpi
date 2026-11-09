@@ -8,7 +8,7 @@ import { after, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../parity/legacyOracle.ts';
+import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../parity/credentials.ts';
 import { registeredRoutes, ROUTE_FACTORY_NAMES, startNextCandidate } from '../parity/nextCandidate.ts';
 import type { RouteDefinition } from '../shared/adapter/in/web/RouteRegistry.ts';
 

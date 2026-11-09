@@ -3,7 +3,7 @@ import { after, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../parity/legacyOracle.ts';
+import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../parity/credentials.ts';
 import { startNextCandidate } from '../parity/nextCandidate.ts';
 import { collectFiles } from '../architecture.helpers.ts';
 import { applySecurityHeaders, contentSecurityPolicy, createNonce } from '../access/adapter/in/web/securityHeaders.ts';

@@ -1,3 +1,4 @@
+// ONLY THE RECORDER USES THIS FILE (through legacyOracle.ts); it is deleted together with server.js.
 // Preloaded into the legacy server child process (`node --import legacyFetchStub.ts server.js`).
 // Creates a fresh in-memory PGlite, applies the Supabase SQL files, and replaces globalThis.fetch so the
 // PostgREST RPC calls of supabase-store.js are answered by that database as role service_role.

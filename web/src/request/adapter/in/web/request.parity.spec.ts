@@ -6,7 +6,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { compare, formatDifferences, loadCorpus, runCorpus } from '../../../../parity/runner.ts';
 import type { Corpus, Result, Scenario } from '../../../../parity/runner.ts';
-import { pgliteAvailable, startLegacyOracle } from '../../../../parity/legacyOracle.ts';
+import { pgliteAvailable } from '../../../../parity/credentials.ts';
+import { recordedResults } from '../../../../parity/recordedOracle.ts';
 import { startNextCandidate } from '../../../../parity/nextCandidate.ts';
 
 // Steps kept per corpus scenario. `secured` keeps everything except the static page files (served by Next, not by the pipeline).
@@ -51,9 +52,9 @@ describe('request parity: legacy oracle vs Next candidate', () => {
     for (const required of ['create-full', 'create-minimal-trimmed', 'status-to-done', 'reopen-without-reason-400', 'reopen-with-reason', 'note-add', 'detail-after-flow', 'list-after-flow', 'viewer-list', 'ct-field-10001', 'ct-body-limit-exact']) {
       assert.ok(labels.some((label) => label.endsWith('/' + required)), `corpus label ${required} must be covered`);
     }
-    const expected = await runCorpus(startLegacyOracle, corpus);
+    const expected = await recordedResults('request', corpus, { canonicalize: withListsAsSets });
     const actual = await runCorpus(startNextCandidate, corpus);
-    const diffs = compare(withListsAsSets(expected), withListsAsSets(actual));
+    const diffs = compare(expected, withListsAsSets(actual));
     assert.equal(diffs.length, 0, `${diffs.length} differences\n${formatDifferences(diffs)}`);
   });
 });

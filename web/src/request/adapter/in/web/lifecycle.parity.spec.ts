@@ -9,7 +9,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { compare, formatDifferences, loadCorpus, runCorpus } from '../../../../parity/runner.ts';
 import type { Corpus, Result, Scenario, Step } from '../../../../parity/runner.ts';
-import { ADMIN_PASSWORD, VIEWER_PASSWORD, pgliteAvailable, startLegacyOracle } from '../../../../parity/legacyOracle.ts';
+import { ADMIN_PASSWORD, VIEWER_PASSWORD, pgliteAvailable } from '../../../../parity/credentials.ts';
+import { recordedResults } from '../../../../parity/recordedOracle.ts';
 import { startNextCandidate } from '../../../../parity/nextCandidate.ts';
 
 const KEEP: Record<string, RegExp> = {
@@ -124,11 +125,11 @@ describe('lifecycle parity: legacy oracle vs Next candidate', () => {
     for (const required of ['char-tasks/ct-edit-valid', 'char-tasks/ct-edit-stale-revision', 'char-tasks/ct-edit-revision-null', 'char-tasks/ct-edit-viewer', 'char-tasks/ct-edit-ghost', 'lifecycle-extra/lc-delete-reason-1', 'lifecycle-extra/lc-restore-reason-1000', 'lifecycle-extra/lc-purge-two', 'lifecycle-extra/lc-viewer-trash-403', 'lifecycle-extra/lc-history-final']) {
       assert.ok(labels.includes(required), `label ${required} must be covered`);
     }
-    const expected = await runCorpus(startLegacyOracle, corpus);
+    const expected = await recordedResults('lifecycle', corpus, { canonicalize: withListsAsSets });
     const actual = await runCorpus(startNextCandidate, corpus);
     assert.equal(expected.length, declared, 'every declared step ran on the legacy oracle');
     assert.equal(actual.length, declared, 'every declared step ran on the candidate');
-    const diffs = compare(withListsAsSets(expected), withListsAsSets(actual));
+    const diffs = compare(expected, withListsAsSets(actual));
     assert.equal(diffs.length, 0, `${diffs.length} differences\n${formatDifferences(diffs)}`);
     // the scenarios really reached the new routes: the legacy answers carry the statuses the hints in the corpus expect
     const status = (key: string) => expected.find((r) => r.key === key)?.status;

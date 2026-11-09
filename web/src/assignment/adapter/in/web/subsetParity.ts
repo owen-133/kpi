@@ -11,7 +11,8 @@ import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { startNextCandidate } from '../../../../parity/nextCandidate.ts';
 import type { CandidateSession } from '../../../../parity/nextCandidate.ts';
-import { pgliteAvailable, startLegacyOracle } from '../../../../parity/legacyOracle.ts';
+import { pgliteAvailable } from '../../../../parity/credentials.ts';
+import { recordedResults } from '../../../../parity/recordedOracle.ts';
 import { compare, formatDifferences, hintMisses, loadCorpus, runCorpus } from '../../../../parity/runner.ts';
 import type { Corpus, SessionFactory, Step } from '../../../../parity/runner.ts';
 import { jsonResponse } from '../../../../shared/adapter/in/web/http.ts';
@@ -94,12 +95,12 @@ const candidateFactory: SessionFactory = async () => {
 /** Registers one parity test: the covered steps of the scenario against the legacy oracle and the candidate. */
 export function subsetParity(name: string, spec: SubsetSpec): void {
   const skip = pgliteAvailable() ? false : 'PGlite not available: run (cd web && npm ci) to run the legacy oracle';
-  it(`parity: ${name} answers its steps of ${spec.scenario} like the legacy oracle`, { skip, timeout: 300_000 }, async (t: TestContext) => {
+  it(`parity: ${name} answers its steps of ${spec.scenario} like the recorded legacy answers`, { skip, timeout: 300_000 }, async (t: TestContext) => {
     const corpus = await loadCorpus();
     const parts = partition(corpus, spec);
     assert.ok(parts.covered.length > 0, 'no covered step');
     const subset: Corpus = { ...corpus, scenarios: [{ name: spec.scenario, mode: 'secured', golden: false, steps: parts.steps }] };
-    const expected = await runCorpus(startLegacyOracle, subset);
+    const expected = await recordedResults(name.replace(/\s+/g, '-'), subset);
     const actual = await runCorpus(candidateFactory, subset);
     t.diagnostic(`covered (${parts.covered.length}): ${parts.covered.join(' ')}`);
     t.diagnostic(`scaffolded setup/read-back (${parts.scaffolded.length}): ${parts.scaffolded.join(' ')}`);

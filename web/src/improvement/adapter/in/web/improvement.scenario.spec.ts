@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createContainer } from '../../../../config/container.ts';
-import { pgliteAvailable } from '../../../../parity/legacyOracle.ts';
+import { pgliteAvailable } from '../../../../parity/credentials.ts';
 
 const skip = pgliteAvailable() ? false : 'PGlite not available: run (cd web && npm ci)';
 const AUTH = { admin: 'Basic ' + Buffer.from('admin:a-secret').toString('base64'), viewer: 'Basic ' + Buffer.from('viewer:v-secret').toString('base64') };

@@ -1,10 +1,12 @@
-// HTTP parity harness specs: pure normalize/compare tests, the oracle self-test and the fire checks.
+// HTTP parity harness specs: pure normalize/compare tests, the recording sanity checks and the fire checks.
 // Per-context specs use parityAgainst() from ./parityAgainst.ts (see its header comment).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { compare, formatDifferences, hintMisses, loadCorpus, normalize, runCorpus } from './runner.ts';
 import type { Result, SessionFactory, Target } from './runner.ts';
-import { pgliteAvailable, startLegacyOracle } from './legacyOracle.ts';
+import { pgliteAvailable } from './credentials.ts';
+import { recordedResults } from './recordedOracle.ts';
+import { startNextCandidate } from './nextCandidate.ts';
 import { parityAgainst } from './parityAgainst.ts';
 
 const ID_A = '0b0f6c1e-1111-4222-8333-444455556666';
@@ -126,9 +128,12 @@ describe('hintMisses', () => {
   });
 });
 
-const skip = pgliteAvailable() ? false : 'PGlite not available: set ORBIT_PGLITE_PATH or run (cd web && npm ci) to run the legacy oracle tests';
+const skip = pgliteAvailable() ? false : 'PGlite not available: set ORBIT_PGLITE_PATH or run (cd web && npm ci) to run the candidate';
+// The recorder (record-parity.ts) sets PARITY_RECORD_OUT: the specs below that probe the replay path would write instead of read.
+const recording = process.env.PARITY_RECORD_OUT ? 'the recorder is running: this probes the replay path' : false;
+const skipFire = skip || recording;
 
-describe('legacy oracle', () => {
+describe('recorded legacy answers', () => {
   it('corpus loads with labeled steps, unique labels per scenario and golden scenarios flagged', async () => {
     const corpus = await loadCorpus();
     assert.ok(corpus.scenarios.length >= 4);
@@ -141,25 +146,32 @@ describe('legacy oracle', () => {
     assert.ok(corpus.scenarios.some((s) => s.name === 'char-kpi'));
   });
 
-  it('SELF-TEST: two fresh legacy oracles answer the whole corpus identically', { skip, timeout: 240_000 }, async () => {
+  it('the recording of the whole corpus has one answer per secured step and every status hint holds', async () => {
     const corpus = await loadCorpus();
-    const first = await runCorpus(startLegacyOracle, corpus);
-    const second = await runCorpus(startLegacyOracle, corpus);
-    const total = corpus.scenarios.filter((s) => s.mode === 'secured').reduce((n, s) => n + s.steps.length, 0);
-    console.log(`parity self-test: ${first.length} requests in ${corpus.scenarios.filter((s) => s.mode === 'secured').length} scenarios`);
-    assert.equal(first.length, total);
-    assert.equal(second.length, total);
-    const diffs = compare(first, second);
-    assert.equal(diffs.length, 0, `oracle is not deterministic\n${formatDifferences(diffs)}`);
-    const misses = hintMisses(first);
+    const recorded = await recordedResults('corpus', corpus);
+    const secured = corpus.scenarios.filter((s) => s.mode === 'secured');
+    const total = secured.reduce((n, s) => n + s.steps.length, 0);
+    console.log(`parity recording: ${recorded.length} requests in ${secured.length} scenarios`);
+    assert.equal(recorded.length, total);
+    const misses = hintMisses(recorded);
     assert.equal(misses.length, 0, `status hints missed:\n${misses.map((r) => `${r.key} expected ${r.expectedStatus} got ${r.status}`).join('\n')}`);
   });
 
-  it('FIRE: a candidate that changes one status code is reported under exactly that label', { skip, timeout: 240_000 }, async () => {
+  it('a recording of another corpus is refused: the old server is gone', { skip: recording }, async () => {
     const corpus = await loadCorpus();
-    const reference = await runCorpus(startLegacyOracle, corpus);
+    const changed = { ...corpus, scenarios: corpus.scenarios.map((s) => ({ ...s, steps: s.steps.slice(1) })) };
+    await assert.rejects(recordedResults('corpus', changed), /corpus changed and the old server is gone; write a Next scenario spec instead/);
+  });
+
+  it('a spec without a recording fails loudly', { skip: recording }, async () => {
+    await assert.rejects(recordedResults('no-such-spec', await loadCorpus()), /no recording for spec 'no-such-spec'/);
+  });
+
+  it('FIRE: a candidate that changes one status code is reported under exactly that label', { skip: skipFire, timeout: 240_000 }, async () => {
+    const corpus = await loadCorpus();
+    const reference = await recordedResults('corpus', corpus);
     const tampered: SessionFactory = async () => {
-      const inner = await startLegacyOracle();
+      const inner = await startNextCandidate();
       const handle: Target = async (request) => {
         const res = await inner.handle(request);
         const credentials = Buffer.from((request.headers.get('authorization') ?? '').slice(6), 'base64').toString();
@@ -171,16 +183,16 @@ describe('legacy oracle', () => {
       };
       return { handle, stop: inner.stop };
     };
-    const diffs = compare(reference, await runCorpus(tampered, corpus));
+    const diffs = compare(reference.filter((r) => r.label === 'session-viewer'), (await runCorpus(tampered, corpus)).filter((r) => r.label === 'session-viewer'));
     assert.deepEqual([...new Set(diffs.map((d) => d.label))], ['secured/session-viewer'], formatDifferences(diffs));
     assert.deepEqual(diffs.map((d) => d.field), ['status']);
   });
 
-  it('FIRE: a candidate that changes one JSON field is reported under exactly that label and path', { skip, timeout: 240_000 }, async () => {
+  it('FIRE: a candidate that changes one JSON field is reported under exactly that label and path', { skip: skipFire, timeout: 240_000 }, async () => {
     const corpus = await loadCorpus();
-    const reference = await runCorpus(startLegacyOracle, corpus);
+    const reference = await recordedResults('corpus', corpus);
     const tampered: SessionFactory = async () => {
-      const inner = await startLegacyOracle();
+      const inner = await startNextCandidate();
       const handle: Target = async (request) => {
         const res = await inner.handle(request);
         if (new URL(request.url).pathname === '/health' && request.method === 'GET') {
@@ -190,7 +202,7 @@ describe('legacy oracle', () => {
       };
       return { handle, stop: inner.stop };
     };
-    const diffs = compare(reference, await runCorpus(tampered, corpus));
+    const diffs = compare(reference.filter((r) => r.label === 'health'), (await runCorpus(tampered, corpus)).filter((r) => r.label === 'health'));
     assert.deepEqual(diffs.map((d) => [d.label, d.field]), [['secured/health', 'body.ok']], formatDifferences(diffs));
   });
 });
