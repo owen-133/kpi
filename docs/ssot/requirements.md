@@ -452,15 +452,14 @@ evidence:
 ### R-020 담당자 배정과 최초 배정 시각
 layer: core
 status: current
+home: web/src/assignment
 evidence:
-- server.js:56 ~ 담당자를 1~100자로 입력하세요
-- server.js:15 ~ async function taskSnapshot
-- kpi-store-local.js:14 ~ const task=id=>
-- kpi-store-local.js:20 ~ action==='assign'
+- web/src/assignment/domain/AssigneeName.ts:2 ~ 담당자를 1~100자로 입력하세요.
+- web/src/request/application/service/ListTasksService.ts:17 ~ tasks.map((task) => ({ ...task, ...byTask.get(task.id) }))
 - supabase/kpi.sql:41-44 ~ elsif action='assign' then
-- public/kpi-ui.js:38 ~ <h3>담당자 · 첨부파일</h3>
-- public/kpi-ui.js:40 ~ /assign
-- frontend/src/board/TaskRow.svelte:9 ~ 담당 {task.assignee||'미배정'}
+- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:149 ~ <h3>담당자 · 첨부파일</h3>
+- web/src/assignment/adapter/in/web/ui/AssignmentApi.ts:12 ~ /assign
+- web/src/board/domain/taskLabels.ts:11 ~ 담당 ${task.assignee?.trim() || '미배정'}
 - web/src/assignment/adapter/in/web/routes.ts:34 ~ /assign$/
 - web/src/assignment/adapter/in/web/assignment.scenario.spec.ts:37 ~ assigning a task over HTTP [R-020]
 - web/src/assignment/application/service/assignmentServices.spec.ts:27 ~ AssignTaskService [R-020]
@@ -468,29 +467,29 @@ evidence:
 - web/src/assignment/adapter/in/web/assignment.parity.spec.ts:1 ~ (R-020, R-021, kpi-status)
 golden:
 test-name:
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
+- each step answers as the legacy portal did and the published report survives the purge of its request
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
-- [R-020] assignee boundary: 1, 99, 100 chars are accepted with 200; empty and 101 chars get 400 with the range message
-- [R-020] assignee is trimmed before the length check: whitespace-only is empty (400), 100 chars padded with spaces is accepted
+- the administrator assigns a name of 1, 99 and 100 characters and the stored name is the trimmed one
+- an empty, blank or 101-character name is 400 with the range message and the stored name stays
+- trims before counting: whitespace-only is empty, 100 characters padded with blanks is accepted, 101 padded is rejected
 accept:
 - Given 등록된 업무 / When 관리자가 담당자 이름을 1~100자로 배정하면 / Then 200 이고 상세에 최초 배정 시각이 기록되며 목록의 담당자가 그 이름이다
 - Given 이미 배정된 업무 / When 다른 담당자로 다시 배정하면 / Then 담당자는 바뀌지만 최초 배정 시각은 처음 값 그대로다
 - Given 조회 계정 / When 배정을 보내면 / Then 403 이다
 
-담당자 이름은 앞뒤 공백을 지운 뒤 1~100자여야 하고 비었거나 101자면 400 이다(`server.js` 의 `담당자를 1~100자로 입력하세요`). 경계(1·99·100자 수락, 0·101자 거절)·공백 처리·없는 업무 404·조회 계정 403 은 `test/char-tasks.test.js` 가 고정하고, 길이 한도의 사본이 서로 같은지는 `test/parity.test.js` 가 본다. 관찰: 길이를 UTF-16 단위로 세어 이모지 50개(100단위)는 받고 51개는 거절한다. 휴지통의 업무는 배정할 수 없다. 변경 이력 `담당자 배정` 의 상세는 로컬이 `이전 담당자 → 새 담당자`(`kpi-store-local.js` 의 `action==='assign'`), 클라우드 DB 가 새 담당자 이름만 남긴다(`supabase/kpi.sql` 의 `담당자 배정`). 보드의 업무 행에는 `담당 <이름>` 또는 `담당 미배정` 이 보인다.
+담당자 이름은 앞뒤 공백을 지운 뒤 1~100자여야 하고 비었거나 101자면 400 이다(`AssigneeName.ts` 의 `ASSIGNEE_RANGE_MESSAGE`). 경계(1·99·100자 수락, 0·101자 거절)·공백 처리·없는 업무 404·조회 계정 403 은 `assignment.scenario.spec.ts`·`AssigneeName.spec.ts` 가 고정한다. 관찰: 길이를 UTF-16 단위로 세어 이모지 50개(100단위)는 받고 51개는 거절한다. 휴지통의 업무는 배정할 수 없다. 변경 이력 `담당자 배정` 의 상세는 새 담당자 이름만 남는다(`supabase/kpi.sql:44`). 이전 담당자를 함께 적던 로컬 저장소 문구는 없어졌다. 보드의 업무 행에는 `담당 <이름>` 또는 `담당 미배정` 이 보인다.
 
 ### R-021 실제 업무와 테스트 업무 구분
 layer: supporting
 status: current
+home: web/src/assignment
 evidence:
-- server.js:55 ~ /test-data$/
-- kpi-store-local.js:19 ~ action==='mark_test'
 - supabase/kpi.sql:38-40 ~ elsif action='mark_test' then
-- public/kpi-model.js:7 ~ !t.deleted_at&&!t.is_test
-- public/kpi-model.js:20 ~ export function similarTasks
-- public/app.js:20 ~ const real=tasks.filter(t=>!t.is_test)
-- public/kpi-ui.js:38-39 ~ data.is_test?
-- frontend/src/board/TaskRow.svelte:9 ~ [테스트] 
+- web/src/report/domain/MonthlyMetrics.ts:44 ~ !t.deleted_at && !t.is_test
+- web/src/automation/domain/automation.ts:62 ~ export function similarTasks(
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:12 ~ tasks.filter((t) => !t.is_test)
+- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:152 ~ isTest: Boolean(kpi?.is_test)
+- web/src/board/domain/taskLabels.ts:3 ~ const TEST_MARK = '[테스트]'
 - web/src/assignment/adapter/in/web/routes.ts:25 ~ /test-data$/
 - web/src/assignment/adapter/in/web/assignment.scenario.spec.ts:97 ~ marking test data over HTTP [R-021]
 - web/src/assignment/application/service/assignmentServices.spec.ts:60 ~ MarkTestDataService [R-021]
@@ -498,60 +497,58 @@ evidence:
 - web/src/assignment/adapter/in/web/assignment.parity.spec.ts:1 ~ (R-020, R-021, kpi-status)
 golden:
 test-name:
-- KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
-- 무료 자동 분류·유사도는 설정 분류를 존중하고 테스트 기록 제외
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
-- [R-021] flipping the data flag records the history sentence for each direction and the list shows the flag
-- [R-021] a non-boolean data flag gets 400 and writes no history; the real booleans still work
-- [R-021] setting the same flag value again still writes a history row (no change detection)
+- KST month boundaries, due dates, denominators, tests, deleted, bad times and the median
+- leaves out deleted tasks and test records
+- each step answers as the legacy portal did and the published report survives the purge of its request
+- flipping to test data and back writes one sentence per direction and the list shows the flag each time
+- a value that is not a boolean is 400 and writes no history row; the real booleans still work afterwards
+- setting the same value again still writes a history row: there is no change detection
 accept:
 - Given 완료된 실제 업무 / When 관리자가 테스트 업무로 바꾸면 / Then 월간 지표의 접수·완료에서 빠지고 변경 이력에 `데이터 구분 변경` 이 남는다
 - Given 테스트 업무 / When 월간 지표와 유사 업무를 구하면 / Then 테스트 업무는 지표에 세지 않고 `excludedTests` 로만 센다
 - Given 구분 값이 참·거짓이 아닌 요청 / When 구분을 바꾸면 / Then 400 이다
 
-담당자 정보 행이 없는 업무는 실제 업무다. 보드에서 테스트 업무는 제목 앞에 `[테스트]` 가 붙는다. 대시보드 통계(R-013)도 테스트 업무를 뺀다. `test/char-tasks.test.js` 가 방향별 이력 문구(`실제 업무 · 지표 포함` 등)와 참·거짓이 아닌 값의 400(이력 없음), 없는 업무보다 값 검사가 먼저인 순서를 고정한다. 관찰: 현재 값과 같은 구분을 다시 보내도 `데이터 구분 변경` 이력이 한 줄 더 쌓인다.
+담당자 정보 행이 없는 업무는 실제 업무다. 보드에서 테스트 업무는 제목 앞에 `[테스트]` 가 붙는다. 대시보드 통계(R-013)도 테스트 업무를 뺀다. `assignmentHistory.char.spec.ts` 가 방향별 이력 문구(`실제 업무 · 지표 포함` 등)와 참·거짓이 아닌 값의 400(이력 없음), 없는 업무보다 값 검사가 먼저인 순서를 고정한다. 관찰: 현재 값과 같은 구분을 다시 보내도 `데이터 구분 변경` 이력이 한 줄 더 쌓인다.
 
 ### R-022 월별 운영 지표 집계
 layer: supporting
 status: current
+home: web/src/report
 evidence:
-- public/kpi-model.js:5-15 ~ export function monthlyMetrics
-- server.js:47 ~ path==='/api/report-preview'
-- public/kpi-ui.js:7 ~ function metricCards
-- public/kpi-ui.js:13 ~ id="report-month"
-- public/kpi-ui.js:16 ~ #metrics-csv
-- public/app.js:68 ~ function dashboardKpi()
+- web/src/report/domain/MonthlyMetrics.ts:42 ~ export function monthlyMetrics(
+- web/src/report/adapter/in/web/ui/ReportView.tsx:15 ~ function MetricCards(
+- web/src/report/adapter/in/web/ui/ReportView.tsx:115 ~ id="report-month"
+- web/src/report/adapter/in/web/ui/ReportView.tsx:122 ~ id="metrics-csv"
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:70 ~ export function kpiStrip(
 - web/src/report/adapter/in/web/routes.ts:21 ~ pattern: '/api/report-preview'
 - web/src/report/domain/MonthlyMetrics.spec.ts:1 ~ // R-022
 - web/src/report/adapter/in/web/report.scenario.spec.ts:1 ~ // R-022, R-023: from the HTTP handler through the services to the real SQL functions (in-memory PGlite).
 - web/src/report/adapter/in/web/report.parity.spec.ts:1 ~ (R-013, R-017, R-022..R-024)
 golden:
 test-name:
-- KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
-- 미래 월도 집계(미리보기)는 200 이고 막는 것은 발행뿐이다
+- KST month boundaries, due dates, denominators, tests, deleted, bad times and the median
+- each step answers as the legacy portal did and the published report survives the purge of its request
+- Given the preview route, When the month is bad or absent, Then 400 with the month message; a future month answers 200
 accept:
 - Given 여러 달에 걸친 업무 / When 월을 정해 집계하면 / Then 접수는 요청 시각이 그 달인 업무 수, 완료는 현재 완료 상태이고 완료 시각이 그 달인 업무 수이며 삭제·테스트 업무와 완료 시각이 요청보다 빠른 업무는 세지 않는다
 - Given 기한이 있는 완료 업무와 기한 없는 완료 업무 / When 집계하면 / Then 완료 기준 준수율은 기한 있는 완료 건을 분모로, 완료 날짜가 기한 날짜 이내인 건을 분자로 소수 첫째 자리까지 구하고 분모가 0 이면 값이 비어 있다
 - Given 선택월에 기한이 있는 업무 / When 집계하면 / Then 기한 도래 기준 준수율은 오늘까지 기한이 도래한 업무(미완료 포함)를 분모로 기한 내 완료한 건을 분자로 구한다
 - Given 완료 업무가 있는 달 / When 집계하면 / Then 평균·중앙값은 요청부터 완료까지 달력 시간(대기·주말 포함)을 시간 단위로 구하고 대상이 없으면 값이 비어 있다
 
-날짜와 월 경계는 한국 시간이다. 잘못된 시각·기한을 가진 업무는 `invalid` 로 따로 센다. 집계는 현재 상태 기준이라 과거 월말 상태를 복원한 수치가 아니다. 업무 실적 화면은 위 값을 카드로 보이고 지표 CSV(`지표,값` 두 열)로 내려받을 수 있다. 월간 접수·완료·평균 경과는 대시보드의 이번 달 카드에도 쓰인다. 형식이 어긋난 월은 400, 미래 월 집계는 200 이며 조회 계정도 읽는다(`test/char-kpi.test.js`). 집계 계산은 시험이 보고, 화면과 CSV 내려받기는 브라우저 시험이 있지만 Playwright 가 있을 때만 돈다.
+날짜와 월 경계는 한국 시간이다. 잘못된 시각·기한을 가진 업무는 `invalid` 로 따로 센다. 집계는 현재 상태 기준이라 과거 월말 상태를 복원한 수치가 아니다. 업무 실적 화면은 위 값을 카드로 보이고 지표 CSV(`지표,값` 두 열)로 내려받을 수 있다. 월간 접수·완료·평균 경과는 대시보드의 이번 달 카드에도 쓰인다. 형식이 어긋난 월은 400, 미래 월 집계는 200 이며 조회 계정도 읽는다(`report.scenario.spec.ts`). 집계 계산은 `MonthlyMetrics.spec.ts` 가, 지표 CSV 의 내용은 `metricsCsv.spec.ts` 가 본다. 카드가 화면에 그려지는 모양은 검사하는 시험이 없다.
 
 ### R-023 월간 보고서 초안과 발행
 layer: supporting
 status: current
+home: web/src/report
 evidence:
-- server.js:16 ~ const reportFingerprint=
-- server.js:47-49 ~ path==='/api/report-preview'
-- public/kpi-model.js:16 ~ export function monthlyDraft
-- kpi-store-local.js:27-28 ~ action==='reports'
-- kpi-store-local.js:10-11 ~ CREATE TRIGGER IF NOT EXISTS reports_no_delete
+- web/src/report/domain/ReportFingerprint.ts:6 ~ export function fingerprintSource(
+- web/src/report/domain/MonthlyDraft.ts:7 ~ export function monthlyDraft(
 - supabase/kpi.sql:6 ~ orbit_private.monthly_reports
 - supabase/kpi.sql:14-15 ~ drop trigger if exists report_immutable
 - supabase/kpi.sql:30-31 ~ if action='reports' then
-- public/kpi-ui.js:13 ~ id="monthly-draft"
-- public/kpi-ui.js:20 ~ #publish-report
+- web/src/report/adapter/in/web/ui/ReportView.tsx:205 ~ id="monthly-draft"
+- web/src/report/adapter/in/web/ui/ReportView.tsx:208 ~ id="publish-report"
 - web/src/report/adapter/in/web/routes.ts:29-30 ~ method: 'POST'
 - web/src/report/domain/ReportDraft.spec.ts:1 ~ // R-023
 - web/src/report/domain/ReportFingerprint.spec.ts:1 ~ // R-023
@@ -560,37 +557,40 @@ evidence:
 - web/src/report/adapter/in/web/report.parity.spec.ts:1 ~ (R-013, R-017, R-022..R-024)
 golden:
 test-name:
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
-- KST 월 경계·기한 날짜·분모·테스트·삭제·잘못된 시각·중앙값
-- 다음 달·먼 미래 월 발행은 400 이고 발행본이 늘지 않는다
-- 문안 20000자는 201 이고 20001자는 400 이며 발행본이 늘지 않는다
-- 지문이 다르면 월 검사보다 먼저 409 로 막는다
-- 공백만 있는 문안은 빈 문안으로 발행된다
+- each step answers as the legacy portal did and the published report survives the purge of its request
+- KST month boundaries, due dates, denominators, tests, deleted, bad times and the median
+- Given a fresh fingerprint, When publishing next month or 9999-12, Then FutureMonthError and nothing is saved
+- Given the draft limit, When 20000 and 20001 characters are published, Then 20000 is saved and 20001 is refused
+- Given a wrong or missing fingerprint, When publishing a future or malformed month, Then 409 comes first and nothing is saved
+- Given no draft, When publishing, Then the rule-based draft is saved; given blanks only, Then an empty text is saved
 accept:
 - Given 월간 지표를 집계한 화면 / When 관리자가 검토한 문안으로 발행하면 / Then 201 이고 그 시점의 집계값과 문안이 발행 이력에 보존된다
 - Given 집계한 뒤 업무가 바뀐 상태 / When 처음 집계의 지문으로 발행하면 / Then 409 로 거절하고 새로 집계해야 한다
 - Given 조회 계정 / When 발행하면 / Then 403 이고 발행 이력은 읽을 수 있다
 - Given 발행본이 있는 상태 / When 그 발행본의 원 업무를 영구 삭제하면 / Then 발행본은 그대로 남고 저장소가 발행본의 수정·삭제를 거부한다
 
-초안은 집계값을 채운 규칙 기반 문안이고 생성형 AI 를 쓰지 않는다. 발행 요청에 문안(`draft`)이 없으면 규칙 기반 초안이 발행된다. 같은 월을 다시 발행하면 발행본이 별도 버전으로 쌓인다. 미래 월 발행은 400, 문안은 앞뒤 공백을 지운 뒤 20000자까지 받고 20001자부터 400 이며, 지문 검사(409)가 월 검사보다 먼저다. 이 순서와 경계는 `test/char-kpi.test.js` 가 고정한다. 관찰: 공백만 있는 문안은 빈 문안으로 발행되고 규칙 기반 초안으로 대체되지 않는다. 발행본 문안이 다시 읽히는지는 로컬 시험이 보고, 클라우드는 `ORBIT_PGLITE_PATH` 가 있을 때 도는 시험이 본다.
+초안은 집계값을 채운 규칙 기반 문안이고 생성형 AI 를 쓰지 않는다. 발행 요청에 문안(`draft`)이 없으면 규칙 기반 초안이 발행된다. 같은 월을 다시 발행하면 발행본이 별도 버전으로 쌓인다. 미래 월 발행은 400, 문안은 앞뒤 공백을 지운 뒤 20000자까지 받고 20001자부터 400 이며, 지문 검사(409)가 월 검사보다 먼저다. 이 순서와 경계는 `PublishReportService.spec.ts`·`ReportDraft.spec.ts` 와 `report.scenario.spec.ts` 가 고정한다. 관찰: 공백만 있는 문안은 빈 문안으로 발행되고 규칙 기반 초안으로 대체되지 않는다. 발행본 문안이 다시 읽히는지는 PGlite 위에서 도는 `report.scenario.spec.ts` 의 첫 케이스가 본다.
 
 ### R-024 발행본 PDF 내려받기
 layer: supporting
 status: current
+home: web/src/report
 evidence:
-- public/kpi-ui.js:18 ~ data-report-id
-- frontend/src/report-pdf.js:10-43 ~ export async function createReportPdf
-- server.js:67 ~ '/pdf/report-pdf.js'
+- web/src/report/adapter/in/web/ui/ReportView.tsx:225 ~ data-report-id
+- web/src/report/adapter/in/web/ui/pdf/createReportPdf.ts:36 ~ export async function createReportPdf(
+- web/src/report/adapter/in/web/ui/pdf/createReportPdf.ts:9 ~ /fonts/NanumGothic-Regular.ttf
 golden:
 test-name:
-- PDF: 한글·A4·원시 집계값 제외·긴 문안 페이지 나눔
-- KPI 브라우저: 추천·배정·첨부·월간 보고서·개선 관리대장·조회 계정
+- the file is named month, 월간처리현황 and the first eight characters of the report id
+- a long draft becomes several A4 pages and the Korean font bytes are embedded in the file
+- every page of a split document carries "current / total" and the figures of the report are not drawn, only the draft
+- a long draft becomes a PDF of three or more A4 pages that carries the document properties
 accept:
 - Given 발행 이력에 발행본이 있는 상태 / When 발행본 내려받기를 누르면 / Then 한글 글꼴을 포함한 A4 PDF 가 `<월>_월간처리현황_<발행본 id 앞 8자>.pdf` 로 내려온다
 - Given 여러 쪽 분량의 문안 / When PDF 를 만들면 / Then 쪽이 나뉘고 쪽마다 `현재쪽 / 전체쪽` 번호가 붙는다
 - Given 집계값이 담긴 발행본 / When PDF 를 만들면 / Then 문안만 그려지고 원시 집계값은 들어가지 않는다
 
-PDF 는 브라우저가 만든다. 서버는 스크립트(`/pdf/report-pdf.js`)와 글꼴(`/fonts/NanumGothic-Regular.ttf`)만 내준다. 글꼴에 없는 글자는 `□` 로 그린다(`frontend/src/report-pdf.js:14`). 두 시험은 기본 실행에서 건너뛴다. PDF 시험은 `ORBIT_PDF_CHECK` 와 `pdfinfo`·`pdftotext` 가 있을 때, 브라우저 시험은 Playwright 가 있을 때 돈다.
+PDF 는 브라우저가 만든다. 서버는 글꼴(`/fonts/NanumGothic-Regular.ttf`)만 내주고 PDF 는 누르는 순간 `createReportPdf` 를 불러 만든다. 글꼴에 없는 글자는 `□` 로 그린다(`createReportPdf.ts:45`). 쪽 번호와 원시 집계값 제외를 `pdftotext` 로 읽어 보는 케이스는 `ORBIT_PDF_CHECK` 가 있을 때만 돌고 없으면 건너뛴다. 버튼을 눌러 파일이 내려오는 화면 동작은 직접 검사하는 시험이 없다.
 
 ### R-025 개선 이력 관리대장
 layer: supporting
