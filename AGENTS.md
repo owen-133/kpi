@@ -74,7 +74,7 @@ Codex 는 git 루트부터 이 파일을 읽고(상한 32 KiB), Claude Code 는 
 Next.js 대응:
 - `app/` 의 라우트·페이지·컴포넌트는 `adapter/in/web` 에 해당한다. `adapter/in/web` 과 `config/container` 만 import 한다. 판정: `cd web && npm test`
 - `*/adapter/in/web/ui/**`(브라우저 화면)의 시험 아닌 파일은 같은 `ui/**`·`*/domain/**`·`*.css`·UI 패키지(`react`, `react-dom`, `@tanstack/react-query`, `pdf-lib`, `@pdf-lib/fontkit`)만 import 하고, `src` 의 `.tsx` 는 `style={` 을 쓰지 않는다(CSP). 판정: `cd web && npm test` 의 규칙 `UI`·`STYLE`
-- 서버 액션(`'use server'`)은 쓰지 않는다. 액션은 `/api/*` 의 가드 파이프라인(인증·조회 권한·출처·본문 한도)을 거치지 않아 조회 계정이 검사를 우회한다. 판정: `/usr/bin/grep -rln "use server" web/src` 가 비어 있다(종료코드 1)
+- 서버 액션(`'use server'`)은 쓰지 않는다. 액션은 `/api/*` 의 가드 파이프라인(인증·조회 권한·출처·`Sec-Fetch-Site`·JSON `Content-Type`·본문 한도)을 거치지 않아 조회 계정이 검사를 우회한다. 판정: `/usr/bin/grep -rln "use server" web/src` 가 비어 있다(종료코드 1)
 - `adapter/out` 을 import 하는 파일은 `config/container.ts` 뿐이다. 판정: `/usr/bin/grep -rln "adapter/out" web/src --include=*.ts --include=*.tsx` 의 결과가 `config/container.ts` 와 `adapter/out` 자신, 시험 도구(`parity/`, `architecture.*`)뿐이다
 
 ## 4. DB 정규화

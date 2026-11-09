@@ -122,14 +122,14 @@ app/api/[...path]/route.ts → 가드 파이프라인(인증·조회 권한·출
 
 - **DB 접근은 함수 호출뿐이다.** 앱 전용 역할은 함수 실행 권한만 갖고 테이블 권한이 없다(`web/db/app-role.sql`). 테이블을 직접 쓰는 방식을 새로 들이지 않는다. 직접 쓰기가 불가피하면 소유자가 아닌 역할, 이력 테이블은 SELECT·INSERT 만, `TRUNCATE`·`TRIGGER`·`CREATE` 금지, 정책 명시, 삭제는 정의자 함수 하나만 허용해야 한다. 권한 SQL 은 사용자가 실행한다.
 - **운영 DB 접속은 TLS 를 검증한다.** 검증을 끄는 접속 URL(`sslmode=disable` 등)은 거부하고, 비밀 값은 서버 전용 모듈에만 둔다.
-- **인증·역할 검사는 프록시, 핸들러, 응용 계층에서 반복한다.** 자격 증명 비교는 해시 비교(`timingSafeEqual`)이고 두 역할을 항상 모두 계산한다. 가드 파이프라인 순서는 인증 → 조회 권한 → 출처 → 본문 한도 → 경로 → 404 → 405 이고, 던져진 오류는 일반 503 이다.
+- **인증·역할 검사는 프록시, 핸들러, 응용 계층에서 반복한다.** 자격 증명 비교는 해시 비교(`timingSafeEqual`)이고 두 역할을 항상 모두 계산한다. 가드 파이프라인 순서는 인증 → 조회 권한 → 출처 → 본문 한도 → 경로 → 404 → 405 이고, 던져진 오류는 일반 503 이다. 쓰기(GET·HEAD 가 아닌 요청)는 출처 검사 다음에 `Sec-Fetch-Site` 가 `cross-site`·`same-site` 이면 403 으로 막고(`same-origin`·`none`·없음은 통과), POST 는 `Content-Type` 이 `application/json`(대소문자 무관, `; charset=…` 허용)이 아니면 본문을 읽기 전에 415 로 막는다. 무인증 401 과 조회 계정 403 이 먼저다. CSRF 방어는 `Origin` 검사 하나가 아니라 `Origin`·`Sec-Fetch-Site`·JSON 전용 `Content-Type` 셋이다.
 - **모든 경로를 `src/proxy.ts` 가 인증한다.** `_next/static` 을 포함한다.
 - **보안 헤더는 프록시가 모든 응답에 붙인다**(401·403·404·413·503 포함): nonce 기반 CSP, HSTS, `nosniff`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store`, `frame-ancestors 'none'`, `poweredByHeader: false`.
 - **본문은 스트림으로 읽어 상한을 넘으면 중단한다.** 전체를 읽은 뒤 검사하지 않는다. 개발·운영 서버는 `HOST` 가 없으면 `127.0.0.1` 에 바인딩한다.
 - **DB 오류가 개인정보를 로그에 남기지 않는다.** 로그에는 경로·상태·오류 이름만 쓴다.
 - **의존성은 정확한 버전으로 고정한다**(`web/package.json`).
-- **필수 시험:** 모든 경로 × {무인증, 틀린 비밀번호, 조회, 관리자} 권한 행렬, 조회 계정의 쓰기가 행 수를 바꾸지 않음, 출처 검사, 본문 한도(청크 전송), 헤더 스냅샷, DB 오류 속 표식 값이 로그에 없음, 앱 역할로 이력 변경·`TRUNCATE`·`DISABLE TRIGGER` 가 실패, CSV 수식 입력, 업로드 경계, 번들에 비밀 이름 없음. 위치: `web/src/security/`.
-- **사용자 승인이 필요한 변화:** HTTP Basic 을 세션·SSO 로 바꾸기, 로그인 실패 횟수 제한·최소 비밀번호 길이, 앞 공백 CSV 수식 방어 통일, 업로드 내용 검사.
+- **필수 시험:** 모든 경로 × {무인증, 틀린 비밀번호, 조회, 관리자} 권한 행렬, 조회 계정의 쓰기가 행 수를 바꾸지 않음, 출처 검사, `Sec-Fetch-Site`·`Content-Type` 검사(거절과 통과 짝), 본문 한도(청크 전송), 헤더 스냅샷, DB 오류 속 표식 값이 로그에 없음, 앱 역할로 이력 변경·`TRUNCATE`·`DISABLE TRIGGER` 가 실패, CSV 수식 입력, 업로드 경계, 번들에 비밀 이름 없음. 위치: `web/src/security/`.
+- **사용자 승인이 필요한 변화:** HTTP Basic 을 세션·SSO 로 바꾸기, 로그인 실패 횟수 제한·최소 비밀번호 길이, 업로드 내용 검사.
 
 ## 8. 화면 구조 규칙
 
@@ -143,7 +143,7 @@ app/api/[...path]/route.ts → 가드 파이프라인(인증·조회 권한·출
 - **`.tsx` 에 `style` prop 을 쓰지 않는다.** 스타일 변경은 effect 안에서 ref 로 한다. 화면 스타일은 `portal/adapter/in/web/ui/portal.css` 의 전역 스타일시트이고 `app/layout.tsx` 가 import 한다. 보드만 `*.module.css` 를 쓴다.
 - **UI 는 도메인 함수를 직접 쓰고 복사하지 않는다.** `ui/**` 는 어느 컨텍스트의 `domain/**`, 다른 `ui/**`, `*.css`, UI 패키지(`react`, `react-dom`, `@tanstack/react-query`, `pdf-lib`, `@pdf-lib/fontkit`)만 import 한다. 날짜·이벤트 문구·CSV 칸 같은 표시 서식은 `ui/` 에 둔다.
 - **컨텍스트마다 `ui/` 에 타입 있는 API 클라이언트**(`XxxApi` 인터페이스, `createXxxApi(client)`)와 `ui/testing/fakeXxxApi.ts` 를 둔다. 흐름 시험은 가짜 API 와 호출 기록용 가짜 `actions` 를 꽂는다. `application/port/out` 이 아니다.
-- **PDF 와 CSV 는 브라우저에서 만든다.** PDF 는 npm `pdf-lib`·`@pdf-lib/fontkit` 을 클릭할 때 `import()` 로 불러오고 글꼴은 `web/public/fonts/NanumGothic-Regular.ttf` 를 쓴다(라이선스 사본은 같은 폴더). CSV 칸의 수식 방어는 업무(`/^[=+@-]/`)와 개선 이력(`/^[\s]*[=+@-]/`)이 서로 다르며, 통일은 사용자 승인이 필요하다.
+- **PDF 와 CSV 는 브라우저에서 만든다.** PDF 는 npm `pdf-lib`·`@pdf-lib/fontkit` 을 클릭할 때 `import()` 로 불러오고 글꼴은 `web/public/fonts/NanumGothic-Regular.ttf` 를 쓴다(라이선스 사본은 같은 폴더). CSV 칸의 수식 방어는 업무 CSV 와 개선 이력 CSV 가 `web/src/shared/adapter/in/web/ui/csvCell.ts` 의 `csvCell`(`/^\s*[=+@-]/`, 앞 공백이 있으면 공백 앞에 `'`) 하나를 쓴다. 지표 CSV 는 시스템 숫자·날짜만 담아 쓰지 않는다.
 - **새 시험 라이브러리(jsdom, Testing Library)를 더하지 않는다.** 시험 러너(`node --test "src/**/*.spec.ts"`)에는 JSX 로더가 없어 시험은 `.ts` 만 쓴다. 브라우저 시나리오는 `ORBIT_PLAYWRIGHT_PATH` 가 없으면 건너뛴다.
 
 ## 9. CSP 와 nonce
