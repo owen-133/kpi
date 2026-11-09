@@ -1,4 +1,4 @@
-// Legacy server.js: GET /api/kpi-status, GET /api/report-preview, GET and POST /api/reports.
+// Legacy server.js: GET /api/report-preview, GET and POST /api/reports (GET /api/kpi-status is registered by the assignment context).
 // Writes by a viewer never get here: the guard answers 403 for every non-GET first.
 import { jsonResponse } from '../../../../shared/adapter/in/web/http.ts';
 import type { RouteContext, RouteDefinition } from '../../../../shared/adapter/in/web/RouteRegistry.ts';
@@ -16,7 +16,6 @@ async function translated<T>(work: () => Promise<T>): Promise<T> {
 
 export function reportRoutes(useCases: ReportUseCases): readonly RouteDefinition[] {
   return [
-    { method: 'GET', pattern: '/api/kpi-status', handler: async () => jsonResponse(200, await translated(() => useCases.kpiStatus.status())) },
     {
       method: 'GET',
       pattern: '/api/report-preview',
