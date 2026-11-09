@@ -136,4 +136,4 @@ home: web/src/request/domain
 ### R-034 Still served by the old portal
 layer: supporting
 status: planned
-home: legacy — served by the old portal until it is ported
+home: web/src/request/domain/placeholder.txt
