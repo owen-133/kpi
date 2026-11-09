@@ -5,7 +5,7 @@ import { taskState } from '../../../../domain/taskStatus.ts';
 import { displayTitle, dueLabel } from '../../../../domain/taskLabels.ts';
 import { isOverdue, receiptText, rowMeta, rowStatus } from './boardLabels.ts';
 import styles from './board.module.css';
-import { StateIcon } from './icons.tsx';
+import { StatusMark } from './icons.tsx';
 
 // One task as a button that opens its detail. The compact form is the title alone.
 export function TaskRow(p: { task: BoardTask; now: string; compact: boolean; onOpen: (id: string) => void }) {
@@ -22,7 +22,7 @@ export function TaskRow(p: { task: BoardTask; now: string; compact: boolean; onO
   return (
     <button className={`${styles.row} ${styles[state]}`} onClick={() => p.onOpen(task.id)}>
       <span className={styles.rowIcon}>
-        <StateIcon state={state} />
+        <StatusMark state={state} />
       </span>
       <span className={styles.rowMain}>
         <strong>{displayTitle(task)}</strong>
