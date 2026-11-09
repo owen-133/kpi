@@ -8,6 +8,7 @@ import {tmpdir} from 'node:os';
 import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {once} from 'node:events';
+import {scenarios,resolveStep,captureVars,baseVars,ADMIN,VIEWER} from './golden/requests.js';
 
 // Characterization (golden) test, two tiers:
 //  behavior: status, headers and API bodies the legacy portal serves (test/golden/legacy-portal.json)
@@ -18,7 +19,6 @@ const goldenPath=join(root,'test','golden','legacy-portal.json');
 const assetsPath=join(root,'test','golden','legacy-assets.json');
 const mode=process.env.UPDATE_GOLDEN;
 const updateBehavior=mode==='1'||mode==='behavior',updateAssets=mode==='1'||mode==='assets';
-const ADMIN='golden-admin',VIEWER='golden-viewer';
 const HEADERS=['content-type','cache-control','www-authenticate','x-content-type-options','content-security-policy'];
 const UUID=/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g;
 const STAMP=/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g;
@@ -37,7 +37,6 @@ async function startServer(extraEnv){
 }
 
 const basic=(u,p)=>'Basic '+Buffer.from(u+':'+p).toString('base64');
-const admin={user:'admin',password:ADMIN},viewer={user:'viewer',password:VIEWER};
 
 // Recorder: sends a request, stores a normalized entry under `label`, returns the raw parsed body.
 // Placeholders: uuids -> <ID-n> by first appearance, generated timestamps -> <TS>.
@@ -63,86 +62,16 @@ function recorder(base,served){
  return {rec,snap};
 }
 
-async function secured(served){
- const srv=await startServer({ADMIN_PASSWORD:ADMIN,VIEWER_PASSWORD:VIEWER});
+// Runs one corpus scenario against a fresh server; `{{ORIGIN}}` is that server's own base URL.
+async function play(scenario,served){
+ const srv=await startServer(scenario.mode==='secured'?{ADMIN_PASSWORD:ADMIN,VIEWER_PASSWORD:VIEWER}:{});
  try{
   const {rec,snap}=recorder(srv.base,served);
-  await rec('health',{path:'/health'});
-  await rec('health-post',{path:'/health',method:'POST'});
-  await rec('auth-missing-page',{path:'/'});
-  await rec('auth-missing-api',{path:'/api/tasks'});
-  await rec('auth-wrong-password',{path:'/',user:'admin',password:'nope'});
-  await rec('auth-unknown-user',{path:'/',user:'other',password:ADMIN});
-  await rec('auth-bearer-scheme',{path:'/',headers:{Authorization:'Bearer x'}});
-  for(const [name,path] of [['index','/'],['app-js','/app.js'],['style-css','/style.css']])await rec('static-'+name+'-admin',{path,...admin,binary:true});
-  await rec('static-index-viewer',{path:'/',...viewer,binary:true});
-  await rec('page-not-found',{path:'/nope.html',...admin});
-  await rec('page-no-public-prefix',{path:'/public/index.html',...admin});
-  await rec('page-post-405',{path:'/',method:'POST',body:{},...admin});
-  await rec('page-delete-405',{path:'/app.js',method:'DELETE',...admin});
-  await rec('api-unknown-get',{path:'/api/unknown',...admin});
-  await rec('api-tasks-put',{path:'/api/tasks',method:'PUT',...admin});
-  await rec('session-admin',{path:'/api/session',...admin});
-  await rec('session-viewer',{path:'/api/session',...viewer});
-  await rec('list-empty',{path:'/api/tasks',...admin});
-
-  const input={title:'신규 입사자 노트북 준비',requester:'홍길동',department:'인사팀',channel:'메신저',category:'비품·자산',priority:'높음',requested_at:'2026-11-03T01:00:00Z',due_date:'2026-11-05',description:'노트북 1대 준비'};
-  const one=await rec('create-full',{path:'/api/tasks',method:'POST',body:input,...admin});
-  const two=await rec('create-minimal-trimmed',{path:'/api/tasks',method:'POST',body:{title:'  최소 입력  ',requester:' 김철수 ',requested_at:'2026-11-03T02:00:00Z'},...admin});
-  const url='/api/tasks/'+one.id,url2='/api/tasks/'+two.id;
-  await rec('create-missing-title',{path:'/api/tasks',method:'POST',body:{requester:'a',requested_at:'2026-11-03T01:00:00Z'},...admin});
-  await rec('create-missing-requester',{path:'/api/tasks',method:'POST',body:{title:'a',requested_at:'2026-11-03T01:00:00Z'},...admin});
-  await rec('create-bad-requested-at',{path:'/api/tasks',method:'POST',body:{title:'a',requester:'b',requested_at:'not a date'},...admin});
-  await rec('create-bad-due-date',{path:'/api/tasks',method:'POST',body:{title:'a',requester:'b',requested_at:'2026-11-03T01:00:00Z',due_date:'11/05'},...admin});
-  await rec('create-too-long-field',{path:'/api/tasks',method:'POST',body:{title:'a'.repeat(10001),requester:'b',requested_at:'2026-11-03T01:00:00Z'},...admin});
-  await rec('create-too-long-body',{path:'/api/tasks',method:'POST',raw:'{"title":"'+'a'.repeat(64100)+'"}',...admin});
-  await rec('bad-json',{path:'/api/tasks',method:'POST',raw:'{not json',...admin});
-  await rec('bad-json-array',{path:'/api/tasks',method:'POST',raw:'[1]',...admin});
-  await rec('bad-json-empty-body',{path:'/api/tasks',method:'POST',raw:'',...admin});
-  await rec('bad-json-status',{path:url+'/status',method:'POST',raw:'{',...admin});
-
-  await rec('viewer-create-403',{path:'/api/tasks',method:'POST',body:input,...viewer});
-  await rec('viewer-status-403',{path:url+'/status',method:'POST',body:{status:'진행 중'},...viewer});
-  await rec('viewer-notes-403',{path:url+'/notes',method:'POST',body:{note:'x'},...viewer});
-  await rec('viewer-put-403',{path:'/api/tasks',method:'PUT',...viewer});
-  await rec('viewer-list',{path:'/api/tasks',...viewer});
-  await rec('cross-origin-create-403',{path:'/api/tasks',method:'POST',body:input,headers:{Origin:'http://evil.example'},...admin});
-  await rec('cross-origin-status-403',{path:url+'/status',method:'POST',body:{status:'진행 중'},headers:{Origin:'https://evil.example'},...admin});
-  await rec('cross-origin-get-allowed',{path:'/api/session',headers:{Origin:'http://evil.example'},...admin});
-  await rec('same-origin-note',{path:url2+'/notes',method:'POST',body:{note:'같은 출처 메모'},headers:{Origin:srv.base},...admin});
-
-  await rec('status-invalid',{path:url+'/status',method:'POST',body:{status:'없는상태'},...admin});
-  await rec('status-unknown-task',{path:'/api/tasks/00000000-0000-4000-8000-000000000000/status',method:'POST',body:{status:'진행 중'},...admin});
-  await rec('status-to-in-progress',{path:url+'/status',method:'POST',body:{status:'진행 중'},...admin});
-  await rec('status-same-noop',{path:url+'/status',method:'POST',body:{status:'진행 중'},...admin});
-  await rec('note-add',{path:url+'/notes',method:'POST',body:{note:'장비 준비 및 계정 설정 완료'},...admin});
-  await rec('note-empty',{path:url+'/notes',method:'POST',body:{note:'  '},...admin});
-  await rec('note-too-long',{path:url+'/notes',method:'POST',body:{note:'a'.repeat(10001)},...admin});
-  await rec('note-unknown-task',{path:'/api/tasks/00000000-0000-4000-8000-000000000000/notes',method:'POST',body:{note:'x'},...admin});
-  await rec('status-to-waiting',{path:url+'/status',method:'POST',body:{status:'대기',reason:'부품 대기'},...admin});
-  await rec('status-to-done',{path:url+'/status',method:'POST',body:{status:'완료'},...admin});
-  await rec('reopen-without-reason-400',{path:url+'/status',method:'POST',body:{status:'진행 중'},...admin});
-  await rec('reopen-reason-too-long',{path:url+'/status',method:'POST',body:{status:'진행 중',reason:'a'.repeat(10001)},...admin});
-  await rec('reopen-with-reason',{path:url+'/status',method:'POST',body:{status:'진행 중',reason:'추가 프로그램 설치 요청'},...admin});
-  await rec('detail-after-flow',{path:url,...admin});
-  await rec('detail-second-task',{path:url2,...viewer});
-  await rec('detail-unknown',{path:'/api/tasks/00000000-0000-4000-8000-000000000000',...admin});
-  await rec('detail-wrong-method-path',{path:url+'/status',...admin});
-  await rec('list-after-flow',{path:'/api/tasks',...admin});
-  return snap;
- }finally{await srv.stop();}
-}
-
-async function open(served){
- const srv=await startServer({});
- try{
-  const {rec,snap}=recorder(srv.base,served);
-  await rec('open-health',{path:'/health'});
-  await rec('open-index',{path:'/',binary:true});
-  await rec('open-session',{path:'/api/session'});
-  const made=await rec('open-create',{path:'/api/tasks',method:'POST',body:{title:'인증 없는 모드',requester:'테스터',requested_at:'2026-11-03T01:00:00Z'}});
-  await rec('open-status',{path:'/api/tasks/'+made.id+'/status',method:'POST',body:{status:'완료'}});
-  await rec('open-list',{path:'/api/tasks'});
+  const vars={...baseVars(),ORIGIN:srv.base};
+  for(const step of scenario.steps){
+   const {label,...request}=resolveStep(step,vars);
+   captureVars(step,await rec(label,request),vars);
+  }
   return snap;
  }finally{await srv.stop();}
 }
@@ -155,7 +84,7 @@ function diffLines(expected,actual){
 
 // Both tests share one server run: behavior snapshot plus the bytes served for the static-asset labels.
 let captured;
-const capture=()=>captured??=(async()=>{const served={};return {actual:{secured:await secured(served),open:await open(served)},served};})();
+const capture=()=>captured??=(async()=>{const served={};const actual={};for(const scenario of scenarios.filter(s=>s.golden))actual[scenario.name]=await play(scenario,served);return {actual,served};})();
 
 const sha=buf=>createHash('sha256').update(buf).digest('hex');
 // tracked files plus untracked-but-not-ignored ones, so a new file under public/ is seen before it is staged
