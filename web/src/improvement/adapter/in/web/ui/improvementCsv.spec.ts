@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { IMPROVEMENT_CSV_FILENAME, improvementCsv, improvementCsvCell } from './improvementCsv.ts';
+import { IMPROVEMENT_CSV_FILENAME, improvementCsv } from './improvementCsv.ts';
 import type { ImprovementItem } from './ImprovementApi.ts';
 
 const item = (over: Partial<ImprovementItem> = {}): ImprovementItem => ({
@@ -34,35 +34,9 @@ test('rows follow the header column order, every cell quoted, joined by CRLF, em
   ]);
 });
 
-test('a null or undefined cell is empty', () => {
-  assert.equal(improvementCsvCell(null), '""');
-  assert.equal(improvementCsvCell(undefined), '""');
-});
-
-test('quotes are doubled', () => {
-  assert.equal(improvementCsvCell('a"b'), '"a""b"');
-});
-
-// The improvement rule also guards a formula start behind leading whitespace; the task CSV rule does not (docs/architecture.md §8).
-for (const lead of ['=', '+', '@', '-']) {
-  test(`a cell starting with ${lead} gets an apostrophe in front`, () => {
-    assert.equal(improvementCsvCell(lead + 'SUM(A1)'), `"'${lead}SUM(A1)"`);
-  });
-  test(`a cell starting with spaces then ${lead} gets an apostrophe in front of the whitespace`, () => {
-    assert.equal(improvementCsvCell('  \t' + lead + 'x'), `"'  \t${lead}x"`);
-  });
-}
-
-test('text that only contains a formula character later or plain text is left alone', () => {
-  assert.equal(improvementCsvCell('a=b'), '"a=b"');
-  assert.equal(improvementCsvCell('  hello'), '"  hello"');
-  assert.equal(improvementCsvCell('가-나'), '"가-나"');
-});
-
-test('a quote inside a guarded cell is doubled after the apostrophe is put in front', () => {
-  assert.equal(improvementCsvCell('=A"B'), `"'=A""B"`);
-});
-
-test('a number such as the revision is written as text', () => {
-  assert.equal(improvementCsvCell(12), '"12"');
+// The cell rule itself (quotes, null, every lead character, whitespace prefixes) is specified in shared/adapter/in/web/ui/csvCell.spec.ts.
+test('the ledger guards a formula start in every text column, also behind whitespace, and writes the revision as text', () => {
+  const csv = improvementCsv([item({ title: '=1+1', feedback: ' @x', action: '\t-1', result: 'a"b', revision: 12 })]);
+  assert.equal(csv.split('\r\n')[1].split(',').slice(0, 7).join(','), `"'=1+1","MVP 구축","",\"' @x\",\"'\t-1\","a""b","검증 완료"`);
+  assert.ok(csv.endsWith(',"12"'));
 });

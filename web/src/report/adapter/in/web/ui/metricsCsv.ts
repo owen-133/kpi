@@ -1,5 +1,6 @@
 // The metrics CSV of the legacy report screen (public/kpi-ui.js): a two column text of every scalar metric, as the server
-// sent them. Unlike the task and ledger CSVs it has no quoting and no formula guard; it is not unified with them.
+// sent them. Unlike the task and ledger CSVs it has no quoting and no formula guard: every key is fixed and every value a system number, month or timestamp (a
+// negative number must stay a number), so it does not use the shared `csvCell`.
 import type { MonthlyMetrics } from '../../../../domain/MonthlyMetrics.ts';
 
 export const metricsCsvFilename = (month: string): string => month + '_지표.csv';
