@@ -7,22 +7,20 @@ Codex 는 git 루트부터 이 파일을 읽고(상한 32 KiB), Claude Code 는 
 
 | 위치 | 내용 | 실행 |
 |---|---|---|
-| 저장소 루트 | 기존 총무 업무 포털(orbit.ops). 바닐라 Node. `server.js`, `local-store.js`, `supabase-store.js`, `public/`, `supabase/`, `test/`, `render.yaml`, `DEPLOY.md` | `npm start` / `npm test` |
-| `web/` | 새 Next.js 앱. 헥사고날 + DDD | `cd web && npm test` |
+| 저장소 루트 | 총무 업무 포털(orbit.ops). `render.yaml`, `DEPLOY.md`, `README.md`, `KPI_GUIDE.md`, `supabase/`(DB 계약), `test/`, `scripts/`, 루트 `package.json`(`start`·`build` 는 `web/` 를 부른다) | `npm test` (`scripts/*.test.mjs`) |
+| `web/` | Next.js 앱. 헥사고날 + DDD | `cd web && npm run dev` / `cd web && npm test` |
 | `docs/architecture.md` | `web/` 의 계층 배치, 폴더 트리, 업무 요청 한 건이 지나는 실제 길 | 읽기 |
-| `docs/ssot/requirements.md` | 요구사항 정본(id·계층·상태·인수 기준). 형식은 이 파일 머리말이 소유한다(§10) | 읽기 |
+| `docs/ssot/requirements.md` | 요구사항 정본(id·계층·상태·인수 기준). 형식은 이 파일 머리말이 소유한다(§9) | 읽기 |
 | `web/src/ssot.spec.ts` | 요구사항 정본의 정합성 검사 | `cd web && npm test` |
-| `scripts/setup-graft.sh`, `scripts/graft` | 코드 지도 도구의 저장소 소유 설치와 래퍼(§11) | `sh scripts/setup-graft.sh` / `sh scripts/graft` |
-| `scripts/verify.mjs`, `scripts/impact.mjs` | 모든 층 확인(§9) / 변경이 걸리는 요구사항·시험 보고 | `node scripts/verify.mjs --base origin/main` / `node scripts/impact.mjs --base origin/main` |
+| `scripts/setup-graft.sh`, `scripts/graft` | 코드 지도 도구의 저장소 소유 설치와 래퍼(§10) | `sh scripts/setup-graft.sh` / `sh scripts/graft` |
+| `scripts/verify.mjs`, `scripts/impact.mjs` | 모든 층 확인(§8) / 변경이 걸리는 요구사항·시험 보고 | `node scripts/verify.mjs --base origin/main` / `node scripts/impact.mjs --base origin/main` |
 | `scripts/check-generated.mjs` | 커밋된 생성 파일이 생성기 출력과 같은지 | `node scripts/check-generated.mjs` |
-| `scripts/env-for-tests.mjs` | 브라우저·PGlite·PDF 시험 환경(§9) | `eval "$(node scripts/env-for-tests.mjs)"` |
-| `web/scripts/new-usecase.ts` | 새 기능 뼈대: 실패하는 시험과 `planned` 요구사항(§7) | `node web/scripts/new-usecase.ts <컨텍스트> <유스케이스>` |
-| `web/scripts/ssot-repin.ts` | 요구사항 증거 줄 번호 재고정(§10) | `node web/scripts/ssot-repin.ts docs/ssot/requirements.md` |
-| `test/legacy-files.json`, `test/legacy-boundary.test.js` | 레거시 파일 허용 목록과 새 레거시 파일 차단(§7) | `node --test test/legacy-boundary.test.js` |
-| `test/golden/legacy-assets.json`, `test/parity.test.js` | `public/` 해시 스냅샷(§6) / 복사본 일치 검사(§7) | 루트 `npm test` |
-| `test/char-tasks.test.js`, `test/char-kpi.test.js` | 코드에서 읽기만 한 동작을 고정하는 특성화 시험(§10) | 루트 `npm test` |
+| `scripts/env-for-tests.mjs` | 브라우저·PGlite·PDF 시험 환경(§8) | `eval "$(node scripts/env-for-tests.mjs)"` |
+| `scripts/capture-behavior.mjs`, `test/behavior/` | 화면 동작 사실 파일(`*.facts.json`)과 설명(`*.md`). 실행기가 Next 앱을 다시 찍어 비교한다(§6) | `eval "$(node scripts/env-for-tests.mjs)" && node scripts/capture-behavior.mjs --target next --check` |
+| `test/golden/requests.js`, `web/src/parity/recorded/*.json` | 요청 말뭉치와 녹화한 응답. 동등성 spec 이 읽는다(§6) | `cd web && npm test` |
+| `web/scripts/new-usecase.ts` | 새 기능 뼈대: 실패하는 시험과 `planned` 요구사항(§6) | `node web/scripts/new-usecase.ts <컨텍스트> <유스케이스>` |
+| `web/scripts/ssot-repin.ts` | 요구사항 증거 줄 번호 재고정(§9) | `node web/scripts/ssot-repin.ts docs/ssot/requirements.md` |
 
-- 기존 포털은 정상 운영 중인 기본 화면이다. 새 앱은 화면 단위로 이식한다(§7).
 - 판정: `ls web/src docs/architecture.md` 가 오류 없이 나온다.
 
 ## 2. 역할과 모델
@@ -81,7 +79,7 @@ Next.js 대응:
 
 ## 4. DB 정규화
 
-테이블 설계는 도메인 모델과 별개다. 스키마의 정본은 `supabase/*.sql` 이고 앱은 테이블에 닿지 않고 DB 함수만 부른다(`docs/architecture.md`). `<스키마>` 는 `supabase/schema.sql supabase/kpi.sql supabase/deletion.sql supabase/settings.sql` 네 파일이다(`supabase/upgrade.sql` 은 이미 배포된 DB 를 맞추는 스크립트라 뺀다). 이 파일들을 고치는 일은 §7 의 레거시 규칙을 따른다.
+테이블 설계는 도메인 모델과 별개다. 스키마의 정본은 `supabase/*.sql` 이고 앱은 테이블에 닿지 않고 DB 함수만 부른다(`docs/architecture.md`). `<스키마>` 는 `supabase/schema.sql supabase/kpi.sql supabase/deletion.sql supabase/settings.sql` 네 파일이다(`supabase/upgrade.sql` 은 이미 배포된 DB 를 맞추는 스크립트라 뺀다). 이 파일들을 고치면 `node scripts/build-upgrade.js` 로 `supabase/upgrade.sql` 을 다시 만든다(`node scripts/check-generated.mjs` 가 같은지 본다).
 
 | # | 규칙 | 검사 |
 |---|---|---|
@@ -126,29 +124,21 @@ DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기�
 - **분모는 명세에서 온다.** 선언한 케이스 수와 실행된 수를 맞춰 본다. 실행 결과에서 분모를 뽑아 `ok N/N` 으로 쓰지 않는다. 실패를 보고하는 능력도 한 번 검사한다.
 - **보고.** `[TESTED]` 블록으로 어디까지 검사했고 무엇을 못 했는지 적고, `untested:` 줄을 남긴다. 경계 없는 통과 개수는 검증으로 읽지 않는다.
 
-## 6. 기존 화면 보호
+## 6. 화면과 동등성
 
-- 리팩터링은 기존 포털의 출력을 바꾸지 않는다. 판정: 루트에서 `npm test` 가 통과한다(골든 검사 `test/golden.test.js` 포함).
-- 골든 시험은 둘이다. `golden: legacy behavior is unchanged` 는 상태·헤더·API 응답(`test/golden/legacy-portal.json`)을, `golden: legacy assets are unchanged` 는 `public/` 모든 파일의 해시(`test/golden/legacy-assets.json`, 새 파일도 잡는다)를 본다. 화면 꾸밈만 고쳐도 assets 시험이 실패하고 파일 이름을 알려 준다.
-- 스냅샷은 `UPDATE_GOLDEN=behavior`(응답) · `UPDATE_GOLDEN=assets`(`public/`) · `UPDATE_GOLDEN=1`(둘 다)을 붙인 `npm test` 로만 다시 쓴다. 사용자가 승인한 뒤에, 그 변경만 담은 별도 커밋으로 한다.
-
-## 7. 이식 규칙
-
-- 화면은 하나씩 Next 로 옮긴다.
 - **새 동작은 `web/src/<컨텍스트>/` 헥사고날 구조에서 시작한다.** 시작 명령: `node web/scripts/new-usecase.ts <컨텍스트> <유스케이스> [--out-port <이름>]`. 실패하는 시험과 `planned` 요구사항(`home:` 포함)이 같이 생기고, `config/container.ts` 에 더할 줄은 출력만 한다. 판정: 종료코드 0, 이어서 `cd web && npm test` 가 새 시험에서 실패한다(red).
-- 기존 포털(루트의 서버·저장소 파일, `public/`, `frontend/`, `supabase/`)에 새 동작을 직접 쓰지 않는다. 버그 수정은 해당 파일만 고치고 시험으로 고정한다.
-- 새 레거시 파일(루트 `.js`, `public/`, `supabase/*.sql`, `frontend/src/`)은 `node --test test/legacy-boundary.test.js` 가 막는다. 정말 필요하면 `test/legacy-files.json` 에 더하는 커밋을 하고 메시지를 `legacy-files:` 로 시작한다. 기존 파일이 커지는 것은 막지 않고 보고만 한다.
-- 복사본은 한 번에 한 곳만 바꾸면 실패한다. 상태 목록·업무 필드·한도 값은 `test/parity.test.js`, 생성 파일은 `node scripts/check-generated.mjs`(프런트 빌드까지는 `--frontend`)가 본다.
-- 라우트마다 동등성 spec 이 있다. 같은 입력을 기존 포털과 새 라우트에 보내 정규화한 응답이 같아야 한다. 판정: `cd web && npm test` 가 통과한다.
-- 동등성 spec 이 통과하고 사용자가 승인하기 전까지 기본 화면은 기존 포털이다. 전환은 `render.yaml` 에서 하고, 승인 없이 `render.yaml` 을 고치지 않는다. 판정: `git diff --stat -- render.yaml` 이 승인 커밋 밖에서 비어 있다.
+- 화면 동작은 `test/behavior/<화면>.facts.json`(접근성 트리·폼·제목·버튼·문구·상호작용 결과)이 고정한다. 화면을 고치면 사실 파일과 설명(`<화면>.md`)이 같이 맞아야 한다. 판정: `eval "$(node scripts/env-for-tests.mjs)" && node scripts/capture-behavior.mjs --target next --check` 종료코드 0. 사실 파일은 사용자가 승인한 변경에서만 다시 쓴다.
+- 라우트마다 동등성 spec 이 있다. 요청 말뭉치(`test/golden/requests.js`)를 새 라우트에 보내 정규화한 응답이 녹화(`web/src/parity/recorded/*.json`)와 같아야 한다. 녹화는 고정이다 — 새 요청이나 바뀐 요청은 녹화가 아니라 새 시나리오 spec 으로 시험한다. 판정: `cd web && npm test` 가 통과한다.
+- 화면 구조 규칙(§3 의 `UI`·`STYLE`)과 CSP 규칙은 `docs/architecture.md` 가 소유한다.
+- 배포 설정(`render.yaml`, `package.json` 의 `start`·`build`)은 사용자 승인 없이 고치지 않는다. 판정: `git diff --stat origin/main -- render.yaml package.json` 이 승인 커밋 밖에서 비어 있다.
 
-## 8. 변경 규율
+## 7. 변경 규율
 
-- 실패를 가리는 폴백을 만들지 않는다. 먼저 죽는다(fail fast). Supabase 오류가 나도 로컬 저장소로 돌아가지 않는다. 판정: `/usr/bin/grep -n "catch" supabase-store.js server.js` 의 각 `catch` 가 오류를 다시 던지거나 응답 오류로 바꾼다.
+- 실패를 가리는 폴백을 만들지 않는다. 먼저 죽는다(fail fast). Postgres 오류가 나도 PGlite 같은 다른 저장소로 돌아가지 않는다. 판정: `/usr/bin/grep -n "catch" web/src/shared/adapter/out/*OrbitFunctions.ts` 의 각 `catch` 가 오류를 `translateError` 로 바꿔 다시 던진다.
 - 산출물에 추정 숫자를 넣지 않는다. 숫자는 실데이터에서 파생한다.
 - 총무 업무 데이터는 실데이터만 쓴다. 시뮬레이션·임의 샘플로 채우지 않는다. 실데이터가 없으면 값을 어떻게 확보할지를 대신 보고한다.
 
-## 9. 완료 조건
+## 8. 완료 조건
 
 일을 끝내기 전에 한 명령이 종료코드 0 이어야 한다.
 
@@ -156,20 +146,22 @@ DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기�
 node scripts/verify.mjs --base origin/main
 ```
 
-모든 층(루트 시험·`web/` 시험·타입·빌드·생성 파일·graft·`AGENTS.md` 크기·제품 파일 불변)을 끝까지 돌려 층별 PASS/FAIL 표를 낸다. 종료코드 0 PASS, 1 FAIL, 2 사용법 오류. 환경이 없어 건너뛴 층은 비고에 이유가 적힌다. 브라우저·PGlite·PDF 환경은 `eval "$(node scripts/env-for-tests.mjs)"` 가 만들고, Playwright 는 저장소 밖에 설치해 `ORBIT_PLAYWRIGHT_REAL` 로 가리킨다.
+모든 층(`root-tests`·`web-tests`·`web-types`·`web-build`·`generated`·`graft`·`agents-size`·`product-untouched`)을 끝까지 돌려 층별 PASS/FAIL 표를 낸다. 종료코드 0 PASS, 1 FAIL, 2 사용법 오류. 환경이 없어 건너뛴 층은 비고에 이유가 적힌다. 브라우저·PGlite·PDF 환경은 `eval "$(node scripts/env-for-tests.mjs)"` 가 만들고, Playwright 는 저장소 밖에 설치해 `ORBIT_PLAYWRIGHT_REAL` 로 가리킨다.
 
-변경이 어느 요구사항·스냅샷 항목·시험에 걸리는지는 `node scripts/impact.mjs --base origin/main` 이 보고한다.
+변경이 어느 요구사항·녹화·시험에 걸리는지는 `node scripts/impact.mjs --base origin/main` 이 보고한다.
 
 verify 가 돌리는 개별 명령(verify 를 쓸 수 없을 때의 목록):
 
 ```
 npm test
 cd web && npm ci && npm test && npx tsc --noEmit && npm run build
+node scripts/check-generated.mjs
+sh scripts/graft build --check
 ```
 
 종료코드는 파이프에 물리지 않고 직접 본다. 통과하지 못한 채 끝내면 어느 명령이 왜 실패했는지 적는다.
 
-## 10. 요구사항 정본 (SSOT)
+## 9. 요구사항 정본 (SSOT)
 
 요구사항의 id·계층·상태·인수 기준은 `docs/ssot/requirements.md` 가 소유한다. 형식은 그 파일을 읽는다. 이 파일(AGENTS.md)에는 요구사항의 제목도 본문도 다시 적지 않는다. 다시 적으면 검사가 실패한다.
 
@@ -181,12 +173,12 @@ cd web && npm ci && npm test && npx tsc --noEmit && npm run build
 
 - 증거는 `경로:N[-M] ~ <문구>` 앵커를 단다. 줄이 밀리면 검사가 실패하고 새 위치를 알려 준다. 고치는 명령(저장소 루트에서): `node web/scripts/ssot-repin.ts docs/ssot/requirements.md [--write]`.
 - `home:` 키는 R-033 부터 필수다. `web/src/<컨텍스트>/…` 경로이고 문법은 `web/src/ssot.helpers.ts` 머리말이 소유한다. `new-usecase.ts` 가 다음 `planned` id 를 `home:` 과 함께 추가한다.
-- 테스트의 `// R-0NN` 태그는 증명이다. 특성화 시험(`test/char-*.test.js`)은 코드에서 읽기만 한 동작을 고정한다.
+- 테스트의 `// R-0NN` 태그는 증명이다.  특성화 시험(`web/src/**/*.char.spec.ts`)은 코드에서 읽기만 한 동작을 고정한다.
 - id 는 다시 쓰지 않는다. 동작이 바뀌면 같은 커밋에서 정본도 고친다. 도구·다이어그램은 맨 나중에 맞춘다.
 - 기계 검사: `cd web && npm test` (`web/src/ssot.spec.ts`). id 결번·중복, 증거 없는 `current` 요구사항, 모르는·`planned`·`dropped` id 를 가리키는 테스트 태그, AGENTS.md 와 `docs/ssot` 밖 `docs/**` 에서 다시 적은 요구사항 제목을 잡는다(README.md 는 제품 설명이라 검사하지 않는다).
 - 리뷰만 보는 것(기계 검사 없음): 말을 바꿔 다시 적은 서술, 인용한 줄이 주장을 받치는지, 계층 선택.
 
-## 11. 코드 지도 (graft)
+## 10. 코드 지도 (graft)
 
 Codex 를 포함한 모든 에이전트는 체크아웃마다 한 번 `sh scripts/setup-graft.sh` 를 돌린다. 연결된 워크트리에서는 그 워크트리 안에서 돌린다(`/graft/` 제외 줄은 공통 git 디렉터리에 한 번만 들어간다). 설치 절차와 종료코드는 그 스크립트 머리말과 `scripts/setup-graft.test.mjs` 가 소유하니 여기에 옮겨 적지 않는다.
 
