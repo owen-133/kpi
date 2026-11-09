@@ -10,7 +10,7 @@ export type TrashActions = {
   openDetail(taskId: string): Promise<void>;
 };
 
-/** The two reads of the dialog; each runs when the dialog opens or the button is pressed (UI-DESIGN §2, trash and lifecycle-history). */
+/** The two reads of the dialog; each runs when the dialog opens or the button is pressed (docs/architecture.md §8, trash and lifecycle-history). */
 export type TrashReads = {
   trash(): Promise<TaskSummary[]>;
   history(): Promise<LifecycleEventView[]>;

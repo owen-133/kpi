@@ -43,7 +43,7 @@ test('quotes are doubled', () => {
   assert.equal(improvementCsvCell('a"b'), '"a""b"');
 });
 
-// The improvement rule also guards a formula start behind leading whitespace; the task CSV rule does not (UI-DESIGN D13).
+// The improvement rule also guards a formula start behind leading whitespace; the task CSV rule does not (docs/architecture.md §8).
 for (const lead of ['=', '+', '@', '-']) {
   test(`a cell starting with ${lead} gets an apostrophe in front`, () => {
     assert.equal(improvementCsvCell(lead + 'SUM(A1)'), `"'${lead}SUM(A1)"`);

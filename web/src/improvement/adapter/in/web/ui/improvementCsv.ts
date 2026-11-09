@@ -1,5 +1,5 @@
 // The improvement-ledger CSV of the legacy portal (public/kpi-ui.js). Its formula guard is its own rule: it also looks
-// behind leading whitespace, unlike the task CSV (UI-DESIGN D13). The two are not unified.
+// behind leading whitespace, unlike the task CSV (docs/architecture.md §8). The two are not unified.
 import type { ImprovementItem } from './ImprovementApi.ts';
 
 export const IMPROVEMENT_CSV_FILENAME = '개선이력관리대장.csv';

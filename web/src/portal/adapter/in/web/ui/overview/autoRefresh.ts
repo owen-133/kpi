@@ -1,4 +1,4 @@
-// The 30 second refresh of the Overview (UI-DESIGN D14), the logic of the setInterval at the end of the legacy public/app.js.
+// The 30 second refresh of the Overview (docs/architecture.md §8), the logic of the setInterval at the end of the legacy public/app.js.
 // Pure and injected so the conditions can be tested without a browser; useDashboardAutoRefresh.ts wires it to the page.
 
 export const AUTO_REFRESH_MS = 30000;

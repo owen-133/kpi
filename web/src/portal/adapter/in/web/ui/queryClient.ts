@@ -1,7 +1,7 @@
 import { QueryClient, notifyManager } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys.ts';
 
-// UI-DESIGN D7. TanStack only caches the reads: nothing is ever refetched by itself (the legacy page loads once and
+// docs/architecture.md §8. TanStack only caches the reads: nothing is ever refetched by itself (the legacy page loads once and
 // refreshes where its code said so), a failed read is not retried, and a read bound to one screen is dropped when that
 // screen unmounts so the screen shows its loading text again on the next mount, like the legacy render().
 export function createQueryClient(): QueryClient {

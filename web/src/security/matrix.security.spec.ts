@@ -1,4 +1,4 @@
-// PLAN section 5 required tests that run in-process on PGlite:
+// docs/architecture.md section 7 required tests that run in-process on PGlite:
 //   every registered route x {no auth, wrong password, viewer, admin}, a viewer's writes never change the data,
 //   and a marker inside a database error never reaches a log line.
 // Covered elsewhere: body cap with chunked transfer and the thrown-error sentinel (guard.security.spec.ts), headers on

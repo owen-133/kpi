@@ -1,4 +1,4 @@
-// Query keys of the portal (UI-DESIGN §2, "읽는 시점"). Every read of the browser uses one of these.
+// Query keys of the portal (docs/architecture.md §8). Every read of the browser uses one of these.
 export const queryKeys = {
   session: ['session'] as const,
   settings: ['settings'] as const,

@@ -30,7 +30,7 @@ const tick = createAutoRefresh<TaskSummary[]>({
   },
 });
 
-/** Refreshes the task list every 30 seconds while this Overview is shown (UI-DESIGN D14). */
+/** Refreshes the task list every 30 seconds while this Overview is shown (docs/architecture.md §8). */
 export function useDashboardAutoRefresh(): void {
   const { apis, actions } = usePortal();
   useEffect(() => {
