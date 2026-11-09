@@ -19,7 +19,10 @@ import { requestRoutes } from '../request/adapter/in/web/routes.ts';
 import { assignmentRoutes } from '../assignment/adapter/in/web/routes.ts';
 import { attachmentRoutes } from '../attachment/adapter/in/web/routes.ts';
 import { reportRoutes } from '../report/adapter/in/web/routes.ts';
+import { createReportUseCases } from '../report/application/service/createReportUseCases.ts';
+import { NodeReportRuntime } from '../report/adapter/out/system/NodeReportRuntime.ts';
 import { improvementRoutes } from '../improvement/adapter/in/web/routes.ts';
+import { createImprovementUseCases } from '../improvement/application/service/ImprovementServices.ts';
 import { settingsRoutes } from '../settings/adapter/in/web/routes.ts';
 import { automationRoutes } from '../automation/adapter/in/web/routes.ts';
 import type { RouteDefinition } from '../shared/adapter/in/web/RouteRegistry.ts';
@@ -75,8 +78,8 @@ export function createContainer(env: Environment = {}, options: ContainerOptions
     ...requestRoutes,
     ...assignmentRoutes,
     ...attachmentRoutes,
-    ...reportRoutes,
-    ...improvementRoutes,
+    ...reportRoutes(createReportUseCases(() => database.open(), new NodeReportRuntime())),
+    ...improvementRoutes(createImprovementUseCases(() => database.open())),
     ...settingsRoutes,
     ...automationRoutes,
     ...(options.extraRoutes ?? []),
