@@ -141,7 +141,7 @@ test('PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존', async () =
     await db.exec('RESET ROLE');
     await assert.rejects(db.exec('DELETE FROM orbit_private.monthly_reports'), /cannot be updated or deleted/);
     await assert.rejects(db.exec('DELETE FROM orbit_private.improvement_events'), /cannot be updated or deleted/);
-    assert.equal((await db.query('SELECT count(*)::integer AS n FROM orbit_private.tasks')).rows[0].n, 1);
+    assert.equal((await db.query<{ n: number }>('SELECT count(*)::integer AS n FROM orbit_private.tasks')).rows[0].n, 1);
     await assert.rejects(db.exec('DELETE FROM orbit_private.task_lifecycle_events'), /cannot be updated or deleted/);
     await assert.rejects(db.exec('DELETE FROM orbit_private.settings_events'), /cannot be updated or deleted/);
     await assert.rejects(db.exec('DELETE FROM orbit_private.events'), /cannot be updated or deleted/);
