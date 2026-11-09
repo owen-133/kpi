@@ -3,7 +3,7 @@ services:
     name: orbit-ops
     runtime: node
     plan: free
-    buildCommand: node --check server.js && node --check public/app.js
+    buildCommand: npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
@@ -13,6 +13,11 @@ services:
         value: production
       - key: HOST
         value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_CA
+        sync: false
+      # The next three keys are used only by the previous version. They are removed at the end.
       - key: STORAGE_BACKEND
         value: supabase
       - key: SUPABASE_URL

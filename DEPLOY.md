@@ -2,6 +2,44 @@
 
 Claude Board 기반 카드 화면 추가 후에도 이 배포 설정은 같습니다. DB 스키마·키·비밀번호를 다시 만들 필요가 없습니다. `public/board/`에 빌드한 Svelte 화면을 소스와 함께 배포합니다. UI 수정 후에는 로컬에서 `npm run build`를 실행해 생성물을 포함해야 합니다. 기존 Render 서비스는 `main` 새 커밋으로 배포하면 됩니다.
 
+## Next 앱 배포
+
+Render는 `web/`의 Next 앱을 실행합니다. 루트 `npm run build`가 `web` 의존성(개발 의존성 포함)을 설치하고 빌드합니다. 루트 `npm start`가 `web`을 시작합니다. 서버는 `HOST`와 `PORT`에 바인딩합니다. 값이 없으면 `127.0.0.1:3000`입니다. Render는 `HOST=0.0.0.0`을 설정하고 `PORT`를 직접 주입합니다.
+
+이전 서버는 코드에 남아 있습니다. 로컬에서 `node server.js`로 실행할 수 있습니다.
+
+### 환경변수
+
+| Key | 내용 |
+|---|---|
+| NODE_VERSION | 24 |
+| NODE_ENV | production |
+| HOST | 0.0.0.0 |
+| DATABASE_URL | `orbit_app` 역할의 Postgres 접속 URL. 비밀 값 |
+| DATABASE_CA | 데이터베이스 CA 인증서의 PEM 전문. 비밀 값은 아니지만 Render에서만 관리 |
+| ADMIN_PASSWORD | 관리자 비밀번호 |
+| VIEWER_PASSWORD | 조회용 비밀번호. 관리자와 달라야 함 |
+
+`STORAGE_BACKEND`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`는 이전 버전만 씁니다. 되돌릴 때를 위해 유지하고, 마지막 정리 단계에서 지웁니다.
+
+### 사용자가 하는 순서
+
+1. Supabase SQL Editor에서 `web/db/app-role.sql`을 실행합니다. 파일 안의 비밀번호 자리 표시자를 긴 임의 값으로 바꾼 뒤 실행합니다. 이 역할은 DB 함수 다섯 개의 실행 권한만 가집니다.
+2. Supabase의 Connect 화면에서 **연결 풀러** 주소를 확인합니다. 직접 연결 주소는 IPv6 전용이라 Render에서 닿지 않을 수 있습니다. 풀러의 사용자 이름은 `orbit_app.<프로젝트 ref>` 형식입니다. 이 사용자와 1단계 비밀번호로 `DATABASE_URL`을 만듭니다.
+3. 데이터베이스 CA 인증서를 PEM으로 받아 `DATABASE_CA`에 전문(`-----BEGIN CERTIFICATE-----` 부터 끝까지)을 넣습니다.
+4. Render에서 `DATABASE_URL`, `DATABASE_CA`, `ADMIN_PASSWORD`, `VIEWER_PASSWORD`를 설정합니다.
+5. Deploy합니다.
+6. 확인합니다.
+   - `/health`가 200을 줍니다.
+   - `admin`으로 로그인하고 업무를 등록합니다.
+   - `viewer`는 조회만 되고 변경이 거부됩니다.
+   - 월간 보고서 PDF를 내려받습니다.
+7. 문제가 있으면 이 배포 전환 커밋을 되돌립니다(`git revert <커밋>`). 이전 서버와 이전 환경변수가 남아 있어 이전 배포로 돌아갑니다.
+
+### 값이 없을 때
+
+운영(`NODE_ENV=production`)에서 `DATABASE_URL`이 없으면 서버가 시작을 거부하고 `운영 배포에는 DATABASE_URL이 필요합니다.`를 출력합니다. 비밀번호가 없거나 두 비밀번호가 같을 때도 거부합니다. 접속 URL이 TLS 검증을 끄면(`sslmode=disable` 등) 접속을 거부합니다. 파일 저장소나 임시 저장으로 대체하지 않습니다.
+
 ## 관리자 설정 기능 추가 시 1회 DB 초기화
 
 기존 Supabase 프로젝트의 SQL Editor에서 `supabase/settings.sql` 전체를 실행하세요. 기존 업무·이력은 삭제하지 않습니다. 새 프로젝트라면 먼저 `supabase/schema.sql`, 다음 `supabase/settings.sql` 순서입니다. 설정 SQL은 재실행해도 기존 설정을 초기화하지 않습니다.
@@ -23,6 +61,8 @@ Claude Board 기반 카드 화면 추가 후에도 이 배포 설정은 같습�
 5. 프로젝트 설정의 API Keys에서 **New secret key**를 확인합니다. `anon`/publishable 키나 DB 비밀번호가 아닙니다. `New secret key`로 만든 `sb_secret_` 키를 사용합니다. 이름은 `orbit-render`로 지정하면 됩니다. 키는 Render 환경변수에만 입력하고 채팅, GitHub, 브라우저 JS에 넣지 않습니다.
 
 ## 2. Render Web Service
+
+이 절의 명령과 환경변수는 이전 서버(`node server.js`) 기준입니다. 현재 설정은 위 「Next 앱 배포」 절을 따릅니다.
 
 GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다.
 
