@@ -7,10 +7,9 @@ import type { Container, ContainerOptions } from '../config/container.ts';
 import { ADMIN_PASSWORD, VIEWER_PASSWORD } from './legacyOracle.ts';
 import type { Session } from './runner.ts';
 import type { RouteDefinition } from '../shared/adapter/in/web/RouteRegistry.ts';
+import type { AuthorizeRequestUseCase } from '../access/application/port/in/AuthorizeRequestUseCase.ts';
+import type { ReportRuntime } from '../report/application/port/out/ReportRuntime.ts';
 import type { OrbitFunctions } from '../shared/port/OrbitFunctions.ts';
-import { AccessConfiguration } from '../access/domain/AccessConfiguration.ts';
-import { AuthorizeRequestService } from '../access/application/service/AuthorizeRequestService.ts';
-import { Sha256SecretComparator } from '../access/adapter/out/crypto/Sha256SecretComparator.ts';
 import { accessRoutes } from '../access/adapter/in/web/routes.ts';
 import { requestRoutes } from '../request/adapter/in/web/routes.ts';
 import { createRequestUseCases } from '../request/application/service/createRequestUseCases.ts';
@@ -18,7 +17,6 @@ import { assignmentModule } from '../assignment/assignmentModule.ts';
 import { attachmentModule } from '../attachment/attachmentModule.ts';
 import { reportRoutes } from '../report/adapter/in/web/routes.ts';
 import { createReportUseCases } from '../report/application/service/createReportUseCases.ts';
-import { NodeReportRuntime } from '../report/adapter/out/system/NodeReportRuntime.ts';
 import { improvementRoutes } from '../improvement/adapter/in/web/routes.ts';
 import { createImprovementUseCases } from '../improvement/application/service/ImprovementServices.ts';
 import { settingsRoutes } from '../settings/adapter/in/web/routes.ts';
@@ -48,14 +46,15 @@ export const ROUTE_FACTORY_NAMES = ['accessRoutes', 'requestRoutes', 'assignment
  */
 export function registeredRoutes(): readonly RouteDefinition[] {
   const never = (): Promise<OrbitFunctions> => Promise.reject(new Error('registry only: the database is never opened'));
-  const configuration = AccessConfiguration.create({ adminPassword: ADMIN_PASSWORD, viewerPassword: VIEWER_PASSWORD, production: false });
-  const authorize = new AuthorizeRequestService(configuration, new Sha256SecretComparator());
+  // Only route patterns are read, so the collaborators are inert (adapter/out is for config/container.ts alone).
+  const authorize: AuthorizeRequestUseCase = { authorize: () => null, describeSession: (role) => ({ role, shared: false }) };
+  const runtime: ReportRuntime = { nowIso: () => new Date(0).toISOString(), sha256Hex: () => '' };
   return [
     ...accessRoutes(authorize),
     ...requestRoutes(createRequestUseCases(never)),
     ...assignmentModule(never),
     ...attachmentModule(never),
-    ...reportRoutes(createReportUseCases(never, new NodeReportRuntime())),
+    ...reportRoutes(createReportUseCases(never, runtime)),
     ...improvementRoutes(createImprovementUseCases(never)),
     ...settingsRoutes(createSettingsUseCases(never)),
     ...automationRoutes(createAutomationUseCases(never)),

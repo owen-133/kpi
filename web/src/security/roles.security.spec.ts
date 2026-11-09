@@ -1,25 +1,29 @@
 // The database role limits of web/db/app-role.sql, run for real: PGlite is PostgreSQL itself (WASM) and enforces
-// roles and privileges, so the file is applied unchanged (only its password placeholder is replaced) over the same
-// supabase/*.sql schema the app uses, and the checks run after `SET ROLE orbit_app`.
+// roles and privileges, so the file is applied unchanged (only its password placeholder is replaced) over the schema
+// the app's own PGlite adapter loads, and the checks run after `SET ROLE orbit_app`.
 // untested: a managed Supabase/Postgres host (its extra default grants, pooler, TLS) - that needs DATABASE_URL and a superuser.
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { PGlite } from '@electric-sql/pglite';
+import { startNextCandidate } from '../parity/nextCandidate.ts';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..', '..');
-let db: PGlite;
+// The PGlite client behind the adapter (architecture rules keep the driver import out of specs); the adapter has
+// already loaded supabase/*.sql and switched to service_role.
+type Client = { exec(sql: string): Promise<unknown>; query<T>(sql: string): Promise<{ rows: T[] }> };
+const session = startNextCandidate();
+let db: Client;
 
 before(async () => {
-  db = new PGlite();
-  await db.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;');
-  for (const file of ['schema', 'settings', 'deletion', 'kpi', 'upgrade']) await db.exec(readFileSync(path.join(ROOT, 'supabase', `${file}.sql`), 'utf8'));
+  const orbit = (await (await session).container.orbitFunctions()) as unknown as { client: Client };
+  db = orbit['client'];
+  await db.exec('RESET ROLE');
   const roleSql = readFileSync(path.join(ROOT, 'web', 'db', 'app-role.sql'), 'utf8').replace('REPLACE-WITH-A-LONG-RANDOM-PASSWORD', 'spec-only-password');
   await db.exec(roleSql);
   await db.exec('SET ROLE orbit_app');
 });
-after(async () => db?.close());
+after(async () => (await session).stop?.());
 
 const refused = async (sql: string): Promise<string> => {
   try {
