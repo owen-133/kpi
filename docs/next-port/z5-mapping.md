@@ -10,7 +10,7 @@ T='awk "/^test-name:/{f=1;next}/^[a-z-]+:/{f=0}/^### /{f=0}f&&/^- /" docs/ssot/r
 eval "$T" | wc -l; eval "$T" | sort -u | wc -l                # 인용 횟수 / 제목(중복 뺌)
 G='awk "/^golden:/{f=1;next}/^[a-z-]+:/{f=0}/^### /{f=0}f&&/^- /" docs/ssot/requirements.md'
 eval "$G" | wc -l; eval "$G" | sort -u | wc -l                # 골든 라벨 인용 횟수 / 라벨(중복 뺌)
-git ls-files --others --exclude-standard 'web/src/**/*.char.spec.ts' | wc -l   # 커밋 전: 새 시험 파일
+git ls-files 'web/src/*.char.spec.ts' 'web/src/**/*.char.spec.ts' | wc -l          # 새 시험 파일
 ```
 
 | 항목 | 값 |
