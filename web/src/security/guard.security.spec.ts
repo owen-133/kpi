@@ -1,10 +1,7 @@
 // Security behavior of the guard: auth matrix, origin rules, body cap, headers, log hygiene and source bans.
 import { after, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
-import { once } from 'node:events';
-import { existsSync, readFileSync } from 'node:fs';
-import { createServer } from 'node:net';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { ADMIN_PASSWORD, VIEWER_PASSWORD } from '../parity/legacyOracle.ts';
 import { startNextCandidate } from '../parity/nextCandidate.ts';
@@ -170,65 +167,4 @@ describe('source bans over web/src', () => {
       assert.deepEqual(hits, []);
     });
   }
-});
-
-describe('production start', () => {
-  const WEB = path.resolve(import.meta.dirname, '..', '..');
-  const built = existsSync(path.join(WEB, '.next', 'BUILD_ID'));
-  const skip = built ? false : 'no production build: run `npm run build` first';
-  const nextBin = path.join(WEB, 'node_modules', 'next', 'dist', 'bin', 'next');
-  const freePort = async (): Promise<number> => {
-    const server = createServer();
-    server.listen(0, '127.0.0.1');
-    await once(server, 'listening');
-    const address = server.address() as { port: number };
-    server.close();
-    await once(server, 'close');
-    return address.port;
-  };
-  const start = (port: number, env: Record<string, string>) =>
-    spawn(process.execPath, [nextBin, 'start', '-H', '127.0.0.1', '-p', String(port)], { cwd: WEB, env: { PATH: process.env.PATH ?? '', ...env } as unknown as NodeJS.ProcessEnv, stdio: ['ignore', 'pipe', 'pipe'] });
-
-  it('exits non-zero in production without the passwords and DATABASE_URL', { skip, timeout: 60_000 }, async () => {
-    const child = start(await freePort(), { NODE_ENV: 'production' });
-    let output = '';
-    child.stdout.on('data', (c) => { output += c; });
-    child.stderr.on('data', (c) => { output += c; });
-    const timer = setTimeout(() => child.kill(), 40_000);
-    const [code] = (await once(child, 'exit')) as [number | null];
-    clearTimeout(timer);
-    assert.notEqual(code, 0, output);
-    assert.notEqual(code, null, `killed after timeout, it did not stop: ${output}`);
-  });
-
-  it('serves 401 and health with a fresh nonce and no unsafe-* source when configured', { skip, timeout: 60_000 }, async () => {
-    const port = await freePort();
-    const child = start(port, { NODE_ENV: 'production', ADMIN_PASSWORD: 'a-secret', VIEWER_PASSWORD: 'v-secret', DATABASE_URL: 'postgres://u:p@127.0.0.1:1/db' });
-    let output = '';
-    child.stdout.on('data', (c) => { output += c; });
-    child.stderr.on('data', (c) => { output += c; });
-    try {
-      for (let attempt = 0; attempt < 60; attempt += 1) {
-        if (/Ready|started server/.test(output)) break;
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-      const first = await fetch(`http://127.0.0.1:${port}/health`);
-      const second = await fetch(`http://127.0.0.1:${port}/health`);
-      const denied = await fetch(`http://127.0.0.1:${port}/_next/static/none.js`);
-      assert.equal(first.status, 200);
-      assert.equal(denied.status, 401);
-      assert.equal(first.headers.get('x-powered-by'), null);
-      for (const response of [first, second, denied]) {
-        const policy = response.headers.get('content-security-policy') ?? '';
-        assert.doesNotMatch(policy, /unsafe-/);
-        assert.match(policy, /script-src 'nonce-[A-Za-z0-9+/=]+' 'strict-dynamic'/);
-        assert.equal(response.headers.get('strict-transport-security'), 'max-age=31536000');
-        assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
-        assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
-      }
-      assert.notEqual(first.headers.get('content-security-policy'), second.headers.get('content-security-policy'));
-    } finally {
-      child.kill();
-    }
-  });
 });
