@@ -30,7 +30,7 @@ const tick = createAutoRefresh<TaskSummary[]>({
   },
 });
 
-/** Refreshes the task list every 30 seconds while this Overview is shown (docs/architecture.md §8). */
+/** Refreshes the task list every 30 seconds while this Overview is shown (docs/architecture.md 「화면 구조 규칙」). */
 export function useDashboardAutoRefresh(): void {
   const { apis, actions } = usePortal();
   useEffect(() => {

@@ -1,4 +1,4 @@
-// Writes and the history read of the improvement dialog, as plain async flows (docs/architecture.md §8). The component hands in
+// Writes and the history read of the improvement dialog, as plain async flows (docs/architecture.md 「화면 구조 규칙」). The component hands in
 // the typed api and the few portal actions it needs.
 import type { ImprovementApi, ImprovementHistoryEvent, ImprovementItem, SaveImprovementBody } from './ImprovementApi.ts';
 

@@ -1,4 +1,4 @@
-// Writes of the report screen as plain async flows (docs/architecture.md §8): the month field, publishing, and the PDF download.
+// Writes of the report screen as plain async flows (docs/architecture.md 「화면 구조 규칙」): the month field, publishing, and the PDF download.
 // The component hands in the typed api and the few portal actions it needs.
 import { assertReportMonth } from '../../../../domain/ReportMonth.ts';
 import type { ReportApi, ReportRecordView } from './ReportApi.ts';

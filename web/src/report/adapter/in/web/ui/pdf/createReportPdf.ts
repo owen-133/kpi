@@ -1,5 +1,5 @@
 // The PDF of a published monthly report: the portal part of the legacy bundle public/pdf/report-pdf.js (`createReportPdf`),
-// on the npm packages pdf-lib and @pdf-lib/fontkit instead of the bundled copies. Loaded on click with import() (docs/architecture.md §8).
+// on the npm packages pdf-lib and @pdf-lib/fontkit instead of the bundled copies. Loaded on click with import() (docs/architecture.md 「화면 구조 규칙」).
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 

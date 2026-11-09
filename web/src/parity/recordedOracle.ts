@@ -13,7 +13,7 @@
 // The recordings are FROZEN. They were made once, while the old portal still existed: a recorder started that server, ran each
 // spec's corpus (test/golden/requests.js) against it twice, required equal normalized answers, and wrote recorded/<spec-id>.json.
 // That recorder and the server are deleted; a recording is never regenerated. A request that is new or changed gets a Next
-// scenario spec (see AGENTS.md), not a recording.
+// scenario spec (see web/AGENTS.md 「화면과 동등성」), not a recording.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';

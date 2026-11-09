@@ -19,6 +19,11 @@
 - `test-name` 은 `web/src/**/*.spec.ts` 또는 루트 도구 시험(`scripts/*.test.mjs`) 안 기존 테스트 제목을 글자 그대로 적는다.
 - `accept` 는 `Given … / When … / Then …` 한 줄이다.
 - 값이 없는 키는 키 줄만 두고 항목을 적지 않는다. `planned` 항목은 증거가 없어도 되고, 근거 문서가 있으면 그 줄을 적는다.
+- `home` 은 `web/src/<컨텍스트>/…` 경로이고 R-033 부터 필수다. 문법은 `web/src/ssot.helpers.ts` 머리말이 소유한다. `node web/scripts/new-usecase.ts <컨텍스트> <유스케이스>` 가 다음 `planned` 번호를 `home` 과 함께 추가한다.
+- 테스트의 `// R-0NN` 태그는 증명이다. 코드에서 읽기만 한 동작은 특성화 시험(`web/src/**/*.char.spec.ts`)으로 고정한다.
+- 동작이 바뀌면 같은 커밋에서 이 파일도 고친다. 도구·다이어그램은 맨 나중에 맞춘다.
+- 기계 검사는 `cd web && npm test` 의 `web/src/ssot.spec.ts` 다. 번호 결번·중복, 증거 없는 `current`, 모르는·`planned`·`dropped` 번호를 가리키는 태그, 다른 문서에 다시 적은 제목을 잡는다.
+- 리뷰만 보는 것(기계 검사 없음): 말을 바꿔 다시 적은 서술, 인용한 줄이 주장을 받치는지, 계층 선택.
 
 형식 예시는 아래 R-001 이다. 키 줄(`layer:`, `status:`, `evidence:`, `golden:`, `test-name:`, `accept:`) 뒤에 목록 항목은 `- ` 로 시작하는 줄로 적는다.
 
