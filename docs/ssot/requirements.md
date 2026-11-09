@@ -595,16 +595,13 @@ PDF 는 브라우저가 만든다. 서버는 글꼴(`/fonts/NanumGothic-Regular.
 ### R-025 개선 이력 관리대장
 layer: supporting
 status: current
+home: web/src/improvement
 evidence:
-- server.js:44-46 ~ path==='/api/improvements'&&req.method==='GET'
-- public/kpi-model.js:21 ~ export function validateImprovement
-- kpi-store-local.js:5-6 ~ CREATE TABLE IF NOT EXISTS improvements(
-- kpi-store-local.js:8-9 ~ improvement_events_no_delete
-- kpi-store-local.js:24-26 ~ action==='improvements'
+- web/src/improvement/domain/ImprovementValue.ts:23 ~ export function validateImprovement(
 - supabase/kpi.sql:4-5 ~ orbit_private.improvements
 - supabase/kpi.sql:12-13 ~ drop trigger if exists improvement_audit
 - supabase/kpi.sql:22-29 ~ if action='improvements' then
-- public/kpi-ui.js:22-33 ~ export async function renderImprovements
+- web/src/improvement/adapter/in/web/ui/ImprovementsView.tsx:13 ~ export function ImprovementsView(
 - web/src/improvement/adapter/in/web/routes.ts:19 ~ pattern: '/api/improvements'
 - web/src/improvement/adapter/in/web/improvement.scenario.spec.ts:1 ~ // R-025: from the HTTP handler through the services to the real SQL functions (in-memory PGlite).
 - web/src/improvement/adapter/in/web/improvement.parity.spec.ts:1 ~ (R-025)
@@ -612,37 +609,34 @@ evidence:
 - web/src/improvement/domain/ImprovementValue.spec.ts:1 ~ // R-025
 golden:
 test-name:
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
-- 무료 자동 분류·유사도는 설정 분류를 존중하고 테스트 기록 제외
+- each step answers as the legacy portal did and the published report survives the purge of its request
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
-- 필수 항목이 비었거나 단계·상태가 목록 밖이거나 검증 완료에 결과가 없으면 400 이고 대장이 늘지 않는다
-- 항목은 5000자까지 201 이고 앞뒤 공백을 지운 뒤 센다
+- title and feedback are required; blank counts as empty (legacy messages)
+- stage and status must be on their lists; each list member passes
+- 검증 완료 needs a non-blank result, other statuses do not
+- each field allows 5000 characters counted after trimming; 5001 fails and is checked before the other rules
+- Given the 5000-character limit, When a field has 5000 or 5001 characters, Then 201 or 400 and the ledger grows only for 201
 accept:
 - Given 관리자 / When 개선 제목·피드백·단계·상태를 담아 저장하면 / Then 201 이고 새 개선 항목이 생기며 저장 전후 값이 수정 이력에 남는다
 - Given 이미 수정된 개선 항목 / When 낡은 버전 번호로 저장하면 / Then 409 로 거절한다
 - Given 상태가 검증 완료인데 검증 결과가 비었다 / When 저장하면 / Then 거절한다
 - Given 조회 계정 / When 개선 항목을 저장하면 / Then 403 이고 목록·수정 이력은 읽을 수 있다
 
-단계는 `MVP 구축`·`본인 실사용`·`정착 운영`, 상태는 `접수`·`개선 중`·`검증 완료` 이고 항목별 5000자를 넘으면 거절한다(`public/kpi-model.js:21`). 검증 결과·단계·상태 거절과 그 400 변환, 버전 누락·0·문자열·소수의 400, 없는 id 의 404, 검증이 버전 검사보다 먼저인 순서는 `test/char-kpi.test.js` 가 고정한다. 개선 항목 목록은 CSV 로 내려받을 수 있다(`public/kpi-ui.js:32`, 시험 없음).
+단계는 `MVP 구축`·`본인 실사용`·`정착 운영`, 상태는 `접수`·`개선 중`·`검증 완료` 이고 항목별 5000자를 넘으면 거절한다(`ImprovementValue.ts` 의 `validateImprovement`). 검증 결과·단계·상태 거절과 그 400 변환, 버전 누락·0·문자열·소수의 400, 없는 id 의 404, 검증이 버전 검사보다 먼저인 순서는 `improvement.scenario.spec.ts` 가 고정한다. 개선 항목 목록은 CSV 로 내려받을 수 있다(`improvementCsv.ts`, 파일 내용은 `improvementCsv.spec.ts` 가 본다).
 
 ### R-026 업무 삭제와 복원(휴지통)
 layer: core
 status: current
+home: web/src/request
 evidence:
-- server.js:34 ~ ['/api/trash','/api/lifecycle-history']
-- server.js:57 ~ notes|delete|restore|purge|edit
-- server.js:61 ~ ['delete','restore','purge'].includes(match[2])
-- local-store.js:23-25 ~ function lifecycle(
-- local-store.js:29 ~ lifecycleHistory:()
-- local-store.js:34-35 ~ list:()=>db.prepare('SELECT * FROM tasks WHERE deleted_at IS NULL
-- local-store.js:37-38 ~ status:(id,status,reason)=>transaction
+- web/src/request/adapter/in/web/routes.ts:20 ~ pattern: '/api/trash'
 - supabase/deletion.sql:21-22 ~ if action='list' then
 - supabase/deletion.sql:36 ~ if t.deleted_at is not null and (action<>'detail'
 - supabase/deletion.sql:62 ~ if action='trash' then
 - supabase/deletion.sql:68-69 ~ if action='delete' and t.deleted_at is not null
 - supabase/deletion.sql:79-80 ~ update orbit_private.tasks set deleted_at=case
-- public/app.js:35 ~ $('#delete-task').onclick
-- public/app.js:57-62 ~ $('#open-trash').onclick
+- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:136 ~ id="delete-task"
+- web/src/portal/adapter/in/web/ui/Shell.tsx:93 ~ id="open-trash"
 - web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
@@ -653,7 +647,10 @@ evidence:
 - web/src/request/domain/TaskLifecycle.ts:1 ~ R-026 delete and restore
 golden:
 test-name:
-- 모든 상태 삭제·조회 차단·복원·제목 확인 후 영구 삭제 및 최소 감사 기록
+- a deleted request leaves the list, shows in the trash and the administrator can still open it, without the KPI part
+- the viewer gets 404 for the deleted request while the administrator gets it
+- deleting twice is a 409, restoring a request that is not in the trash is a 409, and status and notes on a deleted request are 404
+- the reason is 1..1000 characters after trimming: empty, blank, missing and 1001 get the lifecycle reason message, 1 and 1000 pass
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
 accept:
 - Given 어떤 상태든 업무 / When 관리자가 사유를 담아 삭제하면 / Then 200 이고 업무가 목록에서 빠지며 상태 변경이 409 로 막힌다
@@ -661,23 +658,20 @@ accept:
 - Given 휴지통의 업무 / When 조회 계정이 휴지통·삭제 이력·삭제된 업무 상세를 부르면 / Then 403 또는 404 다
 - Given 휴지통의 업무 / When 관리자가 사유를 담아 복원하면 / Then 200 이고 삭제 전 상태 그대로 목록에 돌아온다
 
-사유는 앞뒤 공백을 지운 뒤 1~1000자여야 한다(`server.js` 의 `사유를 1~1000자로 입력하세요`). 이미 휴지통에 있는 업무의 삭제와 휴지통에 없는 업무의 복원은 409 다. 삭제와 복원은 업무 이력에 `업무 삭제`·`업무 복원` 을 남긴다(`local-store.js` 의 `업무 삭제`, `supabase/deletion.sql:80`). 복원이 완료 시각과 처리 이력을 그대로 두는지는 시험이 상태만 본다. 휴지통 업무는 목록·통계·CSV·월간 지표에서 빠지고 담당자·첨부도 바꾸지 못한다(`kpi-store-local.js:14`, `public/kpi-ui.js:36`).
+사유는 앞뒤 공백을 지운 뒤 1~1000자여야 한다(`lifecycleSchemas.ts` 의 `lifecycleReason`). 이미 휴지통에 있는 업무의 삭제와 휴지통에 없는 업무의 복원은 409 다. 삭제와 복원은 업무 이력에 `업무 삭제`·`업무 복원` 을 남긴다(`supabase/deletion.sql:80`). 복원이 완료 시각과 처리 이력을 그대로 두는지는 시험이 상태만 본다. 휴지통 업무는 목록·통계·CSV·월간 지표에서 빠지고 담당자·첨부도 바꾸지 못한다(`supabase/kpi.sql:33` 의 `deleted_at is null`, `detailModel.ts:10`).
 
 ### R-027 제목 확인 후 영구 삭제와 삭제 이력
 layer: core
 status: current
+home: web/src/request
 evidence:
-- server.js:61 ~ ['delete','restore','purge'].includes(match[2])
-- local-store.js:20-22 ~ CREATE TABLE IF NOT EXISTS task_lifecycle_events
-- local-store.js:23-25 ~ function lifecycle(
-- local-store.js:29 ~ lifecycleHistory:()
-- kpi-store-local.js:3-4 ~ CREATE TABLE IF NOT EXISTS task_extras
 - supabase/deletion.sql:3-6 ~ create table if not exists orbit_private.task_lifecycle_events
 - supabase/deletion.sql:15-16 ~ drop trigger if exists lifecycle_immutable
 - supabase/deletion.sql:63 ~ if action='history' then
 - supabase/deletion.sql:70-77 ~ if action='purge' and coalesce(payload->>'confirmation'
 - supabase/kpi.sql:2-3 ~ create table if not exists orbit_private.task_extras
-- public/app.js:62-63 ~ [data-restore],[data-purge]
+- web/src/request/adapter/in/web/ui/trash/TrashDialog.tsx:91 ~ data-restore={t.id}
+- web/src/request/adapter/in/web/ui/trash/TrashDialog.tsx:94 ~ data-purge={t.id}
 - web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
@@ -687,8 +681,10 @@ evidence:
 - web/src/request/domain/TaskLifecycle.ts:1 ~ R-027 purge
 golden:
 test-name:
-- 모든 상태 삭제·조회 차단·복원·제목 확인 후 영구 삭제 및 최소 감사 기록
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
+- purging a request that was never deleted is a 409 and it stays
+- a wrong, empty, padded or missing confirmation is a 400 and the request stays in the trash; the exact title purges it for good
+- the trash is ordered by deletion time, newest first, and the history lists the newest event first without copying the title
+- each step answers as the legacy portal did and the published report survives the purge of its request
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
 accept:
 - Given 휴지통의 업무 / When 업무 제목과 다른 문자열로 영구 삭제하면 / Then 400 으로 거절하고 업무는 휴지통에 남는다
@@ -696,22 +692,20 @@ accept:
 - Given 영구 삭제한 업무 / When 삭제 이력을 조회하면 / Then 업무 id·시각·행위자·작업·사유 행이 남아 있고 저장소가 그 행의 수정·삭제를 거부한다
 - Given 영구 삭제 대상이 아닌 업무(휴지통에 없음) / When 영구 삭제를 보내면 / Then 409 다
 
-삭제 이력 조회는 최근 100건이고 관리자만 본다(`local-store.js` 의 `lifecycleHistory`, `supabase/deletion.sql:63`). 이력 행에는 업무 제목·본문을 복제하지 않는다(로컬은 제목 열에 고정 문구를 넣고 `local-store.js` 의 `[업무 삭제 이력]`, 클라우드 표에는 제목 열이 없다 `supabase/deletion.sql:3-6`). 영구 삭제는 처리 이력 보호의 유일한 예외로, 로컬은 삭제 트리거를 잠시 내리고(`local-store.js` 의 `DROP TRIGGER events_no_delete`) 클라우드는 업무별 허용 설정을 쓴다(`supabase/deletion.sql:11`). 이미 발행한 월간 보고서는 영구 삭제의 영향을 받지 않는다(R-023). 사람 개인은 식별하지 않고 공용 `admin` 이 기록된다.
+삭제 이력 조회는 최근 100건이고 관리자만 본다(`supabase/deletion.sql:63`). 이력 행에는 업무 제목·본문을 복제하지 않는다(표에 제목 열이 없다, `supabase/deletion.sql:3-6`). 영구 삭제는 처리 이력 보호의 유일한 예외로, 업무별 허용 설정을 쓴다(`supabase/deletion.sql:11`). 이미 발행한 월간 보고서는 영구 삭제의 영향을 받지 않는다(R-023). 사람 개인은 식별하지 않고 공용 `admin` 이 기록된다.
 
 ### R-028 관리자 공통 설정과 변경 이력
 layer: supporting
 status: current
+home: web/src/settings
 evidence:
-- server.js:30-32 ~ path==='/api/settings'&&req.method==='GET'
-- local-store.js:14-18 ~ CREATE TABLE IF NOT EXISTS portal_settings
-- local-store.js:31-33 ~ settings:()=>{const r=db.prepare('SELECT * FROM portal_settings
 - supabase/settings.sql:2-14 ~ create table if not exists orbit_private.portal_settings
 - supabase/settings.sql:25-33 ~ select * into s from orbit_private.portal_settings
-- public/admin-settings.js:3-18 ~ export async function openSettings
-- public/settings-model.js:7-8 ~ export const defaults=
-- public/app.js:44-55 ~ function applySettings()
-- public/app.js:41 ~ $('#admin-settings').onclick
-- public/app.js:42-52 ~ config=await api('settings')
+- web/src/settings/adapter/in/web/ui/SettingsDialog.tsx:28 ~ export function SettingsDialog(
+- web/src/settings/domain/PortalSettings.ts:79 ~ export const DEFAULT_SETTINGS
+- web/src/portal/adapter/in/web/ui/PortalApp.tsx:54 ~ document.title = documentTitle(values.texts)
+- web/src/portal/adapter/in/web/ui/Shell.tsx:96 ~ id="admin-settings"
+- web/src/settings/adapter/in/web/ui/SettingsApi.ts:29 ~ get: () => client.request<SettingsEnvelope>('settings')
 - web/src/settings/adapter/in/web/routes.ts:26 ~ pattern: '/api/settings',
 - web/src/settings/adapter/in/web/settings.parity.spec.ts:1 ~ // R-028 R-029
 - web/src/settings/adapter/in/web/settings.scenario.spec.ts:1 ~ // R-028 R-029
@@ -719,25 +713,27 @@ evidence:
 - web/src/settings/domain/PortalSettings.spec.ts:1 ~ // R-029 R-028
 golden:
 test-name:
-- 설정 API 권한·버전 충돌·이력과 재시작 후 공통 설정 보존
+- reports a stale version as 409 with the conflict message and keeps the stored version
+- records every save in the history as admin, newest first, with the values before and after
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
-- 경계값(문구 1000자·선택 항목 30개·항목 50자·로고 280000자)은 모두 200 으로 저장되고 버전이 하나씩 오른다
-- 조회 계정은 저장할 수 없고(403) 읽기는 200 이며 버전과 이력이 그대로다
+- saves the boundary values (1000 character text, 30 items of 50 characters, 280000 character logo) one version at a time
+- lets a viewer read the settings but not save them or read the history, and nothing changes
 accept:
 - Given 조회 계정 / When 설정을 저장하거나 설정 변경 이력을 조회하면 / Then 403 이고 설정 값 읽기는 200 이다
 - Given 관리자 / When 최신 버전 번호로 설정을 저장하면 / Then 200 이고 버전이 1 오르며 수정 전후 값이 `admin` 으로 변경 이력에 남는다
 - Given 이미 저장되어 버전이 오른 설정 / When 낡은 버전 번호로 저장하면 / Then 409 로 거절한다
 - Given 저장된 공통 설정 / When 서버를 다시 시작하면 / Then 모든 계정이 같은 설정을 읽는다
 
-설정은 포털 문구·메뉴·배너·업무 분류/접수 경로/우선순위 선택 항목·이미지 로고·색상이다. 상태 단계와 보안 설정은 설정 대상이 아니다(`public/settings-model.js` 의 `defaults`, 정의에 없는 필드는 `validateSettings` 가 거절한다). 선택 항목을 바꿔도 기존 업무의 값은 그대로다. 변경 이력은 최근 30건이다(`local-store.js` 의 `LIMIT 30`). 설정 DB 가 준비되지 않은 클라우드에서는 기본값과 안내를 돌려준다(`server.js` 의 `SETTINGS_MIGRATION_REQUIRED`, 시험 없음). 경계값 저장(문구 1000자·선택 항목 30개·항목 50자·로고 280000자)과 저장 시 문구 공백 제거·기본값 보충은 `test/char-kpi.test.js` 가 고정한다. 설정 창의 화면 동작은 브라우저 시험(`test/board-ui.test.js`)이 있지만 Playwright 가 있을 때만 돈다.
+설정은 포털 문구·메뉴·배너·업무 분류/접수 경로/우선순위 선택 항목·이미지 로고·색상이다. 상태 단계와 보안 설정은 설정 대상이 아니다(`PortalSettings.ts` 의 `DEFAULT_SETTINGS`, 정의에 없는 필드는 `validateSettings` 가 거절한다). 선택 항목을 바꿔도 기존 업무의 값은 그대로다. 변경 이력은 최근 30건이다(`supabase/settings.sql:21` 의 `limit 30`). 설정 DB 가 준비되지 않은 클라우드에서는 기본값과 안내를 돌려준다(`GetSettingsService.ts` 의 `SettingsMigrationRequiredError`, `SettingsServices.spec.ts` 가 본다). 경계값 저장(문구 1000자·선택 항목 30개·항목 50자·로고 280000자)과 저장 시 문구 공백 제거·기본값 보충은 `settings.scenario.spec.ts` 가 고정한다. 설정 창의 화면 동작은 브라우저 시험(`settings.browser.spec.ts`)이 있지만 Playwright 가 있을 때만 돈다. 서버를 다시 시작한 뒤 읽는 것은 시험하지 못했다. 설정은 DB 행(`supabase/settings.sql:2-14`)이라 서버 프로세스와 무관하다.
 
 ### R-029 설정 값 검증
 layer: supporting
 status: current
+home: web/src/settings
 evidence:
-- public/settings-model.js:14-26 ~ export function validateSettings
-- server.js:32 ~ validateSettings(body.values)
-- server.js:69 ~ if(e.status)return send(e.status
+- web/src/settings/domain/PortalSettings.ts:152 ~ export function validateSettings(
+- web/src/settings/application/service/SaveSettingsService.ts:17 ~ validateSettings(command.values)
+- web/src/settings/adapter/in/web/settingsErrors.ts:16 ~ error instanceof SettingsValidationError
 - web/src/settings/adapter/in/web/routes.ts:26 ~ pattern: '/api/settings',
 - web/src/settings/adapter/in/web/settings.parity.spec.ts:1 ~ // R-028 R-029
 - web/src/settings/adapter/in/web/settings.scenario.spec.ts:1 ~ // R-028 R-029
@@ -745,24 +741,24 @@ evidence:
 - web/src/settings/domain/PortalSettings.spec.ts:1 ~ // R-029 R-028
 golden:
 test-name:
-- 설정 입력 검증: 색상·이미지·중복·빈 항목·임의 필드 차단
-- 잘못된 값은 모두 400 이고 버전과 이력이 그대로다
-- 입력 검증은 버전 충돌 검사보다 먼저다 (잘못된 값 + 낡은 버전은 409 가 아니라 400)
+- settings validation: the 17 invalid values pinned by the characterization test
+- refuses every invalid value with its own message and leaves version and history alone
+- answers a bad value with 400, not 409, even when the version is stale
 accept:
 - Given 분류 목록이 비었거나 같은 항목이 두 번 있는 설정 / When 검증하면 / Then 오류를 던진다
 - Given `#rrggbb` 형식이 아닌 색상, PNG·JPEG·WebP 가 아닌 로고, 정의에 없는 필드 / When 검증하면 / Then 오류를 던진다
 - Given 마크업이 들어 있는 문구 / When 검증하면 / Then 글자 그대로 통과한다
 
-문구는 항목마다 1~1000자, 선택 항목은 1~30개에 항목당 1~50자, 로고는 PNG·JPEG·WebP 데이터 URL 이고 280000자 이하다. 검증 예외의 `status` 400 을 서버가 응답으로 바꾸는 동작은 `test/char-kpi.test.js` 가 고정한다(잘못된 값마다 400, 버전·이력 불변, 검증이 버전 충돌 검사보다 먼저). 마크업 문구를 화면에서 이스케이프하는 줄은 시험이 보지 않는다. 관찰: `texts` 가 배열이어도 `normalizeSettings` 가 객체로 펼쳐 저장되므로 `문구 설정을 확인하세요.` 분기에는 도달하지 못한다.
+문구는 항목마다 1~1000자, 선택 항목은 1~30개에 항목당 1~50자, 로고는 PNG·JPEG·WebP 데이터 URL 이고 280000자 이하다. 검증 예외를 서버가 400 응답으로 바꾸는 동작은 `settings.scenario.spec.ts` 가 고정한다(잘못된 값마다 400, 버전·이력 불변, 검증이 버전 충돌 검사보다 먼저). 마크업 문구는 화면에서 글자로 그려지며 그 그리기는 시험이 보지 않는다. 관찰: `texts` 가 배열이어도 `normalizeSettings` 가 객체로 펼쳐 저장되므로 `문구 설정을 확인하세요.` 분기에는 도달하지 못한다.
 
 ### R-030 규칙 기반 자동 분류와 유사 업무
 layer: supporting
 status: current
+home: web/src/automation
 evidence:
-- server.js:43 ~ path==='/api/automation'
-- public/kpi-model.js:17-20 ~ const keywords=
-- public/app.js:69 ~ id="accept-category"
-- public/index.html:4 ~ id="automate-request"
+- web/src/automation/domain/automation.ts:35 ~ const KEYWORD_GROUPS
+- web/src/automation/adapter/in/web/ui/AutomationBox.tsx:40 ~ id="accept-category"
+- web/src/automation/adapter/in/web/ui/AutomationBox.tsx:27 ~ id="automate-request"
 - web/src/automation/adapter/in/web/routes.ts:29 ~ pattern: '/api/automation'
 - web/src/automation/adapter/in/web/automation.scenario.spec.ts:1 ~ // R-030
 - web/src/automation/adapter/in/web/automation.parity.spec.ts:1 ~ // R-030
@@ -770,24 +766,27 @@ evidence:
 - web/src/automation/domain/automation.spec.ts:1 ~ // R-030
 golden:
 test-name:
-- 무료 자동 분류·유사도는 설정 분류를 존중하고 테스트 기록 제외
-- 배정·파일·실사용 구분·발행 스냅샷·개선 버전·권한과 삭제 연동
+- uses the first category that contains a keyword name, in the order of the configured categories
+- suggests the first configured category, with a "check it yourself" reason, when no keyword matches
+- lists only tasks scoring 10 or more, best first, at most five
+- leaves out deleted tasks and test records
+- each step answers as the legacy portal did and the published report survives the purge of its request
 accept:
 - Given 업무 제목·내용에 장비·구매·시설·계약·복지 같은 키워드 / When 자동 분류를 요청하면 / Then 설정된 분류 중 키워드에 맞는 분류가 있으면 그 분류를 제안한다
 - Given 맞는 키워드가 없는 내용 / When 자동 분류를 요청하면 / Then 설정된 분류의 첫 항목을 제안하고 직접 확인하라는 사유를 붙인다
 - Given 비슷한 업무가 이미 있는 상태 / When 유사 업무를 구하면 / Then 삭제·테스트 업무는 빼고 유사도가 높은 순으로 돌려준다
 
-제안은 담당자가 `분류 적용` 을 눌러야 등록 폼에 들어간다(`public/app.js` 의 `accept-category`). 유사도 10% 미만은 빼고 최대 5건이다(`public/kpi-model.js` 의 `similarTasks`, 한도 값은 시험이 보지 않는다). 응답의 `method` 에 생성형 AI 를 쓰지 않는다고 밝힌다(`server.js` 의 `/api/automation`). 요청은 POST 라 조회 계정은 쓰지 못한다(R-007).
+제안은 담당자가 `분류 적용` 을 눌러야 등록 폼에 들어간다(`AutomationBox.tsx` 의 `accept-category`). 유사도 10% 미만은 빼고 최대 5건이다(`automation.ts` 의 `similarTasks`, `automation.spec.ts` 가 한도를 본다). 응답의 `method` 에 생성형 AI 를 쓰지 않는다고 밝힌다(`automation.ts` 의 `AUTOMATION_METHOD`). 요청은 POST 라 조회 계정은 쓰지 못한다(R-007).
 
 ### R-031 등록 업무의 감사 가능한 정보 정정
 layer: core
 status: current
+home: web/src/request
 evidence:
-- public/task-editor.js:2-10 ~ export function editTask
-- public/app.js:30-35 ~ async function detail(id)
-- local-store.js:26-29 ~ edit_revision
+- web/src/request/adapter/in/web/ui/detail/detailFlow.ts:80 ~ export function editTask(
+- web/src/request/adapter/in/web/ui/detail/detailFlow.ts:85 ~ export async function readDetail(
 - supabase/edit.sql:3-28 ~ create or replace function public.orbit_edit_task
-- test/task-edit.test.js:12-20 ~ for(const status of
+- web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:48 ~ a valid edit answers revision 1
 - web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
@@ -797,17 +796,20 @@ evidence:
 - web/src/request/domain/TaskEdit.ts:1 ~ (R-031)
 golden:
 test-name:
-- 업무 수정: 모든 상태·권한·원본시각 보존·감사·충돌·유효성·삭제 업무 차단
+- a valid edit answers revision 1, changes the stored fields, keeps the status and writes one history row with reason and before/after
+- a viewer cannot edit: 403 and nothing is written; an unknown id is 404; a text that is no id is 400
+- an edit made on a stale revision is a 409 and changes nothing
+- a request in the trash cannot be edited until it is restored
 - PostgreSQL RPC, 접근 권한, 트랜잭션 및 이력 보존
-- [R-031] an edit that changes nothing answers unchanged and adds no history row or revision
-- [R-031] reason boundary: empty, whitespace-only and 1001 chars get 400; 1 and 1000 chars are accepted and stored in the audit row
+- an edit that changes nothing answers unchanged, adds no history row and keeps revision 0
+- the reason is 1..1000 characters after trimming: empty, blank and 1001 get the reason message; 1 and 1000 are stored whole
 accept:
 - Given 관리자와 휴지통에 없는 등록 업무 / When 요청자·기한 등 허용된 항목을 수정 사유와 최신 수정 버전으로 저장하면 / Then 등록·완료 시각과 상태는 유지되고 변경 전후 값·사유·admin 계정·시각이 업무 이력에 남는다
 - Given 조회 계정 또는 휴지통의 업무 / When 정보 수정을 요청하면 / Then 각각 403 또는 409로 거절한다
 - Given 다른 화면에서 이미 수정한 업무 / When 낡은 수정 버전으로 저장하면 / Then 409로 거절하고 먼저 저장한 값을 보존한다
 - Given 완료된 업무 / When 요청 시각을 완료 시각보다 뒤로 바꾸면 / Then 400으로 거절한다
 
-정정 대상은 업무명·요청자·부서·접수 경로·유형·중요도·요청 시각·기한·상세내용이다. 상태·등록 시각·완료 시각·배정·첨부는 정정 요청으로 덮어쓰지 않는다. 바뀐 값이 없으면 이력을 추가하지 않고 수정 버전도 올리지 않는다. 기한과 요청 시각 정정은 현재 지표에 반영되지만 발행본은 유지한다. 이 동작은 새 저장소 규칙을 통합하기 전에 구현·검증된 기존 포털 변경으로, 이번 직접 배포 승인 과정에서는 새 Next 앱으로 이식하지 않는다.
+정정 대상은 업무명·요청자·부서·접수 경로·유형·중요도·요청 시각·기한·상세내용이다. 상태·등록 시각·완료 시각·배정·첨부는 정정 요청으로 덮어쓰지 않는다. 바뀐 값이 없으면 이력을 추가하지 않고 수정 버전도 올리지 않는다. 기한과 요청 시각 정정은 현재 지표에 반영되지만 발행본은 유지한다. 정정은 `routes.ts` 의 `/edit` 로 받고 화면은 `EditTaskDialog.tsx` 에서 저장한다.
 
 ### R-032 회사 브랜딩과 개요 업무 필드의 의미 표시
 layer: supporting
