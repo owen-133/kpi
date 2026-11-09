@@ -13,6 +13,8 @@ export type PortalActions = {
   toast(message: string): void;
   /** GET tasks, store them, record the time, then render(). */
   refresh(): Promise<void>;
+  /** An answer to GET tasks that the caller already holds (the Overview's 30 second refresh): store, record the time, render(). */
+  applyFreshTasks(fresh: TaskSummary[]): void;
   /** The board's refresh: GET tasks and store them; no render. */
   reloadTasksQuietly(): Promise<TaskSummary[]>;
   /** renderTick + 1: the current screen mounts anew (keyed by the tick). */

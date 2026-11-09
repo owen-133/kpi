@@ -78,6 +78,11 @@ function PortalRoot() {
         dispatch({ type: 'refreshed', at: new Date().toISOString() });
         dispatch({ type: 'rendered' });
       },
+      applyFreshTasks: (fresh) => {
+        queryClient.setQueryData(queryKeys.tasks, fresh);
+        dispatch({ type: 'refreshed', at: new Date().toISOString() });
+        dispatch({ type: 'rendered' });
+      },
       reloadTasksQuietly: storeTasks,
       render: () => dispatch({ type: 'rendered' }),
       navigate: (view) => dispatch({ type: 'navigate', view }),
