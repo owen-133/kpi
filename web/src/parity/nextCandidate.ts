@@ -4,7 +4,7 @@
 // non-API paths with the legacy guard behavior.
 import { createContainer } from '../config/container.ts';
 import type { Container, ContainerOptions } from '../config/container.ts';
-import { ADMIN_PASSWORD, VIEWER_PASSWORD } from './legacyOracle.ts';
+import { ADMIN_PASSWORD, VIEWER_PASSWORD } from './credentials.ts';
 import type { Session } from './runner.ts';
 import type { RouteDefinition } from '../shared/adapter/in/web/RouteRegistry.ts';
 import type { AuthorizeRequestUseCase } from '../access/application/port/in/AuthorizeRequestUseCase.ts';

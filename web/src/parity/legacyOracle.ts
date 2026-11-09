@@ -1,23 +1,18 @@
+// ONLY THE RECORDER USES THIS FILE (web/scripts/record-parity.ts). Specs read committed recordings through recordedOracle.ts.
+// It is deleted together with server.js in the legacy-removal stage.
 // The legacy portal as an in-process-callable oracle: server.js in Supabase mode (STORAGE_BACKEND=supabase)
 // whose Supabase RPC calls are answered by a fresh PGlite (legacyFetchStub.ts).
 // server.js starts listening when it is imported and reads its configuration at import time, so it cannot be
 // imported twice in one process; each oracle is a child process on a free port, wrapped as `(request) => Response`.
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { existsSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import type { Session } from './runner.ts';
+import { ADMIN_PASSWORD, VIEWER_PASSWORD, pgliteAvailable } from './credentials.ts';
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const STUB = fileURLToPath(new URL('./legacyFetchStub.ts', import.meta.url));
-export const ADMIN_PASSWORD = 'golden-admin';
-export const VIEWER_PASSWORD = 'golden-viewer';
-
-export function pgliteAvailable(): boolean {
-  const path = process.env.ORBIT_PGLITE_PATH ?? `${REPO_ROOT}web/node_modules/@electric-sql/pglite/dist/index.js`;
-  return existsSync(path);
-}
 
 async function freePort(): Promise<number> {
   const server = createServer();

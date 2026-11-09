@@ -2,7 +2,8 @@
 // the char-kpi scenario of test/golden/requests.js identically (they need no task rows).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { pgliteAvailable, startLegacyOracle } from '../../../../parity/legacyOracle.ts';
+import { pgliteAvailable } from '../../../../parity/credentials.ts';
+import { recordedResults } from '../../../../parity/recordedOracle.ts';
 import { startNextCandidate } from '../../../../parity/nextCandidate.ts';
 import { compare, formatDifferences, loadCorpus, runCorpus } from '../../../../parity/runner.ts';
 import type { Corpus } from '../../../../parity/runner.ts';
@@ -17,7 +18,7 @@ describe('improvement parity: legacy oracle vs Next candidate', () => {
     t.diagnostic(`covered (${steps.length}): ${steps.map((s) => s.label).join(', ')}`);
     assert.ok(steps.length >= 25, `expected the improvement labels, found ${steps.length}`);
     const corpus: Corpus = { ...full, scenarios: [{ ...source, steps }] };
-    const expected = await runCorpus(startLegacyOracle, corpus);
+    const expected = await recordedResults('improvement', corpus);
     const actual = await runCorpus(startNextCandidate, corpus);
     const diffs = compare(expected, actual);
     assert.equal(diffs.length, 0, `${diffs.length} differences\n${formatDifferences(diffs)}`);

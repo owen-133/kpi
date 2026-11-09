@@ -4,7 +4,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { compare, formatDifferences, loadCorpus, runCorpus } from './runner.ts';
 import type { Corpus, Scenario } from './runner.ts';
-import { pgliteAvailable, startLegacyOracle } from './legacyOracle.ts';
+import { pgliteAvailable } from './credentials.ts';
+import { recordedResults } from './recordedOracle.ts';
 import { startNextCandidate } from './nextCandidate.ts';
 
 const GUARD_LABELS = /^(health|auth-|session-|page-|api-|bad-json|viewer-|cross-origin-)/;
@@ -49,7 +50,7 @@ describe('guard parity: legacy oracle vs Next candidate', () => {
     t.diagnostic(`covered (${covered.length}): ${covered.join(', ')}`);
     t.diagnostic(`skipped (${skipped.length}): ${skipped.join(' | ')}`);
     assert.ok(covered.length >= 20, `expected the guard labels, found ${covered.length}`);
-    const expected = await runCorpus(startLegacyOracle, corpus);
+    const expected = await recordedResults('guard', corpus);
     const actual = await runCorpus(startNextCandidate, corpus);
     const diffs = compare(expected, actual);
     assert.equal(diffs.length, 0, `${diffs.length} differences\n${formatDifferences(diffs)}`);
