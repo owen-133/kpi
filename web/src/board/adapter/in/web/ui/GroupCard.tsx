@@ -38,6 +38,7 @@ export function GroupCard(p: Props) {
           <span className={styles.cardName}>{group.name}</span>
           <span className={styles.cardSub}>{p.collapsed && first !== undefined ? collapsedSummary(first) : groupSummary(group)}</span>
         </span>
+        {' '}
         <span className={styles.chips}>
           {group.statusCounts.map((entry) => (
             <span key={entry.status} className={`${styles.chip} ${styles[taskState(entry.status)]}`}>

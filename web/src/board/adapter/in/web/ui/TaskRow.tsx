@@ -28,6 +28,7 @@ export function TaskRow(p: { task: BoardTask; now: string; compact: boolean; onO
         <strong>{displayTitle(task)}</strong>
         <span className={styles.rowMeta}>{rowMeta(task)}</span>
       </span>
+      {' '}
       <span className={styles.rowSide}>
         <span className={styles.rowStatus}>{rowStatus(task)}</span>
         <small className={isOverdue(task, p.now) ? styles.overdue : undefined}>{dueLabel(task)}</small>

@@ -48,7 +48,7 @@ export function BoardToolbar(p: Props) {
           ))}
         </select>
         <button className={styles.control} aria-pressed={state.compact} onClick={() => dispatch({ type: 'toggleCompact' })}>
-          간략 보기
+          {state.compact ? '상세 보기' : '간략 보기'}
         </button>
         <button className={styles.control} onClick={p.onExport}>
           CSV 내보내기
