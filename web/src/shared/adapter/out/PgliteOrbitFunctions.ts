@@ -22,7 +22,12 @@ function findSupabaseDirectory(): string {
   return found;
 }
 const SUPABASE_DIRECTORY = findSupabaseDirectory();
-const SCHEMA_FILES = ['schema', 'settings', 'deletion', 'kpi', 'upgrade'] as const;
+export const SCHEMA_FILES = ['schema', 'settings', 'deletion', 'kpi', 'upgrade'] as const;
+
+/** The text of one supabase/<file>.sql, for specs that load the same files into a PGlite of their own. */
+export function readSupabaseSql(file: (typeof SCHEMA_FILES)[number]): string {
+  return readFileSync(/* turbopackIgnore: true */ join(SUPABASE_DIRECTORY, `${file}.sql`), 'utf8');
+}
 
 export class PgliteOrbitFunctions implements OrbitFunctions {
   private readonly client: PGlite;
@@ -37,7 +42,7 @@ export class PgliteOrbitFunctions implements OrbitFunctions {
     const client = new PGlite();
     await client.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;');
     for (const file of SCHEMA_FILES) {
-      await client.exec(readFileSync(/* turbopackIgnore: true */ join(SUPABASE_DIRECTORY, `${file}.sql`), 'utf8'));
+      await client.exec(readSupabaseSql(file));
     }
     await client.exec('SET ROLE service_role');
     return new PgliteOrbitFunctions(client);
