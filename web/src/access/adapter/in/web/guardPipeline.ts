@@ -1,5 +1,6 @@
 // The legacy request guard (server.js:24-29), in the legacy order:
-//   /health (public) -> 401 Basic -> [api] viewer 403 on non-GET -> cross-origin 403 on writes -> body cap 413 / 400
+//   /health (public) -> 401 Basic -> [api] viewer 403 on non-GET -> cross-origin 403 on writes (Origin, then Sec-Fetch-Site)
+//   -> 415 on a POST that is not application/json -> body cap 413 / 400
 //   -> route -> 404 -> [non-api] 405 on non-GET, 404 page -> any thrown error = generic 503.
 // `screen` answers health, 401 and the non-API 405 (null = let Next serve the page) and is what src/proxy.ts calls for every
 // request, so pages and static files are guarded as the legacy portal guards them. `handle` runs the whole chain
@@ -42,6 +43,18 @@ function isCrossOriginWrite(request: Request, url: URL): boolean {
   if (origin === null || origin === '') return false;
   const host = request.headers.get('host') ?? url.host;
   return origin !== `http://${host}` && origin !== `https://${host}`;
+}
+
+/** A browser says where a write comes from: another site (cross-site, same-site) is refused. same-origin, none and absent pass. */
+function isCrossSiteWrite(request: Request): boolean {
+  if (request.method === 'GET' || request.method === 'HEAD') return false;
+  const site = request.headers.get('sec-fetch-site')?.trim().toLowerCase();
+  return site === 'cross-site' || site === 'same-site';
+}
+
+/** `application/json` with optional parameters (`; charset=utf-8`), any letter case. */
+function isJsonContentType(request: Request): boolean {
+  return /^application\/json\s*(;|$)/i.test((request.headers.get('content-type') ?? '').trim());
 }
 
 /** The Content-Length header as a number, 0 when absent or not a number (a chunked body has none). */
@@ -112,7 +125,8 @@ export function createGuardPipeline(dependencies: GuardPipelineDependencies): Gu
         return jsonResponse(404, { error: '페이지를 찾을 수 없습니다.' });
       }
       if (request.method !== 'GET' && role !== 'admin') return jsonResponse(403, { error: '조회 계정은 업무를 변경할 수 없습니다.' });
-      if (isCrossOriginWrite(request, url)) return jsonResponse(403, { error: '허용되지 않은 요청입니다.' });
+      if (isCrossOriginWrite(request, url) || isCrossSiteWrite(request)) return jsonResponse(403, { error: '허용되지 않은 요청입니다.' });
+      if (request.method === 'POST' && !isJsonContentType(request)) return jsonResponse(415, { error: 'JSON 형식의 요청만 받을 수 있습니다.' });
       let body: Record<string, unknown> = {};
       if (request.method === 'POST') {
         if (declaredLength(request) > BODY_LIMIT_BYTES) return jsonResponse(413, { error: '입력 내용이 너무 깁니다.' });

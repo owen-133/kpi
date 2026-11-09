@@ -15,7 +15,7 @@ const AUTH = {
   none: {} as Record<string, string>,
   wrong: { Authorization: basic('admin', 'wrong') },
   viewer: { Authorization: basic('viewer', VIEWER_PASSWORD) },
-  admin: { Authorization: basic('admin', ADMIN_PASSWORD) },
+  admin: { Authorization: basic('admin', ADMIN_PASSWORD), 'Content-Type': 'application/json' },
 };
 const SENTINEL = 'SENTINEL-홍길동-010-1234-5678';
 const probeRoutes: RouteDefinition[] = [
