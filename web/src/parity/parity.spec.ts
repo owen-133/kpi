@@ -129,9 +129,7 @@ describe('hintMisses', () => {
 });
 
 const skip = pgliteAvailable() ? false : 'PGlite not available: set ORBIT_PGLITE_PATH or run (cd web && npm ci) to run the candidate';
-// The recorder (record-parity.ts) sets PARITY_RECORD_OUT: the specs below that probe the replay path would write instead of read.
-const recording = process.env.PARITY_RECORD_OUT ? 'the recorder is running: this probes the replay path' : false;
-const skipFire = skip || recording;
+const skipFire = skip;
 
 describe('recorded legacy answers', () => {
   it('corpus loads with labeled steps, unique labels per scenario and golden scenarios flagged', async () => {
@@ -157,13 +155,13 @@ describe('recorded legacy answers', () => {
     assert.equal(misses.length, 0, `status hints missed:\n${misses.map((r) => `${r.key} expected ${r.expectedStatus} got ${r.status}`).join('\n')}`);
   });
 
-  it('a recording of another corpus is refused: the old server is gone', { skip: recording }, async () => {
+  it('a recording of another corpus is refused: the old server is gone', async () => {
     const corpus = await loadCorpus();
     const changed = { ...corpus, scenarios: corpus.scenarios.map((s) => ({ ...s, steps: s.steps.slice(1) })) };
     await assert.rejects(recordedResults('corpus', changed), /corpus changed and the old server is gone; write a Next scenario spec instead/);
   });
 
-  it('a spec without a recording fails loudly', { skip: recording }, async () => {
+  it('a spec without a recording fails loudly', async () => {
     await assert.rejects(recordedResults('no-such-spec', await loadCorpus()), /no recording for spec 'no-such-spec'/);
   });
 

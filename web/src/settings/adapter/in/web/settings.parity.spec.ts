@@ -1,5 +1,5 @@
 // R-028 R-029
-// Parity of the settings routes: the legacy oracle and the Next candidate answer the settings steps of the shared corpus
+// Parity of the settings routes: the frozen recording of the old portal and the Next candidate answer the settings steps of the shared corpus
 // (test/golden/requests.js, scenario char-kpi, labels ck-set-*) identically. Every other label of the corpus belongs to
 // another context and is listed as covered-later with its reason. The golden scenario `secured` has no settings step.
 import { describe, it } from 'node:test';

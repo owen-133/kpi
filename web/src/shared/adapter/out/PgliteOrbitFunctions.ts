@@ -1,5 +1,5 @@
 // Development and test adapter: the SQL functions inside a fresh in-memory PGlite. It applies supabase/*.sql in the
-// order of test/supabase.test.js and web/src/parity/legacyFetchStub.ts and calls as role service_role, like the legacy oracle.
+// order of supabase/*.sql (SCHEMA_FILES below) and calls as role service_role, like the old portal did.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';

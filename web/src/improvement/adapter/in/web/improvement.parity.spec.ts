@@ -1,4 +1,4 @@
-// Parity of the improvement-ledger routes (R-025): the legacy oracle and the Next candidate answer the ck-imp-* labels of
+// Parity of the improvement-ledger routes (R-025): the frozen recording of the old portal and the Next candidate answer the ck-imp-* labels of
 // the char-kpi scenario of test/golden/requests.js identically (they need no task rows).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';

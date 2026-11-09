@@ -92,9 +92,9 @@ const candidateFactory: SessionFactory = async () => {
   return session;
 };
 
-/** Registers one parity test: the covered steps of the scenario against the legacy oracle and the candidate. */
+/** Registers one parity test: the covered steps of the scenario against the frozen recording and the candidate. */
 export function subsetParity(name: string, spec: SubsetSpec): void {
-  const skip = pgliteAvailable() ? false : 'PGlite not available: run (cd web && npm ci) to run the legacy oracle';
+  const skip = pgliteAvailable() ? false : 'PGlite not available: run (cd web && npm ci) to run the candidate';
   it(`parity: ${name} answers its steps of ${spec.scenario} like the recorded legacy answers`, { skip, timeout: 300_000 }, async (t: TestContext) => {
     const corpus = await loadCorpus();
     const parts = partition(corpus, spec);

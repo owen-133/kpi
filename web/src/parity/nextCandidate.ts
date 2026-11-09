@@ -1,5 +1,5 @@
 // The Next candidate for the parity harness: the same handler the catch-all route /api/[...path] calls
-// (container.pipeline.handle), built over a fresh PGlite with the same credentials as the legacy oracle.
+// (container.pipeline.handle), built over a fresh PGlite with the credentials the recordings were made with.
 // Page paths never reach this handler in the real app (src/proxy.ts screens them first), so it also answers the
 // non-API paths with the legacy guard behavior.
 import { createContainer } from '../config/container.ts';

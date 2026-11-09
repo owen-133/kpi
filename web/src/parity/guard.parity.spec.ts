@@ -1,4 +1,4 @@
-// Parity of the guard behavior: the legacy oracle and the Next candidate answer the guard labels of the golden corpus
+// Parity of the guard behavior: the frozen recording of the old portal and the Next candidate answer the guard labels of the golden corpus
 // (test/golden/requests.js) identically. Labels belonging to routes of later chunks are listed in SKIPPED.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -43,7 +43,7 @@ async function guardCorpus(): Promise<{ corpus: Corpus; covered: string[]; skipp
   return { corpus, covered, skipped };
 }
 
-describe('guard parity: legacy oracle vs Next candidate', () => {
+describe('guard parity: recorded legacy answers vs Next candidate', () => {
   const skip = pgliteAvailable() ? false : 'PGlite not available: run (cd web && npm ci)';
   it('answers the guard labels like the legacy oracle', { skip, timeout: 300_000 }, async (t) => {
     const { corpus, covered, skipped } = await guardCorpus();

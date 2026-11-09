@@ -1,5 +1,5 @@
 // R-030
-// Parity of POST /api/automation: the legacy oracle and the Next candidate answer the same ordered requests identically.
+// Parity of POST /api/automation: the frozen recording of the old portal and the Next candidate answer the same ordered requests identically.
 // The shared corpus (test/golden/requests.js) has no automation step, so the scenario is written here. Tasks are created
 // through the legacy route on the oracle; the candidate has no task routes yet (request context, later chunk), so its
 // POST /api/tasks and POST /api/tasks/:id/test-data are answered by this spec directly from the same database functions the

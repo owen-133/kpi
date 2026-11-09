@@ -1,6 +1,6 @@
 // R-031 R-026 R-027
-// Parity of the edit, delete, restore, purge, trash and deletion-history routes: the legacy oracle (server.js over PGlite)
-// and the Next candidate answer whole scenarios identically. Two sources of scenarios:
+// Parity of the edit, delete, restore, purge, trash and deletion-history routes: the Next candidate (over PGlite)
+// answers whole scenarios like the frozen recording of the old portal. Two sources of scenarios:
 //   - the corpus (test/golden/requests.js): char-tasks `ct-edit-*` with the registration steps their ids come from, and the
 //     secured golden scenario without the static page files (they are served by Next, not by the pipeline);
 //   - `lifecycle-extra`, written here because the corpus has no delete / restore / purge / trash / history step. It uses

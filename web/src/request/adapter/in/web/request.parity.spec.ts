@@ -1,6 +1,6 @@
 // R-001 R-002 R-003 R-004 R-006
-// Parity of the request routes: the legacy oracle (server.js over PGlite) and the Next candidate answer whole corpus
-// scenarios identically. Scenarios are the corpus ones (test/golden/requests.js) with the steps that belong to other
+// Parity of the request routes: the Next candidate (over PGlite) answers whole corpus
+// scenarios like the frozen recording of the old portal. Scenarios are the corpus ones (test/golden/requests.js) with the steps that belong to other
 // contexts or to the page proxy removed; steps that save ids stay, so `{{one}}` captured ids flow across steps.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';

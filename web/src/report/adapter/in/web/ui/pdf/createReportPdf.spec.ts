@@ -10,7 +10,7 @@ import type { ReportRecordView } from '../ReportApi.ts';
 import { createReportPdf } from './createReportPdf.ts';
 
 const fontBytes = readFileSync(new URL('../../../../../../../public/fonts/NanumGothic-Regular.ttf', import.meta.url));
-// What the legacy bundle made for the same records, recorded by `node web/scripts/record-legacy-pdf.ts`
+// What the legacy bundle made for the same records, recorded once before it was deleted (frozen; the recorder is gone)
 interface RecordedCase {
   name: string;
   portalName: string;
@@ -21,7 +21,7 @@ interface RecordedCase {
 const recordedCases = JSON.parse(readFileSync(new URL('./legacyPdf.recorded.json', import.meta.url), 'utf8')) as RecordedCase[];
 const recordedFor = (name: string): RecordedCase => {
   const found = recordedCases.find((c) => c.name === name);
-  assert.ok(found, `no recording for "${name}": run node web/scripts/record-legacy-pdf.ts`);
+  assert.ok(found, `no recording for "${name}" in legacyPdf.recorded.json (frozen; write a new case against the Next output instead)`);
   return found;
 };
 

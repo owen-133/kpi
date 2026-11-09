@@ -14,30 +14,28 @@ const facts = (overrides = {}) => JSON.stringify({
   ...overrides,
 }, null, 1) + '\n';
 
-test('parseArgs: no arguments is the legacy capture that writes', () => {
-  assert.deepEqual(parseArgs([]), {check: false, screen: null, target: 'legacy'});
+test('parseArgs: --check with --screen is accepted and the target is next; --target next is the same', () => {
+  assert.deepEqual(parseArgs(['--check', '--screen', 'settings']), {check: true, screen: 'settings', target: 'next'});
+  assert.deepEqual(parseArgs(['--target', 'next', '--check']), {check: true, screen: null, target: 'next'});
 });
 
-test('parseArgs: --target next with --check and --screen is accepted', () => {
-  assert.deepEqual(parseArgs(['--target', 'next', '--check', '--screen', 'settings']), {check: true, screen: 'settings', target: 'next'});
+test('parseArgs: without --check it is refused, because the committed facts are frozen and nothing writes them', () => {
+  assert.match(parseArgs([]).error, /frozen.*--check/);
+  assert.match(parseArgs(['--target', 'next']).error, /frozen.*--check/);
 });
 
-test('parseArgs: --target next without --check is refused (next never writes facts), legacy without --check is not', () => {
-  assert.match(parseArgs(['--target', 'next']).error, /never writes facts.*--check/);
-  assert.equal(parseArgs(['--target', 'legacy']).error, undefined);
-});
-
-test('parseArgs: an unknown target, an unknown flag and a flag without a value are refused', () => {
+test('parseArgs: an unknown target (the legacy target is gone), an unknown flag and a flag without a value are refused', () => {
   assert.match(parseArgs(['--target', 'prod', '--check']).error, /unknown target "prod"/);
+  assert.match(parseArgs(['--target', 'legacy', '--check']).error, /unknown target "legacy"/);
   assert.match(parseArgs(['--bogus']).error, /unknown argument "--bogus"/);
   assert.match(parseArgs(['--target']).error, /needs a value/);
   assert.match(parseArgs(['--screen', '--check']).error, /needs a value/);
 });
 
-test('cli: --target next without --check exits 2 with a usage line and runs nothing', () => {
-  const result = spawnSync(process.execPath, [script, '--target', 'next'], {encoding: 'utf8', timeout: 20000});
+test('cli: no --check exits 2 with a usage line, writes nothing and runs nothing', () => {
+  const result = spawnSync(process.execPath, [script], {encoding: 'utf8', timeout: 20000});
   assert.equal(result.status, 2);
-  assert.match(result.stderr, /never writes facts/);
+  assert.match(result.stderr, /frozen/);
   assert.match(result.stderr, /usage: node scripts\/capture-behavior\.mjs/);
 });
 
@@ -88,8 +86,9 @@ test('factDiff: text that is not JSON falls back to a line diff instead of crash
   assert.match(report, /committed: two/);
 });
 
-test('legacy capture is unchanged: --check against the committed facts exits 0', {timeout: 900000}, (t) => {
+test('the Next app matches the committed facts: --check on one screen exits 0', {timeout: 900000}, (t) => {
   if (!process.env.ORBIT_PLAYWRIGHT_PATH || !process.env.CHROMIUM_PATH) return t.skip('browser environment missing (eval "$(node scripts/env-for-tests.mjs)")');
+  if (process.env.ORBIT_UI_USE_BUILD !== '1') return t.skip('set ORBIT_UI_USE_BUILD=1 to serve the existing web/.next build instead of building one');
   const result = spawnSync(process.execPath, [script, '--check', '--screen', 'settings'], {encoding: 'utf8', timeout: 800000});
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`.slice(-3000));
   assert.match(result.stdout, /behavior facts match/);
@@ -106,7 +105,7 @@ test('backend table: every entry names a reason and evidence, and is global (app
     assert.ok(e.pattern instanceof RegExp && e.pattern.global, 'global pattern');
     assert.equal(typeof e.replacement, 'string');
     assert.match(e.reason, /\S{3}/);
-    assert.match(e.evidence, /\.(js|sql):\d+/);
+    assert.match(e.evidence, /\.(js|sql):\d+/); // cites files of the old portal and the supabase sources
   }
 });
 

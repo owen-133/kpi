@@ -1,4 +1,4 @@
-// Parity of the report routes (R-013, R-017, R-022..R-024): the legacy oracle and the Next candidate answer the
+// Parity of the report routes (R-013, R-017, R-022..R-024): the frozen recording of the old portal and the Next candidate answer the
 // report labels of the char-kpi scenario of test/golden/requests.js identically. The two seed tasks (ck-new-*) go to the
 // candidate through a test-only POST /api/tasks that forwards the legacy-trimmed fields to orbit_api 'create'.
 // Not covered here (other contexts): ck-file-*, ck-ten-*, ck-set-*, ck-imp-* (improvement.parity.spec.ts).

@@ -10,7 +10,7 @@
 // The candidate is any `(request: Request) => Promise<Response>`. Its requests use the origin
 // http://parity.test, so a same-origin Origin header equals the candidate's own origin.
 // Skipped with a message when PGlite is unavailable (ORBIT_PGLITE_PATH or web/node_modules/@electric-sql/pglite).
-// A new spec needs its recording: node web/scripts/record-parity.ts while the legacy server exists.
+// The recordings are frozen (see recordedOracle.ts): a new request gets a Next scenario spec, not a recording.
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { compare, formatDifferences, loadCorpus, runCorpus } from './runner.ts';
