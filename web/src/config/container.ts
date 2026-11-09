@@ -16,8 +16,8 @@ import { accessRoutes } from '../access/adapter/in/web/routes.ts';
 import { createGuardPipeline } from '../access/adapter/in/web/guardPipeline.ts';
 import type { GuardPipeline } from '../access/adapter/in/web/guardPipeline.ts';
 import { requestRoutes } from '../request/adapter/in/web/routes.ts';
-import { assignmentRoutes } from '../assignment/adapter/in/web/routes.ts';
-import { attachmentRoutes } from '../attachment/adapter/in/web/routes.ts';
+import { assignmentModule } from '../assignment/assignmentModule.ts';
+import { attachmentModule } from '../attachment/attachmentModule.ts';
 import { reportRoutes } from '../report/adapter/in/web/routes.ts';
 import { improvementRoutes } from '../improvement/adapter/in/web/routes.ts';
 import { settingsRoutes } from '../settings/adapter/in/web/routes.ts';
@@ -73,8 +73,8 @@ export function createContainer(env: Environment = {}, options: ContainerOptions
   const routes: RouteDefinition[] = [
     ...accessRoutes(authorize),
     ...requestRoutes,
-    ...assignmentRoutes,
-    ...attachmentRoutes,
+    ...assignmentModule(() => database.open()),
+    ...attachmentModule(() => database.open()),
     ...reportRoutes,
     ...improvementRoutes,
     ...settingsRoutes,
