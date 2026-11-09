@@ -37,7 +37,7 @@ GitHub 저장소 `owen-133/kpi`, 브랜치 `main`을 선택합니다. Blueprint�
 | ADMIN_PASSWORD | 관리자 비밀번호 |
 | VIEWER_PASSWORD | 조회용 비밀번호. 관리자와 달라야 함 |
 
-`STORAGE_BACKEND`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`는 앱이 읽지 않습니다. Render 서비스나 `render.yaml`에 남아 있어도 동작에는 영향이 없고 지워도 됩니다.
+`STORAGE_BACKEND`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`는 앱이 읽지 않습니다. 남아 있어도 동작에는 영향이 없습니다. 이전 배포(옛 서버)로 되돌릴 가능성을 남기려면 새 앱이 안정적인 것을 확인할 때까지 두고, 확인한 뒤 Render와 `render.yaml`에서 지웁니다. 지우면 옛 서버로는 되돌릴 수 없습니다.
 
 ### 값이 없을 때
 

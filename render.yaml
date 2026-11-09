@@ -17,7 +17,7 @@ services:
         sync: false
       - key: DATABASE_CA
         sync: false
-      # The next three keys are used only by the previous version. They are removed at the end.
+      # The next three keys are read only by the previous server version. Keep them until the new app is confirmed stable, then remove them (rollback to the previous server needs them).
       - key: STORAGE_BACKEND
         value: supabase
       - key: SUPABASE_URL
