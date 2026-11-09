@@ -123,3 +123,47 @@ describe('request body limit before the guard (real build)', () => {
     assert.deepEqual(await admin.json(), { error: TOO_LONG });
   });
 });
+
+describe('trailing slash (real build)', () => {
+  // Next's built-in 308 redirects answer before the proxy and carry no security headers (skipTrailingSlashRedirect).
+  const HEADERS = ['content-security-policy', 'strict-transport-security', 'x-content-type-options', 'referrer-policy', 'cache-control'];
+  const PATHS = ['/health/', '/api/tasks/', '/api/session/', '/api/tasks/1/'];
+
+  it('never redirects, and answers 401 with every security header without credentials', { skip, timeout: 60_000 }, async () => {
+    for (const pathname of PATHS) {
+      const response = await fetch(base + pathname, { redirect: 'manual' });
+      assert.equal(response.status, 401, `${pathname} -> ${response.status} location=${response.headers.get('location')}`);
+      for (const name of HEADERS) assert.notEqual(response.headers.get(name), null, `${pathname} lacks ${name}`);
+      assert.equal(response.headers.get('location'), null, pathname);
+    }
+  });
+
+  it('answers an authenticated request on such a path with a plain 404, never a redirect, and with the headers', { skip, timeout: 60_000 }, async () => {
+    for (const pathname of PATHS) {
+      const response = await fetch(base + pathname, { redirect: 'manual', headers: { Authorization: ADMIN } });
+      assert.equal(response.status, 404, `${pathname} -> ${response.status} location=${response.headers.get('location')}`);
+      for (const name of HEADERS) assert.notEqual(response.headers.get(name), null, `${pathname} lacks ${name}`);
+    }
+  });
+
+  it('still serves the exact public health path without credentials', { skip, timeout: 60_000 }, async () => {
+    const response = await fetch(`${base}/health`, { redirect: 'manual' });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true });
+  });
+});
+
+// Next 16.4.5 normalizes `//` and `\` with a hard-wired 308 before proxy.ts (resolve-routes.js; no config option), so that
+// answer has no security headers. What is checked here is that it is harmless: the body only repeats the same-origin single-slash target.
+describe('repeated slashes (real build): Next answers a bare 308 that no config can change', () => {
+  it('redirects to a same-origin path without the repeated slash and the target is guarded', { skip, timeout: 60_000 }, async () => {
+    for (const [requested, target] of [['/api//tasks', '/api/tasks'], ['//evil.example/x', '/evil.example/x'], ['/health//', '/health/']] as const) {
+      const response = await fetch(base + requested, { redirect: 'manual' });
+      assert.equal(response.status, 308, requested);
+      assert.equal(response.headers.get('location'), target, requested);
+      assert.equal(await response.text(), target, requested);
+    }
+    const followed = await fetch(`${base}/api/tasks`, { redirect: 'manual' });
+    assert.equal(followed.status, 401);
+  });
+});
