@@ -14,9 +14,9 @@ export function tlsOptionsFor(databaseUrl: string | undefined, certificateAuthor
     throw new Error('DATABASE_URL is not a valid URL');
   }
   if (url.protocol !== 'postgres:' && url.protocol !== 'postgresql:') throw new Error('DATABASE_URL must be a postgres:// URL');
-  const sslmode = url.searchParams.get('sslmode');
-  const ssl = url.searchParams.get('ssl');
-  if ((sslmode !== null && PLAINTEXT_SSLMODES.has(sslmode)) || (ssl !== null && FALSE_VALUES.has(ssl.toLowerCase()))) {
+  const sslmode = url.searchParams.get('sslmode')?.toLowerCase();
+  const ssl = url.searchParams.get('ssl')?.toLowerCase();
+  if ((sslmode !== undefined && PLAINTEXT_SSLMODES.has(sslmode)) || (ssl !== undefined && FALSE_VALUES.has(ssl))) {
     throw new Error('DATABASE_URL disables TLS verification: refusing to send the password in plaintext');
   }
   return certificateAuthority === undefined || certificateAuthority === ''

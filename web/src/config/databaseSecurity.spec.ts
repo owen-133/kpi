@@ -8,7 +8,7 @@ describe('database TLS policy', () => {
     assert.deepEqual(tlsOptionsFor('postgres://u:p@db.example:5432/postgres', 'PEM'), { rejectUnauthorized: true, ca: 'PEM' });
   });
   it('refuses URLs that would send the password in plaintext', () => {
-    for (const bad of ['sslmode=disable', 'sslmode=allow', 'sslmode=prefer', 'ssl=false', 'ssl=0', 'sslmode=no-verify']) {
+    for (const bad of ['sslmode=disable', 'sslmode=allow', 'sslmode=prefer', 'ssl=false', 'ssl=0', 'sslmode=no-verify', 'sslmode=DISABLE', 'sslmode=Prefer', 'ssl=FALSE']) {
       assert.throws(() => tlsOptionsFor(`postgres://u:p@db.example/postgres?${bad}`, undefined), /plaintext|TLS/, bad);
     }
   });
