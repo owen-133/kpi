@@ -24,5 +24,8 @@ export function createQueryClient(): QueryClient {
   });
   // Session, settings and tasks are the legacy `session`, `config` and `tasks` variables: they live as long as the page.
   for (const key of [queryKeys.session, queryKeys.settings, queryKeys.tasks]) client.setQueryDefaults(key, { gcTime: Infinity });
+  // A task is read by `openDetail` (no observer) and then drawn by the detail dialog and held for the edit dialog (the legacy
+  // `current` copy). With gcTime 0 the entry would be dropped before the dialog is drawn, which opens it empty until it re-reads.
+  client.setQueryDefaults(['task'], { gcTime: Infinity });
   return client;
 }

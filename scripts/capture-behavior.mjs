@@ -778,6 +778,44 @@ export function parseArgs(argv) {
   return out;
 }
 
+// The committed facts were recorded against the legacy server in local storage mode (local-store.js / kpi-store-local.js);
+// production (render.yaml STORAGE_BACKEND=supabase) and the Next app run the Supabase SQL. Where the two backends write
+// different TEXT into the same business-history line, `--target next --check` rewrites BOTH sides with this table before it
+// compares. Each entry is exactly one known text difference. Everything else stays strictly compared. A snapshot is an array of
+// aria lines; an entry is applied to the lines joined by "\n" (so a pattern may span adjacent lines).
+const ADMIN_KINDS = '데이터 구분 변경|담당자 배정|첨부파일 등록|첨부파일 삭제|업무 정보 수정|업무 삭제|업무 복원';
+export const BACKEND_NORMALIZATIONS = [
+  {
+    pattern: new RegExp(`(- text: <TS> · )총무 담당자(\\n\\s*- strong: (?:${ADMIN_KINDS}))`, 'g'),
+    replacement: '$1admin$2',
+    reason: 'Local mode records every history line with actor "총무 담당자"; the Supabase functions that write these kinds record actor "admin" (only 등록, 상태 변경, 처리 메모 keep the column default "총무 담당자").',
+    evidence: 'local-store.js:27 vs supabase/kpi.sql:40,44,49,55 + supabase/edit.sql:23 + supabase/deletion.sql:80',
+  },
+  {
+    pattern: /(- strong: 담당자 배정\n\s*- paragraph: ).+? → /g,
+    replacement: '$1',
+    reason: 'Local mode writes the assign detail as "<old assignee or 미배정> → <new>"; the Supabase function writes only the new assignee name.',
+    evidence: 'kpi-store-local.js:20 vs supabase/kpi.sql:44',
+  },
+  {
+    pattern: /(수정 사유: .*?)중요도: ([^\s"]+ → [^\s"]+) 처리 기한: ([^\s"]+ → [^\s"]+)/g,
+    replacement: '$1처리 기한: $3 중요도: $2',
+    reason: 'The edit detail lists changed fields in task-edit.js order (priority before due_date) in local mode; Supabase stores the changes as jsonb, which orders keys by length then bytes (due_date before priority).',
+    evidence: 'task-edit.js:1,3 (editableFields order) vs supabase/edit.sql:16-23 (jsonb_build_object)',
+  },
+];
+
+export function normalizeBackendMode(value, table = BACKEND_NORMALIZATIONS) {
+  const lines = (list) => table.reduce((text, e) => text.replace(e.pattern, e.replacement), list.join('\n')).split('\n');
+  const walk = (v) => Array.isArray(v) ? (v.every((x) => typeof x === 'string') ? lines(v) : v.map(walk)) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, walk(x)])) : v;
+  return walk(value);
+}
+
+// Text in, text out; anything that is not JSON is left alone (factDiff then falls back to its line diff).
+export function normalizeFactsText(text) {
+  try { return JSON.stringify(normalizeBackendMode(JSON.parse(text)), null, 1) + '\n'; } catch { return text; }
+}
+
 const USAGE = 'usage: node scripts/capture-behavior.mjs [--screen <id>] [--check] [--target legacy|next]   (--target next needs --check)';
 
 const show = (value) => { const text = JSON.stringify(value); return text === undefined ? '(missing)' : text.length > 200 ? text.slice(0, 200) + '…' : text; };
@@ -850,7 +888,7 @@ async function capture(ids, check, h) {
     for (const [name, content] of Object.entries(files)) {
       const path = join(OUT, name);
       const committed = existsSync(path) ? readFileSync(path, 'utf8') : '';
-      const diff = next && name.endsWith('.facts.json') ? factDiff(name, committed, content) : committed !== content ? lineDiff(name, committed, content) : null;
+      const diff = next && name.endsWith('.facts.json') ? factDiff(name, normalizeFactsText(committed), normalizeFactsText(content)) : committed !== content ? lineDiff(name, committed, content) : null;
       if (diff) problems.push(diff);
     }
     if (problems.length) { console.error(`behavior facts differ in ${problems.length} file(s)${next ? ' (next vs committed legacy facts)' : ''}:\n${problems.join('\n')}`); return 1; }
