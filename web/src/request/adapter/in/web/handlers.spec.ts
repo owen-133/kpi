@@ -16,7 +16,17 @@ const refuse = (error: unknown): RequestUseCases => {
   const fail = async () => {
     throw error;
   };
-  return { listTasks: { list: fail }, getTaskDetail: { detail: fail }, registerTask: { register: fail }, changeTaskStatus: { change: fail }, addTaskNote: { add: fail } };
+  return {
+    listTasks: { list: fail },
+    getTaskDetail: { detail: fail },
+    registerTask: { register: fail },
+    changeTaskStatus: { change: fail },
+    addTaskNote: { add: fail },
+    editTask: { edit: fail },
+    changeTaskLifecycle: { change: fail },
+    listTrash: { list: fail },
+    listLifecycleHistory: { list: fail },
+  };
 };
 const NEW = { title: 't', requester: 'r', requested_at: '2026-11-03T01:00:00Z' };
 
@@ -32,6 +42,10 @@ describe('write routes check the role themselves', () => {
     ['POST', '/api/tasks', NEW],
     ['POST', `/api/tasks/${ID}/status`, { status: '완료' }],
     ['POST', `/api/tasks/${ID}/notes`, { note: 'x' }],
+    ['POST', `/api/tasks/${ID}/edit`, { values: {}, revision: 0, reason: 'x' }],
+    ['POST', `/api/tasks/${ID}/delete`, { reason: 'x' }],
+    ['POST', `/api/tasks/${ID}/restore`, { reason: 'x' }],
+    ['POST', `/api/tasks/${ID}/purge`, { reason: 'x', confirmation: 'x' }],
   ];
   for (const [method, path, body] of writes) {
     it(`${method} ${path} refuses a viewer with 403 before touching any use case`, async () => {
@@ -68,4 +82,84 @@ describe('database failures become the answers the legacy portal gave', () => {
       await assert.rejects(run(refuse(error), method, path, { ...body }, 'admin'), (e) => e instanceof HttpError && e.status === 404, `${method} ${path}`);
     }
   });
+});
+
+describe('the trash and the deletion history are for administrators only', () => {
+  for (const path of ['/api/trash', '/api/lifecycle-history']) {
+    it(`GET ${path} refuses a viewer with the legacy 403 message before touching any use case`, async () => {
+      await assert.rejects(run(refuse(new Error('must not be called')), 'GET', path, {}, 'viewer'), (e) => e instanceof HttpError && e.status === 403 && e.message === '관리자만 휴지통과 삭제 이력을 볼 수 있습니다.');
+    });
+    it(`GET ${path} lets an administrator through to the use case`, async () => {
+      const marker = new Error('reached the use case');
+      await assert.rejects(run(refuse(marker), 'GET', path, {}, 'admin'), (e) => e === marker);
+    });
+  }
+  it('only GET is routed: POST /api/trash is not a request route', () => {
+    assert.equal(findRoute(requestRoutes(refuse(new Error('x'))), 'POST', '/api/trash', false), null);
+    assert.equal(findRoute(requestRoutes(refuse(new Error('x'))), 'GET', `/api/tasks/${ID}/edit`, false), null);
+  });
+});
+
+describe('edit, delete, restore and purge validate the body before calling a use case', () => {
+  const cases: Array<[string, Record<string, unknown>, string]> = [
+    [`/api/tasks/${ID}/edit`, { reason: 'x', revision: 0 }, '수정 항목을 확인하세요.'],
+    [`/api/tasks/${ID}/edit`, { values: { title: '', requester: 'r', department: '', channel: '', category: '', priority: '', requested_at: '2026-11-03T01:00:00Z', due_date: '', description: '' }, reason: 'x', revision: 0 }, '업무명·요청자·요청 시각·기한을 확인하세요.'],
+    [`/api/tasks/${ID}/edit`, { values: { title: 't', requester: 'r', department: '', channel: '', category: '', priority: '', requested_at: '2026-11-03T01:00:00Z', due_date: '', description: '' }, reason: '', revision: 0 }, '수정 사유와 버전을 확인하세요.'],
+    [`/api/tasks/${ID}/delete`, {}, '사유를 1~1000자로 입력하세요.'],
+    [`/api/tasks/${ID}/restore`, { reason: ' ' }, '사유를 1~1000자로 입력하세요.'],
+    [`/api/tasks/${ID}/purge`, { reason: 'a'.repeat(1001) }, '사유를 1~1000자로 입력하세요.'],
+  ];
+  for (const [path, body, expected] of cases) {
+    it(`POST ${path.replace(ID, ':id')} ${JSON.stringify(body).slice(0, 30)} -> 400 ${expected}`, async () => {
+      await assert.rejects(run(refuse(new Error('must not be called')), 'POST', path, body, 'admin'), (e) => e instanceof HttpError && e.status === 400 && e.message === expected);
+    });
+  }
+});
+
+describe('edit failures follow the legacy edit mapping (store.edit), not the shared one', () => {
+  const cases: Array<[string, string | undefined, number, string]> = [
+    ['식별자 또는 시각을 확인하세요.', 'PT400', 400, '식별자 또는 시각을 확인하세요.'],
+    ['업무를 찾을 수 없습니다.', 'PT404', 404, '업무를 찾을 수 없습니다.'],
+    ['휴지통의 업무는 복원 후 수정하세요.', 'PT409', 409, '휴지통의 업무는 복원 후 수정하세요.'],
+    ['function public.orbit_edit_task(jsonb) does not exist', '42883', 503, '업무 수정 기능 DB 초기화가 필요합니다. supabase/edit.sql을 SQL Editor에서 실행하세요.'],
+    ['invalid input syntax for type uuid', '22P02', 503, '업무 수정 저장에 실패했습니다.'],
+    ['connection terminated', undefined, 503, '업무 수정 저장에 실패했습니다.'],
+  ];
+  const body = { values: { title: 't', requester: 'r', department: '', channel: '', category: '', priority: '', requested_at: '2026-11-03T01:00:00Z', due_date: '', description: '' }, revision: 0, reason: 'x' };
+  for (const [message, code, status, expected] of cases) {
+    it(`code ${code ?? 'none'} -> ${status} ${expected.slice(0, 20)}`, async () => {
+      await assert.rejects(run(refuse(new OrbitFunctionError(message, code)), 'POST', `/api/tasks/${ID}/edit`, body, 'admin'), (e) => e instanceof HttpError && e.status === status && e.message === expected);
+    });
+  }
+  it('an error that is not a database failure is rethrown untouched (the pipeline answers its generic 503)', async () => {
+    const error = new TypeError('boom');
+    await assert.rejects(run(refuse(error), 'POST', `/api/tasks/${ID}/edit`, body, 'admin'), (e) => e === error);
+  });
+});
+
+describe('lifecycle failures follow the legacy rpc mapping with the deletion-install message', () => {
+  const cases: Array<[string, string | undefined, number | 'unmapped', string]> = [
+    ['사유를 1~1000자로 입력하세요.', 'PT400', 400, '사유를 1~1000자로 입력하세요.'],
+    ['업무를 찾을 수 없습니다.', 'PT404', 404, '업무를 찾을 수 없습니다.'],
+    ['이미 휴지통에 있는 업무입니다.', 'PT409', 409, '이미 휴지통에 있는 업무입니다.'],
+    ['function public.orbit_lifecycle(unknown, jsonb) does not exist', '42883', 503, '삭제 기능 DB 초기화가 필요합니다. supabase/deletion.sql을 SQL Editor에서 실행하세요.'],
+    ['invalid input syntax for type uuid', '22P02', 'unmapped', ''],
+    ['connection terminated', undefined, 'unmapped', ''],
+  ];
+  const routes: Array<[string, string, Record<string, unknown>]> = [
+    ['POST', `/api/tasks/${ID}/delete`, { reason: 'x' }],
+    ['POST', `/api/tasks/${ID}/purge`, { reason: 'x', confirmation: 'y' }],
+    ['GET', '/api/trash', {}],
+    ['GET', '/api/lifecycle-history', {}],
+  ];
+  for (const [message, code, status, expected] of cases) {
+    it(`code ${code ?? 'none'} -> ${status}`, async () => {
+      for (const [method, path, body] of routes) {
+        const error = new OrbitFunctionError(message, code);
+        const outcome = run(refuse(error), method, path, body, 'admin');
+        if (status === 'unmapped') await assert.rejects(outcome, (e) => !(e instanceof HttpError) && e === error, path);
+        else await assert.rejects(outcome, (e) => e instanceof HttpError && e.status === status && e.message === expected, path);
+      }
+    });
+  }
 });
