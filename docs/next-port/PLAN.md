@@ -28,8 +28,8 @@
 
 - **구동 어댑터**: `app/api/[...path]/route.ts` 한 개가 기존과 같은 순서로 검사한다(인증 → 조회 권한 → 출처 → 본문 한도 → 경로 → 404 → 405, 던져진 오류는 일반 503). 서버 액션은 쓰지 않는다(조회 계정이 검사를 우회한다).
 - **페이지 인증**: `src/proxy.ts` 가 `_next/static` 까지 포함해 모든 경로를 인증한다. 핸들러도 스스로 확인한다.
-- **상태 관리**: TanStack Query 하나만 서버 상태에 쓴다(`staleTime: Infinity`, 포커스·재연결 재조회 없음, 재시도 없음, 자동 갱신 없음). 화면 상태는 `useReducer`. 상태 라이브러리는 `adapter/in/web` 안에서만 쓰고 `architecture.spec.ts` 가 강제한다.
-- **PDF·CSV**: 기존처럼 브라우저에서 만든다. 스타일은 CSS Modules.
+- **상태 관리**: TanStack Query 하나만 서버 상태에 쓴다(`staleTime: Infinity`, 포커스·재연결 재조회 없음, 재시도 없음, TanStack 자동 재조회 없음. 기존 Overview 의 30초 갱신은 화면 타이머가 재현한다). 화면 상태는 `useReducer`. 상태 라이브러리는 `adapter/in/web` 안에서만 쓰고 `architecture.spec.ts` 가 강제한다.
+- **PDF·CSV**: 기존처럼 브라우저에서 만든다. 스타일은 기존 `public/style.css` 를 바이트 그대로 복사한 전역 스타일시트이고(화면 동일성이 불변 조건이다), 새 보드만 CSS Modules 를 쓴다. 화면 구현 설계는 `UI-DESIGN.md` 가 소유한다.
 - **개발 저장소**: PGlite. 운영은 Postgres.
 - **데이터**: 기존 `orbit_private` 의 테이블과 함수를 그대로 쓴다. 새 스키마나 데이터 이전은 없다. 쓰기 방식(함수 호출 우선, 앱 역할에는 함수 실행 권한만)은 「보안 필수 조건」 절의 첫 항목이 정한다.
 
