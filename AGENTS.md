@@ -75,6 +75,7 @@ Codex 는 git 루트부터 이 파일을 읽고(상한 32 KiB), Claude Code 는 
 
 Next.js 대응:
 - `app/` 의 라우트·페이지·컴포넌트는 `adapter/in/web` 에 해당한다. `adapter/in/web` 과 `config/container` 만 import 한다. 판정: `cd web && npm test`
+- `*/adapter/in/web/ui/**`(브라우저 화면)의 시험 아닌 파일은 같은 `ui/**`·`*/domain/**`·`*.css`·UI 패키지(`react`, `react-dom`, `@tanstack/react-query`, `pdf-lib`, `@pdf-lib/fontkit`)만 import 하고, `src` 의 `.tsx` 는 `style={` 을 쓰지 않는다(CSP). 판정: `cd web && npm test` 의 규칙 `UI`·`STYLE`
 - `actions.ts`(`'use server'`)는 일반 핸들러를 감싸는 얇은 껍데기다. 로직은 핸들러에 둔다
 - `adapter/out` 을 import 하는 파일은 `config/container.ts` 뿐이다. 판정: `/usr/bin/grep -rln "adapter/out" web/src --include=*.ts --include=*.tsx` 의 결과가 `config/container.ts` 와 `adapter/out` 자신과 테스트뿐이다
 

@@ -10,7 +10,7 @@
 | 입력 포트 | `application/port/in/` | 유스케이스 인터페이스 |
 | 출력 포트 | `application/port/out/` | 저장소·이벤트 발행 인터페이스 |
 | 애플리케이션 서비스 | `application/service/` | 입력 포트 구현. 흐름만 조립한다 |
-| 입력 어댑터 | `adapter/in/web/` | 일반 핸들러, `'use server'` 액션, 컴포넌트 |
+| 입력 어댑터 | `adapter/in/web/` | 일반 핸들러, `'use server'` 액션, 컴포넌트. 브라우저 화면은 `adapter/in/web/ui/` |
 | 출력 어댑터 | `adapter/out/persistence/` | 출력 포트 구현. 인메모리와 Postgres(Drizzle) |
 | 조립 | `config/container.ts`, `config/database.ts` | `getContainer()` 가 어댑터를 서비스에 꽂는다. `database.ts` 는 Postgres 연결을 연다 |
 | 라우트 | `app/` | `adapter/in/web` 의 일부. 페이지와 라우트 핸들러 |
@@ -29,6 +29,7 @@ web/src/
       service/
     adapter/
       in/web/
+      in/web/ui/
       out/persistence/
   config/
     container.ts

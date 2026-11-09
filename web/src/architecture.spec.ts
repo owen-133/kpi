@@ -5,11 +5,14 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  checkAll,
   checkAppBoundary,
   checkBannedTokens,
   checkContainerOnly,
+  checkNoStyleProp,
   checkFrameworkPlacement,
   checkServerOnlyPlacement,
+  checkUiBoundary,
   checkUseClientPlacement,
   checkOrmOnlyInPersistence,
   checkRule1,
@@ -94,6 +97,14 @@ describe('architecture rules on the real tree', () => {
 
   it("'use client' appears only in */adapter/in/web/** and src/app/**", (t) => {
     runRule(t, 'use-client', collectFiles(SRC), checkUseClientPlacement);
+  });
+
+  it('ui files import only ui, domain, css and the UI packages', (t) => {
+    runRule(t, 'ui', collectFiles(SRC), checkUiBoundary);
+  });
+
+  it('no tsx file uses a style prop', (t) => {
+    runRule(t, 'style', collectFiles(SRC), checkNoStyleProp);
   });
 });
 
@@ -192,6 +203,22 @@ describe('architecture checks fire on violation fixtures', () => {
 
   it("fixture: 'use client' outside adapter/in/web and app is flagged", () => {
     detects(checkUseClientPlacement, 'USE_CLIENT', fixtureFile('use-client-outside/src/config/BadUseClient.tsx'), 'use client');
+  });
+
+  it('fixture: UI rule flags a ui file importing routes.ts and next/server', () => {
+    const file = fixtureFile('ui-imports-routes/src/request/adapter/in/web/ui/Bad.ts');
+    detects(checkUiBoundary, 'UI', file, "'../routes.ts'");
+    detects(checkUiBoundary, 'UI', file, "'next/server'");
+  });
+
+  it('fixture: STYLE rule flags a style prop in a tsx file', () => {
+    detects(checkNoStyleProp, 'STYLE', fixtureFile('style-prop/src/portal/adapter/in/web/ui/Bad.tsx'), 'style');
+  });
+
+  it('fixture: UI and STYLE rules pass a compliant ui file', () => {
+    const file = fixtureFile('good/src/request/adapter/in/web/ui/GoodView.tsx');
+    const source = fs.readFileSync(file, 'utf8');
+    assert.deepStrictEqual(checkAll(file, source), []);
   });
 
   it('fixture: compliant tree produces no violations and is non-trivial', () => {

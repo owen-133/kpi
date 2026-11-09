@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export type RuleId = 'R1' | 'R2' | 'R6' | 'APP' | 'CONTAINER' | 'ORM' | 'FRAMEWORK' | 'SERVER_ONLY' | 'BANNED' | 'USE_CLIENT';
+export type RuleId = 'R1' | 'R2' | 'R6' | 'APP' | 'CONTAINER' | 'ORM' | 'FRAMEWORK' | 'SERVER_ONLY' | 'BANNED' | 'USE_CLIENT' | 'UI' | 'STYLE';
 
 export interface Violation {
   rule: RuleId;
@@ -434,6 +434,49 @@ export function checkUseClientPlacement(file: string, source: string): Violation
   return match === null ? [] : [violation('USE_CLIENT', file, lineOf(source, match.index), "'use client' only in */adapter/in/web/** and src/app/**")];
 }
 
+// Packages a ui file may import (plus their subpaths).
+const UI_PACKAGES = ['react', 'react-dom', '@tanstack/react-query', 'pdf-lib', '@pdf-lib/fontkit'];
+
+function isUiPackage(spec: string): boolean {
+  return UI_PACKAGES.some((name) => spec === name || spec.startsWith(`${name}/`));
+}
+
+const isUiFolder = (rel: string): boolean => /(^|\/)adapter\/in\/web\/ui\//.test(rel);
+
+// UI rule: non-test files under */adapter/in/web/ui/** import only ui files, domain, css and the UI packages.
+export function checkUiBoundary(file: string, source: string): Violation[] {
+  const rel = relFromSrc(toPosix(path.resolve(file)));
+  if (rel === null || isTestFile(file) || !isUiFolder(rel)) return [];
+  const out: Violation[] = [];
+  for (const ref of extractImports(source)) {
+    if (/\.css$/.test(ref.spec)) continue;
+    if (!isRelative(ref.spec) && !ref.spec.startsWith('@/')) {
+      if (!isUiPackage(ref.spec)) out.push(violation('UI', file, ref.line, `ui imports package '${ref.spec}'`));
+      continue;
+    }
+    const target = resolveImport(file, ref.spec);
+    if (target === null) {
+      out.push(violation('UI', file, ref.line, `ui imports a path outside src ('${ref.spec}')`));
+      continue;
+    }
+    const placed = classify(target, true);
+    const allowed = placed.layer === 'domain' || (placed.layer === 'adapter' && isUiFolder(`${target}/`));
+    if (!allowed) out.push(violation('UI', file, ref.line, `ui imports outside ui and domain ('${ref.spec}')`));
+  }
+  return out;
+}
+
+// STYLE rule: no style prop in non-test tsx files (CSP drops style attributes in server-rendered HTML).
+export function checkNoStyleProp(file: string, source: string): Violation[] {
+  if (relFromSrc(toPosix(path.resolve(file))) === null || isTestFile(file) || !/\.tsx$/.test(file)) return [];
+  const code = mask(source, true);
+  const out: Violation[] = [];
+  for (const m of code.matchAll(/\bstyle\s*=\s*\{/g)) {
+    out.push(violation('STYLE', file, lineOf(code, m.index ?? 0), "style prop 'style={' (use CSS classes or set styles from an effect)"));
+  }
+  return out;
+}
+
 export function checkAll(file: string, source: string): Violation[] {
   return [
     ...checkRule1(file, source),
@@ -446,6 +489,8 @@ export function checkAll(file: string, source: string): Violation[] {
     ...checkServerOnlyPlacement(file, source),
     ...checkBannedTokens(file, source),
     ...checkUseClientPlacement(file, source),
+    ...checkUiBoundary(file, source),
+    ...checkNoStyleProp(file, source),
   ];
 }
 
