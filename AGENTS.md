@@ -136,7 +136,7 @@ DB 쓰기(DDL·DML)는 사용자가 직접 실행한다. 내가 SQL 을 넘기�
 
 - 화면은 하나씩 Next 로 옮긴다.
 - **새 동작은 `web/src/<컨텍스트>/` 헥사고날 구조에서 시작한다.** 시작 명령: `node web/scripts/new-usecase.ts <컨텍스트> <유스케이스> [--out-port <이름>]`. 실패하는 시험과 `planned` 요구사항(`home:` 포함)이 같이 생기고, `config/container.ts` 에 더할 줄은 출력만 한다. 판정: 종료코드 0, 이어서 `cd web && npm test` 가 새 시험에서 실패한다(red).
-- 기존 포털(루트의 서버·저장소 파일, `public/`, `frontend/`, `supabase/`)에 새 동작을 직접 쓰는 것은 요구사항 정본에 `home: legacy — <이유>` 를 적을 때만이다(§10). 버그 수정은 해당 파일만 고치고 시험으로 고정한다.
+- 기존 포털(루트의 서버·저장소 파일, `public/`, `frontend/`, `supabase/`)에 새 동작을 직접 쓰지 않는다. 버그 수정은 해당 파일만 고치고 시험으로 고정한다.
 - 새 레거시 파일(루트 `.js`, `public/`, `supabase/*.sql`, `frontend/src/`)은 `node --test test/legacy-boundary.test.js` 가 막는다. 정말 필요하면 `test/legacy-files.json` 에 더하는 커밋을 하고 메시지를 `legacy-files:` 로 시작한다. 기존 파일이 커지는 것은 막지 않고 보고만 한다.
 - 복사본은 한 번에 한 곳만 바꾸면 실패한다. 상태 목록·업무 필드·한도 값은 `test/parity.test.js`, 생성 파일은 `node scripts/check-generated.mjs`(프런트 빌드까지는 `--frontend`)가 본다.
 - 라우트마다 동등성 spec 이 있다. 같은 입력을 기존 포털과 새 라우트에 보내 정규화한 응답이 같아야 한다. 판정: `cd web && npm test` 가 통과한다.
@@ -180,7 +180,7 @@ cd web && npm ci && npm test && npx tsc --noEmit && npm run build
 4. 같은 커밋에서 상태를 `current` 로 바꾼다.
 
 - 증거는 `경로:N[-M] ~ <문구>` 앵커를 단다. 줄이 밀리면 검사가 실패하고 새 위치를 알려 준다. 고치는 명령(저장소 루트에서): `node web/scripts/ssot-repin.ts docs/ssot/requirements.md [--write]`.
-- `home:` 키는 R-033 부터 필수다. `web/src/<컨텍스트>/…` 또는 `legacy — <이유>` 이고 문법은 `web/src/ssot.helpers.ts` 머리말이 소유한다. `new-usecase.ts` 가 다음 `planned` id 를 `home:` 과 함께 추가한다.
+- `home:` 키는 R-033 부터 필수다. `web/src/<컨텍스트>/…` 경로이고 문법은 `web/src/ssot.helpers.ts` 머리말이 소유한다. `new-usecase.ts` 가 다음 `planned` id 를 `home:` 과 함께 추가한다.
 - 테스트의 `// R-0NN` 태그는 증명이다. 특성화 시험(`test/char-*.test.js`)은 코드에서 읽기만 한 동작을 고정한다.
 - id 는 다시 쓰지 않는다. 동작이 바뀌면 같은 커밋에서 정본도 고친다. 도구·다이어그램은 맨 나중에 맞춘다.
 - 기계 검사: `cd web && npm test` (`web/src/ssot.spec.ts`). id 결번·중복, 증거 없는 `current` 요구사항, 모르는·`planned`·`dropped` id 를 가리키는 테스트 태그, AGENTS.md 와 `docs/ssot` 밖 `docs/**` 에서 다시 적은 요구사항 제목을 잡는다(README.md 는 제품 설명이라 검사하지 않는다).

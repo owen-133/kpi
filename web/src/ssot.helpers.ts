@@ -6,7 +6,8 @@
 //   C1  IDs run R-001, R-002, ... in order with no gap and no repeat; the file has at least one requirement
 //   C2  layer is core|supporting|out and status is current|planned|dropped
 //   C3  a current requirement has an accept line and proof: a tag R-NNN in a test file, a golden label that
-//       exists in test/golden/legacy-portal.json, or a test-name found verbatim in a test file.
+//       is a `scenario/label` key of a committed recording (web/src/parity/recorded/*.json) or of the request corpus
+//       (test/golden/requests.js), or a test-name found verbatim in a test file (web/src/**/*.spec.ts, scripts/**/*.test.mjs).
 //       Every golden label and test-name a current requirement cites must resolve (a stale pointer fires)
 //   C4  every evidence entry names an existing file and a line inside it (planned and current; dropped is history).
 //       An entry may carry an anchor, `path:N[-M] ~ <literal text>`: then the literal must occur inside the cited
@@ -16,9 +17,10 @@
 //       AGENTS.md mentions docs/ssot/requirements.md. README.md is upstream product documentation, not one
 //       of our rule documents, so it is not scanned
 //   C7  `home:` names where the requirement lives in the hexagonal tree: a path under web/src/<context>/ that exists
-//       (a trailing `…`, `...`, `/*` or `/**` marks a prefix), or `legacy — <reason>`. Required from R-033 up;
+//       (a trailing `…`, `...`, `/*` or `/**` marks a prefix). Required from R-033 up;
 //       R-001..R-032 are grandfathered and need none, but a home they do give is checked too
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 export type RuleCode = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7';
@@ -311,13 +313,10 @@ export function checkEvidence(reqs: Requirement[], corpus: Corpus): Violation[] 
   return out;
 }
 
-const LEGACY_HOME = /^legacy(?:\s+—(.*))?$/;
 const PREFIX_MARK = /(?:…|\.\.\.|\/\*\*?)$/;
 
 function homeProblem(home: string, root: string): string | null {
-  const legacy = LEGACY_HOME.exec(home);
-  if (legacy !== null) return (legacy[1] ?? '').trim() === '' ? "home 'legacy' needs a reason after '—'" : null;
-  if (!home.startsWith('web/src/')) return `home '${home}' is neither web/src/<context>/… nor 'legacy — <reason>'`;
+  if (!home.startsWith('web/src/')) return `home '${home}' is not a path under web/src/<context>/…`;
   const target = home.replace(PREFIX_MARK, '');
   const segments = target.split('/').filter((part) => part !== '');
   if (segments.includes('..') || segments.includes('.')) return `home '${home}' must stay under web/src`;
@@ -337,7 +336,7 @@ export function checkHomes(reqs: Requirement[], corpus: Corpus): Violation[] {
   for (const req of reqs) {
     const number = Number(req.id.slice(2));
     if (req.home === '') {
-      if (number >= FIRST_ID_NEEDING_HOME) out.push({ code: 'C7', id: req.id, message: `${req.id} has no home (required from R-${pad3(FIRST_ID_NEEDING_HOME)}; web/src/<context>/… or legacy — <reason>)` });
+      if (number >= FIRST_ID_NEEDING_HOME) out.push({ code: 'C7', id: req.id, message: `${req.id} has no home (required from R-${pad3(FIRST_ID_NEEDING_HOME)}; web/src/<context>/…)` });
       continue;
     }
     const problem = homeProblem(req.home, root);
@@ -395,14 +394,24 @@ export function unclaimedGoldenLabels(reqs: Requirement[], goldenLabels: Set<str
   return [...goldenLabels].filter((label) => !claimed.has(label)).sort();
 }
 
-export function loadGoldenLabels(goldenPath: string): Set<string> {
-  if (!fs.existsSync(goldenPath)) throw new Error(`missing golden file ${goldenPath}`);
-  const golden = JSON.parse(fs.readFileSync(goldenPath, 'utf8')) as Record<string, Record<string, unknown>>;
+// Golden labels are `scenario/label` keys. They come from the committed recordings (the legacy portal's answers,
+// web/src/parity/recorded/*.json) and from the request corpus (test/golden/requests.js), which also holds the
+// scenarios no recording covers.
+export function loadGoldenLabels(repoRoot: string): Set<string> {
   const labels = new Set<string>();
-  for (const [group, entries] of Object.entries(golden)) {
-    for (const label of Object.keys(entries)) labels.add(`${group}/${label}`);
+  const recorded = path.join(repoRoot, 'web', 'src', 'parity', 'recorded');
+  if (fs.existsSync(recorded)) {
+    for (const name of fs.readdirSync(recorded).filter((n) => n.endsWith('.json')).sort()) {
+      const recording = JSON.parse(fs.readFileSync(path.join(recorded, name), 'utf8')) as { results?: { key?: unknown }[] };
+      for (const result of recording.results ?? []) if (typeof result.key === 'string') labels.add(result.key);
+    }
   }
-  if (labels.size === 0) throw new Error(`golden file ${goldenPath} has no labels`);
+  const corpusFile = path.join(repoRoot, 'test', 'golden', 'requests.js');
+  if (fs.existsSync(corpusFile)) {
+    const corpus = createRequire(corpusFile)(corpusFile) as { scenarios?: { name: string; steps: { label: string }[] }[] };
+    for (const scenario of corpus.scenarios ?? []) for (const step of scenario.steps) labels.add(`${scenario.name}/${step.label}`);
+  }
+  if (labels.size === 0) throw new Error(`no labels: neither web/src/parity/recorded/*.json nor the request corpus ${corpusFile} gave any under ${repoRoot}`);
   return labels;
 }
 
@@ -424,8 +433,8 @@ function readSources(root: string, files: string[]): SourceFile[] {
   return files.map((full) => ({ file: path.relative(root, full).split(path.sep).join('/'), text: fs.readFileSync(full, 'utf8') }));
 }
 
-// Fixture case dir: requirements.md, tests.txt (one test file), docs.md (AGENTS.md and the only doc).
-export function loadFixtureCorpus(dir: string, goldenPath: string): { corpus: Corpus; requirements: Requirement[] } {
+// Fixture case dir: requirements.md, tests.txt (one test file), docs.md (AGENTS.md and the only doc); labels come from repoRoot.
+export function loadFixtureCorpus(dir: string, repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
   const need = (name: string): string => {
     const full = path.join(dir, name);
     if (!fs.existsSync(full)) throw new Error(`missing ${full}`);
@@ -438,13 +447,13 @@ export function loadFixtureCorpus(dir: string, goldenPath: string): { corpus: Co
     testFiles: [{ file: 'tests.txt', text: need('tests.txt') }],
     docFiles: [{ file: 'docs.md', text: docs }],
     agentsText: docs,
-    goldenLabels: loadGoldenLabels(goldenPath),
+    goldenLabels: loadGoldenLabels(repoRoot),
   };
   return { corpus, requirements };
 }
 
 // Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts, which mentions tags as examples)
-// and test/**/*.test.js; docs scanned for restated titles are AGENTS.md and docs/** outside docs/ssot/.
+// and the root tooling tests scripts/**/*.test.mjs; docs scanned for restated titles are AGENTS.md and docs/** outside docs/ssot/.
 export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
   const ssot = path.join(repoRoot, SSOT_PATH);
   if (!fs.existsSync(ssot)) throw new Error(`missing ${SSOT_PATH}`);
@@ -452,15 +461,15 @@ export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements
   const agents = path.join(repoRoot, 'AGENTS.md');
   if (!fs.existsSync(agents)) throw new Error('missing AGENTS.md');
   const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => path.basename(f) !== 'ssot.spec.ts');
-  const jsTests = walk(path.join(repoRoot, 'test'), (n) => n.endsWith('.test.js'));
+  const toolTests = walk(path.join(repoRoot, 'scripts'), (n) => n.endsWith('.test.mjs'));
   const ssotDir = path.join(repoRoot, 'docs', 'ssot');
   const docs = walk(path.join(repoRoot, 'docs'), (n) => n.endsWith('.md'), (full) => full === ssotDir);
   const corpus: Corpus = {
     root: repoRoot,
-    testFiles: readSources(repoRoot, [...specs, ...jsTests]),
+    testFiles: readSources(repoRoot, [...specs, ...toolTests]),
     docFiles: readSources(repoRoot, [agents, ...docs]),
     agentsText: fs.readFileSync(agents, 'utf8'),
-    goldenLabels: loadGoldenLabels(path.join(repoRoot, 'test', 'golden', 'legacy-portal.json')),
+    goldenLabels: loadGoldenLabels(repoRoot),
   };
   return { corpus, requirements };
 }

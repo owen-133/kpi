@@ -21,7 +21,8 @@ import {
 const SRC = import.meta.dirname;
 const REPO = path.resolve(SRC, '..', '..');
 const FIXTURES = path.resolve(SRC, '..', 'ssot-fixtures');
-const GOLDEN = path.join(REPO, 'test', 'golden', 'legacy-portal.json');
+// Golden labels come from the committed recordings and the request corpus; fixtures read the real ones from the repository.
+const GOLDEN = REPO;
 
 // Each violation fixture breaks exactly one rule; needle is a word that must appear in the message.
 const VIOLATION_FIXTURES: { dir: string; code: RuleCode; needle: string }[] = [
@@ -45,7 +46,6 @@ const VIOLATION_FIXTURES: { dir: string; code: RuleCode; needle: string }[] = [
   { dir: 'c6-no-agents-mention', code: 'C6', needle: 'docs/ssot/requirements.md' },
   { dir: 'c7-home-missing', code: 'C7', needle: 'R-033' },
   { dir: 'c7-home-bad-path', code: 'C7', needle: 'web/src/nowhere/domain' },
-  { dir: 'c7-home-legacy-no-reason', code: 'C7', needle: 'reason' },
 ];
 const CLEAN_FIXTURES = ['clean', 'clean-markdown-variants', 'clean-test-name-with-key-word', 'c4-anchor-clean', 'c7-home-clean'];
 // Tree fixtures are miniature repositories read by loadRealCorpus (AGENTS.md, README.md, docs/**, test/golden).
@@ -74,7 +74,7 @@ describe('ssot checks fire on violation fixtures and pass on clean ones', () => 
 
   it('fixture: the golden label used by the clean fixtures exists in the real golden file', () => {
     const { corpus } = loadFixtureCorpus(path.join(FIXTURES, 'clean'), GOLDEN);
-    assert.ok(corpus.goldenLabels.has('secured/health'), 'secured/health missing from test/golden/legacy-portal.json');
+    assert.ok(corpus.goldenLabels.has('secured/health'), 'secured/health missing from the recordings and test/golden/requests.js');
     assert.ok(!corpus.goldenLabels.has('secured/no-such-label'));
   });
 
@@ -142,8 +142,54 @@ describe('ssot checks fire on violation fixtures and pass on clean ones', () => 
     assert.deepStrictEqual(requirements.slice(0, 32).map((r) => r.home), Array(32).fill(''));
     assert.deepStrictEqual(requirements.slice(32).map((r) => r.home), [
       'web/src/request/domain',
-      'legacy — served by the old portal until it is ported',
+      'web/src/request/domain/placeholder.txt',
     ]);
+  });
+
+  // A miniature repository without the legacy files: labels come from the recordings and test/golden/requests.js,
+  // test titles and tags only from web/src/**/*.spec.ts and scripts/**/*.test.mjs.
+  function withMiniRepo<T>(run: (root: string) => T): T {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ssot-mini-'));
+    const put = (name: string, text: string): void => {
+      fs.mkdirSync(path.dirname(path.join(root, name)), { recursive: true });
+      fs.writeFileSync(path.join(root, name), text);
+    };
+    try {
+      put('AGENTS.md', 'see docs/ssot/requirements.md\n');
+      put('docs/ssot/requirements.md', '### R-001 Mini\nlayer: core\nstatus: planned\n');
+      put('test/golden/requests.js', "export const scenarios=[{name:'secured',mode:'secured',golden:true,steps:[{label:'from-corpus',path:'/'}]},{name:'open',mode:'open',golden:true,steps:[{label:'open-only',path:'/'}]}];\n");
+      put('web/src/parity/recorded/one.json', '{"corpusSha256":"x","results":[\n  {"key":"secured/recorded-only","scenario":"secured","label":"recorded-only"}\n]}\n');
+      put('web/src/a.spec.ts', "it('web title', () => {});\n");
+      put('web/src/ssot.spec.ts', "it('skipped title', () => {});\n");
+      put('test/old.test.js', "test('legacy title', () => {});\n");
+      put('scripts/tool.test.mjs', "test('tool title', () => {});\n");
+      return run(root);
+    } finally {
+      fs.rmSync(root, { recursive: true });
+    }
+  }
+
+  it('real corpus: golden labels are the union of the recorded keys and the labels in test/golden/requests.js, no legacy-portal.json needed', () => {
+    withMiniRepo((root) => {
+      assert.ok(!fs.existsSync(path.join(root, 'test', 'golden', 'legacy-portal.json')));
+      const { corpus } = loadRealCorpus(root);
+      assert.deepStrictEqual([...corpus.goldenLabels].sort(), ['open/open-only', 'secured/from-corpus', 'secured/recorded-only']);
+    });
+  });
+
+  it('real corpus: proof comes from web/src specs and root scripts tests, not from the legacy test/**/*.test.js', () => {
+    withMiniRepo((root) => {
+      const { corpus } = loadRealCorpus(root);
+      assert.deepStrictEqual(corpus.testFiles.map((f) => f.file), ['web/src/a.spec.ts', 'scripts/tool.test.mjs']);
+    });
+  });
+
+  it('real corpus: a missing request corpus or an empty label set fails loudly', () => {
+    withMiniRepo((root) => {
+      fs.rmSync(path.join(root, 'test', 'golden', 'requests.js'));
+      fs.rmSync(path.join(root, 'web', 'src', 'parity', 'recorded', 'one.json'));
+      assert.throws(() => loadRealCorpus(root), /request corpus|no labels/);
+    });
   });
 
   it('fixture: a case directory without requirements.md fails loudly instead of passing', () => {
@@ -241,12 +287,8 @@ describe('ssot checks fire on violation fixtures and pass on clean ones', () => 
     { id: 33, home: 'web/src/', fires: true, needle: 'context' },
     { id: 33, home: 'web/src/../../outside', fires: true, needle: 'web/src' },
     { id: 33, home: 'docs/ssot', fires: true, needle: 'web/src' },
-    { id: 33, home: 'legacy — still served by the old portal', fires: false, needle: '' },
-    { id: 33, home: 'legacy', fires: true, needle: 'reason' },
-    { id: 33, home: 'legacy —', fires: true, needle: 'reason' },
-    { id: 33, home: 'legacy —   ', fires: true, needle: 'reason' },
-    { id: 33, home: 'legacy - ascii hyphen is not the separator', fires: true, needle: 'legacy' },
-    { id: 33, home: 'legacyish — reason', fires: true, needle: 'legacyish' },
+    { id: 33, home: 'legacy — still served by the old portal', fires: true, needle: 'legacy' }, // the legacy home grammar is gone
+    { id: 33, home: 'legacy', fires: true, needle: 'legacy' },
     { id: 32, home: 'web/src/nowhere/domain', fires: true, needle: 'nowhere' }, // exempt means not required, a given home is still checked
   ];
   for (const { id, home, fires, needle } of HOME_PROBES) {
