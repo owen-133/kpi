@@ -26,6 +26,21 @@ test('session, settings and tasks live as long as the app', () => {
   assert.equal(client.getQueryDefaults(queryKeys.trash).gcTime, undefined);
 });
 
+test('a task read by the detail dialog is still held when the edit dialog opens later (no observer keeps it alive)', async () => {
+  const client = createQueryClient();
+  await client.fetchQuery({ queryKey: queryKeys.task('t1'), queryFn: () => Promise.resolve({ id: 't1' }), staleTime: 0 });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.deepEqual(client.getQueryData(queryKeys.task('t1')), { id: 't1' });
+  assert.equal(client.getQueryDefaults(queryKeys.task('t2')).gcTime, Infinity);
+});
+
+test('a read of another screen without an observer is still dropped at once', async () => {
+  const client = createQueryClient();
+  await client.fetchQuery({ queryKey: queryKeys.trash, queryFn: () => Promise.resolve([]) });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(client.getQueryData(queryKeys.trash), undefined);
+});
+
 test('writes do not retry', () => {
   assert.equal(createQueryClient().getDefaultOptions().mutations?.retry, false);
 });
