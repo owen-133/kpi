@@ -11,7 +11,9 @@ import { findRoute } from '../../../../shared/adapter/in/web/RouteRegistry.ts';
 import type { RouteDefinition } from '../../../../shared/adapter/in/web/RouteRegistry.ts';
 import { credentialsFromHeader } from './basicAuthHeader.ts';
 
-export const BODY_LIMIT_CHARACTERS = 1_600_000;
+import { BODY_LIMIT_BYTES, BODY_LIMIT_CHARACTERS } from './bodyLimit.ts';
+
+export { BODY_LIMIT_CHARACTERS };
 const GENERIC_ERROR = '데이터 저장소에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.';
 
 export type GuardPipelineDependencies = {
@@ -40,6 +42,12 @@ function isCrossOriginWrite(request: Request, url: URL): boolean {
   if (origin === null || origin === '') return false;
   const host = request.headers.get('host') ?? url.host;
   return origin !== `http://${host}` && origin !== `https://${host}`;
+}
+
+/** The Content-Length header as a number, 0 when absent or not a number (a chunked body has none). */
+function declaredLength(request: Request): number {
+  const value = Number(request.headers.get('content-length') ?? '0');
+  return Number.isFinite(value) ? value : 0;
 }
 
 type BodyResult = { readonly kind: 'object'; readonly value: Record<string, unknown> } | { readonly kind: 'too-long' } | { readonly kind: 'invalid' };
@@ -82,6 +90,9 @@ export function createGuardPipeline(dependencies: GuardPipelineDependencies): Gu
     if (findRoute(routes, request.method, url.pathname, true) !== null) return handle(request);
     if (roleOf(request) === null) return unauthorized();
     if (!url.pathname.startsWith('/api/') && request.method !== 'GET') return jsonResponse(405, { error: '지원하지 않는 요청입니다.' });
+    // A declared size over the byte limit is answered by `handle`, which keeps the legacy order (403 before 413)
+    // and answers 413 without reading the body.
+    if (request.method === 'POST' && declaredLength(request) > BODY_LIMIT_BYTES) return handle(request);
     return null;
   }
 
@@ -104,6 +115,7 @@ export function createGuardPipeline(dependencies: GuardPipelineDependencies): Gu
       if (isCrossOriginWrite(request, url)) return jsonResponse(403, { error: '허용되지 않은 요청입니다.' });
       let body: Record<string, unknown> = {};
       if (request.method === 'POST') {
+        if (declaredLength(request) > BODY_LIMIT_BYTES) return jsonResponse(413, { error: '입력 내용이 너무 깁니다.' });
         const result = await readJsonObject(request);
         if (result.kind === 'too-long') return jsonResponse(413, { error: '입력 내용이 너무 깁니다.' });
         if (result.kind === 'invalid') return jsonResponse(400, { error: '잘못된 입력입니다.' });
