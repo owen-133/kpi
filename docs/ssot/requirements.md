@@ -30,7 +30,7 @@ status: current
 home: web/src/request
 evidence:
 - web/src/shared/domain/kstDates.ts:16 ~ export function isValidDay(
-- web/src/access/adapter/in/web/guardPipeline.ts:14 ~ export const BODY_LIMIT_CHARACTERS = 1_600_000
+- web/src/access/adapter/in/web/bodyLimit.ts:2 ~ export const BODY_LIMIT_CHARACTERS = 1_600_000
 - web/src/request/domain/TaskLimits.ts:2 ~ export const FIELD_MAX_LENGTH = 10000
 - supabase/deletion.sql:23-28 ~ elsif action='create' then
 - web/src/request/adapter/in/web/routes.ts:12 ~ handler: handlers.create
@@ -200,7 +200,7 @@ layer: supporting
 status: current
 home: web/src/access
 evidence:
-- web/src/access/adapter/in/web/guardPipeline.ts:103 ~ request.method !== 'GET' && role !== 'admin'
+- web/src/access/adapter/in/web/guardPipeline.ts:114 ~ request.method !== 'GET' && role !== 'admin'
 - web/src/request/adapter/in/web/ui/detail/detailModel.ts:10 ~ return role === 'admin' && !task.deleted_at
 - web/src/portal/adapter/in/web/ui/PortalApp.tsx:56 ~ classList.toggle('viewer'
 golden:
@@ -224,7 +224,7 @@ status: current
 home: web/src/access
 evidence:
 - web/src/access/adapter/out/crypto/Sha256SecretComparator.ts:5 ~ export class Sha256SecretComparator
-- web/src/access/adapter/in/web/guardPipeline.ts:29 ~ function unauthorized()
+- web/src/access/adapter/in/web/guardPipeline.ts:31 ~ function unauthorized()
 - web/src/access/adapter/in/web/routes.ts:8 ~ pattern: '/health', isPublic: true
 - web/src/access/domain/AccessConfiguration.ts:38 ~ get shared(): boolean
 - web/src/board/adapter/in/web/ui/BoardView.tsx:15 ~ 로컬 개발 모드입니다
@@ -259,7 +259,7 @@ layer: supporting
 status: current
 home: web/src/access
 evidence:
-- web/src/access/adapter/in/web/guardPipeline.ts:37 ~ function isCrossOriginWrite(
+- web/src/access/adapter/in/web/guardPipeline.ts:39 ~ function isCrossOriginWrite(
 golden:
 - secured/cross-origin-create-403
 - secured/cross-origin-status-403
@@ -277,9 +277,9 @@ layer: supporting
 status: current
 home: web/src/config
 evidence:
-- web/src/config/startupChecks.ts:19 ~ if (production && !cloud) problems.push('운영 배포에는 DATABASE_URL이 필요합니다.')
+- web/src/config/startupChecks.ts:23 ~ if (production && !cloud) problems.push('운영 배포에는 DATABASE_URL이 필요합니다.')
 - web/src/config/container.ts:65 ~ if (production && !env.DATABASE_URL) throw new Error(
-- web/src/config/startupChecks.ts:13 ~ (production || cloud) && (!env.ADMIN_PASSWORD || !env.VIEWER_PASSWORD)
+- web/src/config/startupChecks.ts:17 ~ (production || cloud) && (!env.ADMIN_PASSWORD || !env.VIEWER_PASSWORD)
 - web/src/config/databaseSecurity.ts:16 ~ DATABASE_URL must be a postgres:// URL
 - web/src/config/container.ts:44-47 ~ if (env.DATABASE_URL) {
 golden:

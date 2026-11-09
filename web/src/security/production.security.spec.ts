@@ -50,6 +50,21 @@ describe('production start', () => {
     assert.match(output, /배포 시 관리자와 조회 비밀번호가 필요합니다/, 'it must stop for the missing passwords, not for another reason');
   });
 
+  it('exits non-zero in production when DATABASE_URL turns TLS verification off (checked at startup, not at the first query)', { skip, timeout: 60_000 }, async () => {
+    for (const mode of ['disable', 'DISABLE']) {
+      const child = start(await freePort(), { NODE_ENV: 'production', ...SECRETS, DATABASE_URL: `postgres://orbit_user:dbpass-MARK-5d10@127.0.0.1:1/db?sslmode=${mode}` });
+      let output = '';
+      child.stdout?.on('data', (c) => { output += c; });
+      child.stderr?.on('data', (c) => { output += c; });
+      const timer = setTimeout(() => child.kill(), 40_000);
+      const [code] = (await once(child, 'exit')) as [number | null];
+      clearTimeout(timer);
+      assert.equal(code, 1, `${mode}: ${output}`);
+      assert.match(output, /운영 DB 연결은 검증된 TLS가 필요합니다/, mode);
+      assert.doesNotMatch(output, /dbpass-MARK-5d10/, 'the refusal must not print the password');
+    }
+  });
+
   it('serves 401 and health with a fresh nonce and no unsafe-* source when configured', { skip, timeout: 60_000 }, async () => {
     const port = await freePort();
     const child = start(port, { NODE_ENV: 'production', ...SECRETS });
