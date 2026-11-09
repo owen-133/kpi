@@ -35,7 +35,7 @@ async function freePort(): Promise<number> {
 export async function startLegacyOracle(): Promise<Session> {
   if (!pgliteAvailable()) throw new Error('PGlite not available: set ORBIT_PGLITE_PATH or run (cd web && npm ci)');
   const port = await freePort();
-  const env: NodeJS.ProcessEnv = {
+  const env: Record<string, string | undefined> = {
     ...process.env,
     PORT: String(port),
     HOST: '127.0.0.1',
@@ -46,7 +46,7 @@ export async function startLegacyOracle(): Promise<Session> {
     VIEWER_PASSWORD,
   };
   delete env.NODE_ENV;
-  const child = spawn(process.execPath, ['--import', STUB, 'server.js'], { cwd: REPO_ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, ['--import', STUB, 'server.js'], { cwd: REPO_ROOT, env: env as unknown as NodeJS.ProcessEnv, stdio: ['ignore', 'pipe', 'pipe'] });
   let stderr = '';
   child.stderr.on('data', (chunk) => {
     stderr += String(chunk);

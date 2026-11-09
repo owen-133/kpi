@@ -6,7 +6,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   checkAppBoundary,
+  checkBannedTokens,
   checkContainerOnly,
+  checkFrameworkPlacement,
+  checkServerOnlyPlacement,
+  checkUseClientPlacement,
   checkOrmOnlyInPersistence,
   checkRule1,
   checkRule2,
@@ -72,8 +76,24 @@ describe('architecture rules on the real tree', () => {
     runRule(t, 'container-only', collectFiles(SRC), checkContainerOnly);
   });
 
-  it('ORM and driver packages are imported only under adapter/out/persistence and config/{container,database}.ts', (t) => {
+  it('ORM and driver packages are imported only under */adapter/out/**, shared/adapter/out/** and config/**', (t) => {
     runRule(t, 'orm-only', collectFiles(SRC), checkOrmOnlyInPersistence);
+  });
+
+  it('react, next and tanstack are imported only under */adapter/in/web/**, app, proxy and instrumentation', (t) => {
+    runRule(t, 'framework', collectFiles(SRC), checkFrameworkPlacement);
+  });
+
+  it("server-only is imported only where server code lives", (t) => {
+    runRule(t, 'server-only', collectFiles(SRC), checkServerOnlyPlacement);
+  });
+
+  it('src has none of the banned tokens', (t) => {
+    runRule(t, 'banned', collectFiles(SRC), checkBannedTokens);
+  });
+
+  it("'use client' appears only in */adapter/in/web/** and src/app/**", (t) => {
+    runRule(t, 'use-client', collectFiles(SRC), checkUseClientPlacement);
   });
 });
 
@@ -148,6 +168,30 @@ describe('architecture checks fire on violation fixtures', () => {
 
   it('fixture: ORM rule flags a route importing postgres', () => {
     detects(checkOrmOnlyInPersistence, 'ORM', fixtureFile('orm-in-app-route/src/app/bad/page.ts'), "'postgres'");
+  });
+
+  it('fixture: framework rule flags react in config, next in an out adapter and tanstack in shared', () => {
+    detects(checkFrameworkPlacement, 'FRAMEWORK', fixtureFile('fw-react-in-config/src/config/BadReact.ts'), "'react'");
+    detects(checkFrameworkPlacement, 'FRAMEWORK', fixtureFile('fw-next-in-out-adapter/src/request/adapter/out/persistence/BadNext.ts'), "'next/server'");
+    detects(checkFrameworkPlacement, 'FRAMEWORK', fixtureFile('fw-tanstack-in-shared/src/shared/BadTanstack.ts'), "'@tanstack/react-query'");
+  });
+
+  it('fixture: server-only rule flags the import outside server places', () => {
+    detects(checkServerOnlyPlacement, 'SERVER_ONLY', fixtureFile('server-only-in-lib/src/lib/BadServerOnly.ts'), "'server-only'");
+  });
+
+  it('fixture: ORM rule flags drizzle in shared/port', () => {
+    detects(checkOrmOnlyInPersistence, 'ORM', fixtureFile('orm-in-shared-port/src/shared/port/BadOrm.ts'), "'drizzle-orm'");
+  });
+
+  it('fixture: banned tokens are flagged', () => {
+    for (const token of ['dangerouslySetInnerHTML', 'sql.raw', '.unsafe(', 'NEXT_PUBLIC_']) {
+      detects(checkBannedTokens, 'BANNED', fixtureFile('banned-tokens/src/lib/BadTokens.tsx'), token);
+    }
+  });
+
+  it("fixture: 'use client' outside adapter/in/web and app is flagged", () => {
+    detects(checkUseClientPlacement, 'USE_CLIENT', fixtureFile('use-client-outside/src/config/BadUseClient.tsx'), 'use client');
   });
 
   it('fixture: compliant tree produces no violations and is non-trivial', () => {
