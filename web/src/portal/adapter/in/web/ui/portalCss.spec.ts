@@ -3,10 +3,10 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-const sha256 = (url: URL): string => createHash('sha256').update(readFileSync(url)).digest('hex');
+// sha256 of the original asset that was copied byte for byte
+const STYLE_CSS_SHA256 = '48937c49787fc214f779a87997a2c3384137cc11f4cc16ac7db5195ef58a4686';
 
-test('portal.css is a byte-for-byte copy of the legacy public/style.css (UI-DESIGN D9)', () => {
-  const legacy = new URL('../../../../../../../public/style.css', import.meta.url);
-  const copy = new URL('./portal.css', import.meta.url);
-  assert.equal(sha256(copy), sha256(legacy));
+test('portal.css is a byte-for-byte copy of the original portal stylesheet (UI-DESIGN D9)', () => {
+  const copy = readFileSync(new URL('./portal.css', import.meta.url));
+  assert.equal(createHash('sha256').update(copy).digest('hex'), STYLE_CSS_SHA256);
 });

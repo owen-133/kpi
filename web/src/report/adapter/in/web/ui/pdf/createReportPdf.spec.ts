@@ -10,9 +10,20 @@ import type { ReportRecordView } from '../ReportApi.ts';
 import { createReportPdf } from './createReportPdf.ts';
 
 const fontBytes = readFileSync(new URL('../../../../../../../public/fonts/NanumGothic-Regular.ttf', import.meta.url));
-const LEGACY_BUNDLE = new URL('../../../../../../../../public/pdf/report-pdf.js', import.meta.url).href;
-type PdfMaker = (record: unknown, options: { fontBytes: Uint8Array; portalName: string }) => Promise<Uint8Array>;
-const legacyMaker = async (): Promise<PdfMaker> => ((await import(LEGACY_BUNDLE)) as { createReportPdf: PdfMaker }).createReportPdf;
+// What the legacy bundle made for the same records, recorded by `node web/scripts/record-legacy-pdf.ts`
+interface RecordedCase {
+  name: string;
+  portalName: string;
+  record: unknown;
+  pages: number;
+  text: string;
+}
+const recordedCases = JSON.parse(readFileSync(new URL('./legacyPdf.recorded.json', import.meta.url), 'utf8')) as RecordedCase[];
+const recordedFor = (name: string): RecordedCase => {
+  const found = recordedCases.find((c) => c.name === name);
+  assert.ok(found, `no recording for "${name}": run node web/scripts/record-legacy-pdf.ts`);
+  return found;
+};
 
 const base: ReportRecordView = {
   id: 'published-1',
@@ -62,11 +73,15 @@ test('without a portal name the author is the fallback 아이지넷', async () =
   assert.equal((await PDFDocument.load(bytes)).getAuthor(), '아이지넷');
 });
 
-// Given the same record / When made by the legacy bundle and by this port / Then the page counts are equal
+// Given the same record / When made by the legacy bundle (recorded) and by this port / Then the page counts are equal
 for (const [name, record] of records) {
+  test(`the recording holds the record of the case: ${name}`, () => {
+    assert.deepEqual(JSON.parse(JSON.stringify(record)), recordedFor(name).record);
+  });
   test(`the page count equals the legacy bundle's for ${name}`, async () => {
-    const legacy = await (await legacyMaker())(record, { fontBytes, portalName: '피플팀 업무 포털' });
-    assert.equal((await pagesOf(await make(record))).length, (await pagesOf(legacy)).length);
+    const recorded = recordedFor(name);
+    assert.ok(recorded.pages >= 1);
+    assert.equal((await pagesOf(await make(record, recorded.portalName))).length, recorded.pages);
   });
 }
 
@@ -75,14 +90,11 @@ for (const [name, record] of records) {
   test(`pdftotext -layout of the PDF equals the legacy bundle's for ${name}`, { skip: !process.env.ORBIT_PDF_CHECK }, async () => {
     const dir = mkdtempSync(join(tmpdir(), 'orbit-pdf-'));
     try {
-      const text = (bytes: Uint8Array, file: string) => {
-        const path = join(dir, file);
-        writeFileSync(path, bytes);
-        return execFileSync('pdftotext', ['-layout', path, '-'], { encoding: 'utf8' });
-      };
-      const ported = text(await make(record), 'ported.pdf');
-      const legacy = text(await (await legacyMaker())(record, { fontBytes, portalName: '피플팀 업무 포털' }), 'legacy.pdf');
-      assert.equal(ported, legacy);
+      const recorded = recordedFor(name);
+      const path = join(dir, 'ported.pdf');
+      writeFileSync(path, await make(record, recorded.portalName));
+      const ported = execFileSync('pdftotext', ['-layout', path, '-'], { encoding: 'utf8' });
+      assert.equal(ported, recorded.text);
       assert.match(ported, /\d+\s*\/\s*\d+/);
       assert.doesNotMatch(ported, /RAW_METRICS_MUST_NOT_APPEAR|raw_test_marker|발행 시점의 집계값/);
     } finally {
@@ -91,7 +103,7 @@ for (const [name, record] of records) {
   });
 }
 
-test('a glyph the font lacks is drawn as □ (checked on the legacy output too, so the port keeps the substitution)', { skip: !process.env.ORBIT_PDF_CHECK }, async () => {
+test('a glyph the font lacks is drawn as □ (the recorded legacy text carries the same substitution)', { skip: !process.env.ORBIT_PDF_CHECK }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'orbit-pdf-'));
   try {
     const path = join(dir, 'x.pdf');
