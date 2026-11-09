@@ -27,11 +27,11 @@
 ### R-001 업무 요청 등록
 layer: core
 status: current
+home: web/src/request
 evidence:
-- server.js:36-41 ~ path==='/api/tasks'&&req.method==='POST'
-- server.js:29 ~ raw.length>1600000
-- public/kpi-model.js:3 ~ export function validDate(
-- local-store.js:36 ~ create:(v)=>transaction
+- web/src/shared/domain/kstDates.ts:16 ~ export function isValidDay(
+- web/src/access/adapter/in/web/guardPipeline.ts:14 ~ export const BODY_LIMIT_CHARACTERS = 1_600_000
+- web/src/request/domain/TaskLimits.ts:2 ~ export const FIELD_MAX_LENGTH = 10000
 - supabase/deletion.sql:23-28 ~ elsif action='create' then
 - web/src/request/adapter/in/web/routes.ts:12 ~ handler: handlers.create
 - web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
@@ -52,20 +52,19 @@ golden:
 - secured/bad-json-array
 - secured/bad-json-empty-body
 test-name:
-- golden: legacy behavior is unchanged
+- answers the request-route scenarios like the legacy oracle
 accept:
 - Given 관리자로 로그인한 상태 / When 제목·요청자·요청 시각을 담아 업무를 등록하면 / Then 201 과 새 업무 id 가 돌아오고 상태는 접수다
 - Given 관리자로 로그인한 상태 / When 제목이나 요청자가 비었거나 요청 시각이 날짜로 읽히지 않으면 / Then 400 으로 거절한다
 
-등록 입력은 앞뒤 공백을 지우고 항목마다 10000자를 넘으면 400, 요청 본문이 1600000자를 넘으면 413(`server.js` 의 `raw.length>1600000`), JSON 객체가 아니면 400 이다. 기한은 있으면 `YYYY-MM-DD` 형식의 실제 달력 날짜여야 한다. 등록은 변경 이력에 `등록` 한 줄을 남긴다. golden `create-too-long-body` 는 한 항목이 64100자인 본문이라 413 이 아니라 항목 길이 400 을 고정한다. 413 경로는 `test/char-tasks.test.js` 가 고정한다. 본문 1600000자는 받고 1600001자는 JSON 을 읽기 전에 413 이며, 조회 계정은 본문을 읽기 전에 403 이다. 한도는 등록뿐 아니라 모든 POST 에 걸린다.
+등록 입력은 앞뒤 공백을 지우고 항목마다 10000자를 넘으면 400, 요청 본문이 1600000자를 넘으면 413(`guardPipeline.ts` 의 `BODY_LIMIT_CHARACTERS`), JSON 객체가 아니면 400 이다. 기한은 있으면 `YYYY-MM-DD` 형식의 실제 달력 날짜여야 한다. 등록은 변경 이력에 `등록` 한 줄을 남긴다. golden `create-too-long-body` 는 한 항목이 64100자인 본문이라 413 이 아니라 항목 길이 400 을 고정한다. 413 경로는 `web/src/security/guard.security.spec.ts` 가 고정한다. 본문 1600000자는 받고 1600001자는 JSON 을 읽기 전에 413 이며, 조회 계정은 본문을 읽기 전에 403 이다(녹화 `char-tasks/ct-body-viewer`). 한도는 등록뿐 아니라 모든 POST 에 걸린다.
 
 ### R-002 업무 상태 전환
 layer: core
 status: current
+home: web/src/request
 evidence:
-- server.js:17 ~ const statuses=['접수'
-- server.js:62 ~ match[2]==='status'
-- local-store.js:37 ~ status:(id,status,reason)=>transaction
+- web/src/request/domain/TaskStatus.ts:3 ~ export const TASK_STATUSES = ['접수', '진행 중', '대기', '완료']
 - supabase/schema.sql:9 ~ check(status in
 - supabase/deletion.sql:40-46 ~ elsif action='status' then
 - web/src/request/adapter/in/web/routes.ts:14 ~ handler: handlers.changeStatus
@@ -83,21 +82,21 @@ golden:
 - secured/status-same-noop
 - secured/bad-json-status
 test-name:
-- golden: legacy behavior is unchanged
+- answers the request-route scenarios like the legacy oracle
 accept:
 - Given 접수 상태의 업무 / When 상태를 진행 중으로 바꾸면 / Then 200 이고 변경 이력에 `접수 → 진행 중` 이 남는다
 - Given 진행 중 상태의 업무 / When 같은 상태 진행 중으로 바꾸면 / Then 200 을 돌려주되 상태와 변경 이력은 그대로다
 
-상태는 접수·진행 중·대기·완료 넷이다. 이 밖의 값은 400, 없는 업무는 404 다. 같은 상태로 바꾸는 요청은 오류가 아니라 아무 일도 하지 않는 성공이다. 완료로 바뀔 때만 완료 시각이 기록되고, 완료에서 벗어나면 완료 시각이 비워진다. 휴지통에 있는 업무의 상태는 바꾸지 못한다(R-026). 상태 목록의 사본(서버·화면·SQL)이 서로 같은지는 `test/parity.test.js` 가 본다.
+상태는 접수·진행 중·대기·완료 넷이다. 이 밖의 값은 400, 없는 업무는 404 다. 같은 상태로 바꾸는 요청은 오류가 아니라 아무 일도 하지 않는 성공이다. 완료로 바뀔 때만 완료 시각이 기록되고, 완료에서 벗어나면 완료 시각이 비워진다. 휴지통에 있는 업무의 상태는 바꾸지 못한다(R-026). 상태 목록은 `TaskStatus.ts` 와 `supabase/schema.sql` 의 검사 제약에 있다.
 
 ### R-003 완료 업무 재개는 사유가 필요하다
 layer: core
 status: current
+home: web/src/request
 evidence:
-- local-store.js:37 ~ status:(id,status,reason)=>transaction
-- server.js:62 ~ reason.length>10000
+- web/src/request/adapter/in/web/schemas.ts:47 ~ reason.length <= FIELD_MAX_LENGTH
 - supabase/deletion.sql:44 ~ t.status='완료' and reason=''
-- README.md:42 ~ 완료 후 재개 사유가 필요합니다
+- web/src/request/domain/TaskStatus.ts:11 ~ export function isReopening(
 - web/src/request/domain/TaskStatus.spec.ts:1 ~ // R-002 R-003
 - web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 - web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
@@ -107,8 +106,8 @@ golden:
 - secured/reopen-reason-too-long
 - secured/reopen-with-reason
 test-name:
-- 접수, 변경 이력, 완료 재개 사유, 조회 권한, 재시작 후 보존
-- golden: legacy behavior is unchanged
+- reopening a finished request needs a reason: 400 without one, and it stays finished
+- answers the request-route scenarios like the legacy oracle
 accept:
 - Given 완료 상태의 업무 / When 사유 없이 다른 상태로 바꾸면 / Then 400 으로 거절하고 상태는 완료 그대로다
 - Given 완료 상태의 업무 / When 사유를 담아 다른 상태로 바꾸면 / Then 200 이고 변경 이력에 `완료 → 진행 중 · 사유` 가 남는다
@@ -118,11 +117,10 @@ accept:
 ### R-004 업무 메모 추가
 layer: core
 status: current
+home: web/src/request
 evidence:
-- server.js:63 ~ match[2]==='notes'
-- local-store.js:38 ~ note:(id,note)=>transaction
 - supabase/deletion.sql:47-49 ~ elsif action='note' then
-- README.md:37 ~ 등록·상태 변경·메모는 DB 함수
+- web/src/request/adapter/in/web/schemas.ts:50 ~ const noteSchema = z
 - web/src/request/adapter/in/web/routes.ts:15 ~ handler: handlers.addNote
 - web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
 - web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
@@ -136,7 +134,7 @@ golden:
 - secured/note-unknown-task
 - secured/same-origin-note
 test-name:
-- 접수, 변경 이력, 완료 재개 사유, 조회 권한, 재시작 후 보존
+- adds a trimmed note to the history and answers 201
 accept:
 - Given 등록된 업무 / When 메모를 보내면 / Then 201 이고 변경 이력에 `처리 메모` 가 남는다
 - Given 등록된 업무 / When 빈 메모나 10000자를 넘는 메모를 보내면 / Then 400 으로 거절한다
@@ -146,34 +144,31 @@ accept:
 ### R-005 변경 이력은 추가만 되고 시각은 서버가 기록한다
 layer: core
 status: current
+home: web/src/request
 evidence:
-- local-store.js:10-12 ~ CREATE TABLE IF NOT EXISTS events(
-- local-store.js:25 ~ DROP TRIGGER events_no_delete
-- local-store.js:27 ~ function record(id,kind,detail)
 - supabase/schema.sql:12-22 ~ create table if not exists orbit_private.events
 - supabase/deletion.sql:8-14 ~ create or replace function orbit_private.protect_events
 - supabase/deletion.sql:38 ~ order by e.id
-- public/app.js:40 ~ $('#new-task').onclick
-- README.md:42 ~ 등록·변경 시각은 서버/DB에서 기록합니다
-- README.md:44 ~ DB 관리자 권한 소유자의 변경까지 막는
+- web/src/request/adapter/in/web/ui/create/CreateDialog.tsx:57 ~ 요청일 *<input name="requested_at"
+- supabase/schema.sql:14 ~ at timestamptz not null default clock_timestamp()
+- web/src/request/adapter/in/web/history.char.spec.ts:77 ~ the store refuses to edit or erase an entry
 golden:
 - secured/detail-after-flow
 test-name:
-- 접수, 변경 이력, 완료 재개 사유, 조회 권한, 재시작 후 보존
+- after register, status change and note the detail lists them in the order they happened, as register, status change and note
 accept:
 - Given 등록·상태 변경·메모를 거친 업무 / When 상세를 조회하면 / Then 변경 이력이 발생 순서대로 `등록`·`상태 변경`·`처리 메모` 로 나온다
 - Given 기록된 변경 이력 / When 수정이나 삭제를 시도하면 / Then 저장소가 거부한다
 
-변경 이력의 시각은 서버(로컬은 `new Date()`, 클라우드는 DB 시계)가 기록한다. 등록·상태 변경·메모의 행위자는 `총무 담당자` 로 고정된다. 삭제·복원·배정·첨부 이력의 행위자는 로컬 저장소가 `총무 담당자`, 클라우드 DB 가 `admin` 이다(`supabase/deletion.sql:80`). 요청 시각만 사용자가 한국 시간으로 입력한다. 거부의 예외는 업무 영구 삭제 하나뿐이고, 그때 그 업무의 변경 이력이 함께 지워진다(R-027). DB 관리자 권한 소유자의 변경까지 막지는 못한다(`README.md:44`).
+변경 이력의 시각은 DB 시계(`clock_timestamp()`)가 기록한다. 등록·상태 변경·메모의 행위자는 `총무 담당자` 로 고정된다. 삭제·복원·수정·배정·첨부 이력의 행위자는 DB 가 `admin` 으로 적는다(`supabase/deletion.sql:80`). 요청 시각만 사용자가 한국 시간으로 입력한다. 거부의 예외는 업무 영구 삭제 하나뿐이고, 그때 그 업무의 변경 이력이 함께 지워진다(R-027). 이력 보호는 트리거(`supabase/schema.sql:21-22`)라서 트리거를 끌 수 있는 DB 관리자 권한까지 막지는 못한다.
 
 ### R-006 업무 목록과 상세
 layer: core
 status: current
+home: web/src/request
 evidence:
-- server.js:15 ~ async function taskSnapshot
-- server.js:35 ~ path==='/api/tasks'&&req.method==='GET'
-- server.js:59 ~ req.method==='GET'&&!match[2]
-- local-store.js:34-35 ~ list:()=>db.prepare('SELECT * FROM tasks WHERE deleted_at IS NULL
+- web/src/request/application/service/ListTasksService.ts:17 ~ tasks.map((task) => ({ ...task, ...byTask.get(task.id) }))
+- web/src/request/application/service/GetTaskDetailService.ts:19 ~ return { ...task, kpi: await this.kpi(id) }
 - supabase/deletion.sql:21-22 ~ if action='list' then
 - supabase/deletion.sql:36-39 ~ if t.deleted_at is not null and (action<>'detail'
 - web/src/request/adapter/in/web/routes.ts:11 ~ handler: handlers.list
@@ -190,24 +185,24 @@ golden:
 - secured/detail-unknown
 - secured/detail-wrong-method-path
 test-name:
-- golden: legacy behavior is unchanged
+- answers the request-route scenarios like the legacy oracle
 accept:
 - Given 등록된 업무가 없는 상태 / When 목록을 조회하면 / Then 빈 목록이 돌아온다
 - Given 업무가 여럿 등록된 상태 / When 목록을 조회하면 / Then 최근 등록한 업무가 먼저 나온다
 - Given 없는 업무 id / When 상세를 조회하면 / Then 404 다
 
-상세는 업무 항목에 변경 이력(`events`)을 발생 순서대로 붙이고, 휴지통에 없는 업무에는 담당자·첨부 정보(`kpi`)도 붙인다. 목록 항목은 `deleted_at` 열을 지니며 휴지통 업무는 목록에서 빠진다(R-026). 담당자 정보 행이 있는 업무의 목록 항목에는 `task_id`·`assignee`·`assigned_at`·`is_test` 가 더해진다(`server.js` 의 `taskSnapshot`). golden 은 담당자 정보 행이 없는 업무만 고정한다.
+상세는 업무 항목에 변경 이력(`events`)을 발생 순서대로 붙이고, 휴지통에 없는 업무에는 담당자·첨부 정보(`kpi`)도 붙인다. 목록 항목은 `deleted_at` 열을 지니며 휴지통 업무는 목록에서 빠진다(R-026). 담당자 정보 행이 있는 업무의 목록 항목에는 `task_id`·`assignee`·`assigned_at`·`is_test` 가 더해진다(`ListTasksService.ts` 의 `list`). golden 은 담당자 정보 행이 없는 업무만 고정한다.
 
 ## 지원
 
 ### R-007 조회 계정은 아무것도 바꾸지 못한다
 layer: supporting
 status: current
+home: web/src/access
 evidence:
-- server.js:27 ~ req.method!=='GET'&&userRole!=='admin'
-- public/app.js:31 ~ const editable=session.role==='admin'&&!t.deleted_at
-- public/app.js:43 ~ classList.toggle('viewer'
-- README.md:35 ~ 는 조회만 허용합니다
+- web/src/access/adapter/in/web/guardPipeline.ts:103 ~ request.method !== 'GET' && role !== 'admin'
+- web/src/request/adapter/in/web/ui/detail/detailModel.ts:10 ~ return role === 'admin' && !task.deleted_at
+- web/src/portal/adapter/in/web/ui/PortalApp.tsx:56 ~ classList.toggle('viewer'
 golden:
 - secured/viewer-create-403
 - secured/viewer-status-403
@@ -216,7 +211,7 @@ golden:
 - secured/viewer-list
 - secured/session-viewer
 test-name:
-- 접수, 변경 이력, 완료 재개 사유, 조회 권한, 재시작 후 보존
+- every write on the task routes is 403 with the viewer message, and the list afterwards is exactly what it was
 accept:
 - Given 조회 계정(`viewer`)으로 로그인한 상태 / When GET 이 아닌 API 를 부르면 / Then 403 이고 아무것도 바뀌지 않는다
 - Given 조회 계정으로 로그인한 상태 / When 목록을 조회하면 / Then 200 이다
@@ -226,13 +221,14 @@ accept:
 ### R-008 Basic 로그인과 로컬 열린 모드
 layer: supporting
 status: current
+home: web/src/access
 evidence:
-- server.js:18 ~ function safeEqual
-- server.js:25 ~ res.writeHead(401
-- server.js:24 ~ path==='/health'&&req.method==='GET'
-- server.js:33 ~ shared:!!process.env.ADMIN_PASSWORD
-- public/app.js:24 ~ 로컬 개발 모드입니다
-- server.js:19 ~ if(!process.env.ADMIN_PASSWORD)return 'admin'
+- web/src/access/adapter/out/crypto/Sha256SecretComparator.ts:5 ~ export class Sha256SecretComparator
+- web/src/access/adapter/in/web/guardPipeline.ts:29 ~ function unauthorized()
+- web/src/access/adapter/in/web/routes.ts:8 ~ pattern: '/health', isPublic: true
+- web/src/access/domain/AccessConfiguration.ts:38 ~ get shared(): boolean
+- web/src/board/adapter/in/web/ui/BoardView.tsx:15 ~ 로컬 개발 모드입니다
+- web/src/access/application/service/AuthorizeRequestService.ts:17 ~ if (this.configuration.openMode) return this.configuration.openModeRole
 golden:
 - secured/health
 - secured/health-post
@@ -249,25 +245,29 @@ golden:
 - open/open-status
 - open/open-list
 test-name:
-- 접수, 변경 이력, 완료 재개 사유, 조회 권한, 재시작 후 보존
+- without credentials, with a wrong password, an unknown user, a password of the other account or a Bearer scheme the page and the API are 401 with the Basic challenge
+- only GET /health is open: it answers ok without credentials while POST /health asks for the login
+- with no password configured nothing is asked: the caller passes as admin, the session is not shared, and writes work
 accept:
 - Given 관리자 비밀번호가 설정된 서버 / When 인증 없이 화면이나 API 를 부르면 / Then 401 과 Basic 인증 요구가 돌아온다
 - Given 관리자 비밀번호가 없는 로컬 서버 / When 인증 없이 부르면 / Then 관리자로 통과하고 세션의 `shared` 는 false 다
 
-`/health` 의 GET 만 인증 없이 열린다. 사용자는 `admin` 과 `viewer` 둘이다. 비밀번호 비교는 길이가 같을 때만 시간 일정 비교로 한다. 열린 모드에서는 화면에 로컬 개발 모드 안내가 뜬다.
+`/health` 의 GET 만 인증 없이 열린다. 사용자는 `admin` 과 `viewer` 둘이다. 비밀번호는 SHA-256 다이제스트끼리 시간 일정 비교로 맞춰 보므로 길이와 내용이 걸리는 시간에 드러나지 않는다. 열린 모드에서는 화면에 로컬 개발 모드 안내가 뜬다.
 
 ### R-009 다른 출처의 변경 요청은 막는다
 layer: supporting
 status: current
+home: web/src/access
 evidence:
-- server.js:28 ~ req.headers.origin&&req.headers.origin!==
+- web/src/access/adapter/in/web/guardPipeline.ts:37 ~ function isCrossOriginWrite(
 golden:
 - secured/cross-origin-create-403
 - secured/cross-origin-status-403
 - secured/cross-origin-get-allowed
 - secured/same-origin-note
 test-name:
-- golden: legacy behavior is unchanged
+- answers the guard labels like the legacy oracle
+- a POST whose Origin is not the server is 403 with the refusal message, on create and on status, and stores nothing
 accept:
 - Given 관리자로 로그인한 상태 / When `Origin` 이 서버 주소와 다른 POST 를 보내면 / Then 403 으로 거절한다
 - Given 관리자로 로그인한 상태 / When `Origin` 이 다른 GET 을 보내면 / Then 200 으로 통과한다
@@ -275,27 +275,32 @@ accept:
 ### R-010 배포 설정이 없으면 서버가 뜨지 않는다
 layer: supporting
 status: current
+home: web/src/config
 evidence:
-- server.js:9-12 ~ const cloud=process.env.STORAGE_BACKEND==='supabase'
-- supabase-store.js:3-5 ~ SUPABASE_URL과 SUPABASE_SECRET_KEY가 필요합니다
-- README.md:34 ~ STORAGE_BACKEND=supabase
-- README.md:38 ~ 로컬 저장으로 전환하지 않습니다
+- web/src/config/startupChecks.ts:19 ~ if (production && !cloud) problems.push('운영 배포에는 DATABASE_URL이 필요합니다.')
+- web/src/config/container.ts:65 ~ if (production && !env.DATABASE_URL) throw new Error(
+- web/src/config/startupChecks.ts:13 ~ (production || cloud) && (!env.ADMIN_PASSWORD || !env.VIEWER_PASSWORD)
+- web/src/config/databaseSecurity.ts:16 ~ DATABASE_URL must be a postgres:// URL
+- web/src/config/container.ts:44-47 ~ if (env.DATABASE_URL) {
 golden:
 test-name:
-- 배포 설정 누락 시 임시 디스크로 시작하지 않음
+- production without a database address refuses to start, with the passwords given or not
+- production or a cloud database without both passwords refuses to start, whichever one is missing or empty
+- the same password for both accounts refuses to start
 accept:
-- Given `NODE_ENV=production` 이고 `STORAGE_BACKEND` 가 supabase 가 아닌 환경 / When 서버를 시작하면 / Then 오류로 종료한다
-- Given 운영 또는 supabase 모드 / When 관리자나 조회 비밀번호가 없으면 / Then 오류로 종료한다
+- Given `NODE_ENV=production` 이고 `DATABASE_URL` 이 없는 환경 / When 서버를 시작하면 / Then 오류로 종료한다
+- Given 운영 또는 `DATABASE_URL` 이 있는 환경 / When 관리자나 조회 비밀번호가 없으면 / Then 오류로 종료한다
 
-관리자와 조회 비밀번호가 같아도 시작하지 않는다. supabase 모드는 `SUPABASE_URL` 과 비밀 키가 있고 URL 이 `https://*.supabase.co` 루트일 때만 시작한다. 연결 오류가 나도 로컬 저장으로 바꾸지 않는다. 시험은 첫 조건(운영 환경에서 저장소가 supabase 가 아님)만 검사하고, 나머지는 코드 줄로만 뒷받침된다.
+관리자와 조회 비밀번호가 같아도 시작하지 않는다. `DATABASE_URL` 은 `postgres://` 주소여야 하고 TLS 검증을 끄는 `sslmode`·`ssl` 값이 붙으면 쓰지 않는다(`databaseSecurity.ts`). `DATABASE_URL` 이 없으면 개발·시험용 인메모리 PGlite 로 뜨고 운영에서는 시작하지 않는다. 연결 오류가 나도 PGlite 로 바꾸지 않는다. 시험은 운영 환경의 `DATABASE_URL` 누락·비밀번호 누락·같은 비밀번호를 검사하고, 주소 형식과 연결 오류의 비전환은 코드 줄로만 뒷받침된다.
 
 ### R-011 업무 보드, 검색, 상태 필터
 layer: supporting
 status: current
+home: web/src/board
 evidence:
-- frontend/src/board/format.js:10 ~ export function groupsFor
-- frontend/src/Board.svelte:15-16 ~ aria-label="업무 상태 필터"
-- public/app.js:26 ~ mountBoard($('#claude-board-root')
+- web/src/board/domain/groupTasks.ts:172 ~ export function groupTasks(
+- web/src/board/adapter/in/web/ui/BoardToolbar.tsx:19 ~ <div className={styles.statusRow}>
+- web/src/board/domain/taskSearch.ts:4 ~ export function matchesQuery(
 - web/src/board/domain/taskStatus.spec.ts:1 ~ // R-011
 - web/src/board/domain/boardFacts.spec.ts:1 ~ // R-011
 - web/src/board/domain/elapsedLabel.spec.ts:1 ~ // R-011
@@ -303,30 +308,30 @@ evidence:
 - web/src/board/domain/taskSearch.spec.ts:1 ~ // R-011
 golden:
 test-name:
-- 검색과 상태를 함께 적용하고 부서별로 재분류
-- 원본 대표 상태 우선순위로 분류하고 완료 기록도 유지
+- search and status apply together and the board regroups by department
+- groups by category by default with the 접수 task first and keeps completed records
 accept:
 - Given 업무 보드 화면 / When 검색어를 입력하면 / Then 제목·요청자·부서·내용·담당자에 대소문자 구분 없이 검색어가 들어 있는 업무만 보인다
 - Given 업무 보드 화면 / When 상태를 고르면 / Then 그 상태의 업무만 보인다
 
-보드는 업무를 분류·부서·접수 경로 중 고른 기준으로 묶고, 묶음 안은 접수 → 진행 중 → 대기 → 완료 순, 같은 상태에서는 기한이 가까운 순이다. 묶고 거르는 계산(`format.js` 의 `groupsFor`)은 시험이 있다. 화면 그리기와 조회 계정의 읽기 전용 표시는 브라우저 시험(`test/board-ui.test.js`)이 보지만 그 시험은 `ORBIT_PLAYWRIGHT_PATH` 가 없으면 건너뛴다.
+보드는 업무를 분류·부서·접수 경로 중 고른 기준으로 묶고, 묶음 안은 접수 → 진행 중 → 대기 → 완료 순, 같은 상태에서는 기한이 가까운 순이다. 묶고 거르는 계산(`groupTasks.ts` 의 `groupTasks`)은 시험이 있다. 렌더링된 화면(그리기, 조회 계정의 읽기 전용 표시)을 검사하는 시험은 없고 라벨·상태 계산만 `boardLabels.spec.ts`·`boardState.spec.ts` 가 본다.
 
 ### R-012 CSV 내려받기
 layer: supporting
 status: current
+home: web/src/request
 evidence:
-- public/app.js:38 ~ function exportCSV
-- public/app.js:26 ~ onexport:exportCSV
-- frontend/src/Board.svelte:17 ~ CSV 내보내기
+- web/src/request/adapter/in/web/ui/tasksCsv.ts:21 ~ export function buildTasksCsv(
+- web/src/board/adapter/in/web/ui/BoardView.tsx:35 ~ tasksCsvFilename(todayKst())
+- web/src/board/adapter/in/web/ui/BoardToolbar.tsx:54 ~ CSV 내보내기
 golden:
-- secured/static-app-js-admin
 test-name:
 accept:
-- Given 업무 보드 화면 / When CSV 내려받기를 누르면 / Then 업무, 요청자, 부서, 접수 경로, 분류, 상태, 요청 시각, 등록 시각, 완료 시각 열의 `총무업무_날짜.csv` 가 내려온다
+- Given 업무 보드 화면 / When CSV 내려받기를 누르면 / Then 업무, 요청자, 부서, 접수 경로, 분류, 상태, 요청일, 등록 시각, 완료 시각 열의 `총무업무_날짜.csv` 가 내려온다
 
 파일은 BOM 이 붙은 UTF-8 이고, 셀이 `=`·`+`·`@`·`-` 로 시작하면 앞에 `'` 를 붙여 수식으로 읽히지 않게 한다. 내려받는 목록은 화면 필터와 무관하게 휴지통을 뺀 전체 업무이고 테스트 업무(R-021)도 들어 있다.
 
-화면 동작 자체를 검사하는 시험은 없다. golden 은 `public/app.js` 바이트가 그대로인지만 고정한다(동작은 리뷰에서 본다).
+파일 내용과 이름은 `tasksCsv.char.spec.ts`·`tasksCsv.spec.ts` 가 고정한다. 버튼을 눌러 파일이 내려오는 화면 동작은 직접 검사하는 시험이 없다(리뷰에서 본다).
 
 ### R-013 누적 실적과 소요 시간
 layer: supporting
