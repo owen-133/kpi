@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "npm --prefix web start",
-    "test": "node --test",
+    "test": "node --test scripts/*.test.mjs",
     "build": "npm --prefix web ci --include=dev --no-audit --no-fund && npm --prefix web run build"
   },
   "engines": {

@@ -2,25 +2,23 @@
 // Copies the working tree to a temp directory, runs the generators THERE and
 // compares the results byte for byte with the files in the real tree.
 //
-// Usage: node scripts/check-generated.mjs [--frontend] [--root <dir>]
-//   (default)    supabase/upgrade.sql  <- node scripts/build-upgrade.js
-//   --frontend   also public/**        <- npm --prefix frontend ci && npm --prefix frontend run build (needs network)
+// Usage: node scripts/check-generated.mjs [--root <dir>]
+//   supabase/upgrade.sql  <- node scripts/build-upgrade.js
 //   --root <dir> tree to check (default: the repo containing this script)
 // Exit: 0 all in sync, 1 something differs, 2 usage/setup error.
 import {spawnSync} from 'node:child_process';
-import {cpSync,existsSync,mkdtempSync,readdirSync,readFileSync,rmSync,statSync} from 'node:fs';
+import {cpSync,existsSync,mkdtempSync,readFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,relative,resolve,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-const USAGE='usage: node scripts/check-generated.mjs [--frontend] [--root <dir>]';
+const USAGE='usage: node scripts/check-generated.mjs [--root <dir>]';
 class SetupError extends Error{}
 
 function parseArgs(argv){
-  const opts={frontend:false,root:resolve(fileURLToPath(new URL('..',import.meta.url)))};
+  const opts={root:resolve(fileURLToPath(new URL('..',import.meta.url)))};
   for(let i=0;i<argv.length;i++){
-    if(argv[i]==='--frontend')opts.frontend=true;
-    else if(argv[i]==='--root'){
+    if(argv[i]==='--root'){
       if(!argv[i+1])throw new SetupError('--root needs a directory\n'+USAGE);
       opts.root=resolve(argv[++i]);
     }else throw new SetupError('unknown argument: '+argv[i]+'\n'+USAGE);
@@ -54,17 +52,6 @@ function firstDifferingLine(a,b){
   return line;
 }
 
-function listFiles(dir,base=dir){
-  if(!existsSync(dir))return [];
-  const out=[];
-  for(const name of readdirSync(dir)){
-    const p=join(dir,name);
-    if(statSync(p).isDirectory())out.push(...listFiles(p,base));
-    else out.push(relative(base,p).split(sep).join('/'));
-  }
-  return out.sort();
-}
-
 // Returns one result line and whether the pair is in sync. `committed`/`generated` are absolute paths.
 function compareFile(label,committed,generated){
   const a=existsSync(committed)?readFileSync(committed):null;
@@ -85,12 +72,6 @@ function check(opts){
     rmSync(join(tmp,'supabase','upgrade.sql'),{force:true});
     run(process.execPath,['scripts/build-upgrade.js'],tmp);
     const results=[compareFile('upgrade.sql',join(root,'supabase','upgrade.sql'),join(tmp,'supabase','upgrade.sql'))];
-    if(opts.frontend){
-      run('npm',['--prefix','frontend','ci','--no-audit','--no-fund'],tmp);
-      run('npm',['--prefix','frontend','run','build'],tmp);
-      const names=[...new Set([...listFiles(join(root,'public')),...listFiles(join(tmp,'public'))])].sort();
-      for(const f of names)results.push(compareFile('public/'+f,join(root,'public',f),join(tmp,'public',f)));
-    }
     for(const r of results)console.log(r.line);
     return results.every(r=>r.ok)?0:1;
   }finally{
