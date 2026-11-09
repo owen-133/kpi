@@ -1,0 +1,910 @@
+{
+ "screen": "improvement",
+ "variants": {
+  "admin/empty": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "피드백을 개선으로, 개선을 성과로"
+    },
+    {
+     "level": 3,
+     "text": "01 · MVP 구축"
+    },
+    {
+     "level": 3,
+     "text": "02 · 본인 실사용"
+    },
+    {
+     "level": 3,
+     "text": "03 · 정착 운영"
+    },
+    {
+     "level": 2,
+     "text": "피드백 · 개선 이력 관리대장"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 휴지통"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 설정"
+    },
+    {
+     "kind": "button",
+     "name": "＋ 새 업무 등록"
+    },
+    {
+     "kind": "button",
+     "name": "＋ 개선 기록"
+    },
+    {
+     "kind": "button",
+     "name": "관리대장 CSV"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "select",
+     "label": "수행 단계",
+     "options": [
+      {
+       "text": "전체 단계",
+       "selected": true
+      },
+      {
+       "text": "MVP 구축"
+      },
+      {
+       "text": "본인 실사용"
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 총무 담당자 · 업무 관리",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 개선 이력",
+    "  - text: 업무 워크스페이스",
+    "  - button \"관리자 휴지통\": ▤ 휴지통",
+    "  - button \"관리자 설정\": ⚙ 설정",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - paragraph: 피드백이나 개선 결과를 기록해 보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  },
+  "admin/populated": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "피드백을 개선으로, 개선을 성과로"
+    },
+    {
+     "level": 3,
+     "text": "01 · MVP 구축"
+    },
+    {
+     "level": 3,
+     "text": "02 · 본인 실사용"
+    },
+    {
+     "level": 3,
+     "text": "03 · 정착 운영"
+    },
+    {
+     "level": 2,
+     "text": "피드백 · 개선 이력 관리대장"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 휴지통"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 설정"
+    },
+    {
+     "kind": "button",
+     "name": "＋ 새 업무 등록"
+    },
+    {
+     "kind": "button",
+     "name": "＋ 개선 기록"
+    },
+    {
+     "kind": "button",
+     "name": "관리대장 CSV"
+    },
+    {
+     "kind": "button",
+     "name": "기한 초과 표시MVP 구축 · 본인 · <TS> · v1"
+    },
+    {
+     "kind": "button",
+     "name": "상태 변경 안내 문구 정리본인 실사용 · 총무팀 시연 · <TS> · v1"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "select",
+     "label": "수행 단계",
+     "options": [
+      {
+       "text": "전체 단계",
+       "selected": true
+      },
+      {
+       "text": "MVP 구축"
+      },
+      {
+       "text": "본인 실사용"
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 총무 담당자 · 업무 관리",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 개선 이력",
+    "  - text: 업무 워크스페이스",
+    "  - button \"관리자 휴지통\": ▤ 휴지통",
+    "  - button \"관리자 설정\": ⚙ 설정",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  },
+  "viewer/empty": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "피드백을 개선으로, 개선을 성과로"
+    },
+    {
+     "level": 3,
+     "text": "01 · MVP 구축"
+    },
+    {
+     "level": 3,
+     "text": "02 · 본인 실사용"
+    },
+    {
+     "level": 3,
+     "text": "03 · 정착 운영"
+    },
+    {
+     "level": 2,
+     "text": "피드백 · 개선 이력 관리대장"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "관리대장 CSV"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "select",
+     "label": "수행 단계",
+     "options": [
+      {
+       "text": "전체 단계",
+       "selected": true
+      },
+      {
+       "text": "MVP 구축"
+      },
+      {
+       "text": "본인 실사용"
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 팀장 · 조회 전용",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 개선 이력",
+    "  - text: 업무 워크스페이스",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - paragraph: 피드백이나 개선 결과를 기록해 보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  },
+  "viewer/populated": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "피드백을 개선으로, 개선을 성과로"
+    },
+    {
+     "level": 3,
+     "text": "01 · MVP 구축"
+    },
+    {
+     "level": 3,
+     "text": "02 · 본인 실사용"
+    },
+    {
+     "level": 3,
+     "text": "03 · 정착 운영"
+    },
+    {
+     "level": 2,
+     "text": "피드백 · 개선 이력 관리대장"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "관리대장 CSV"
+    },
+    {
+     "kind": "button",
+     "name": "기한 초과 표시MVP 구축 · 본인 · <TS> · v1"
+    },
+    {
+     "kind": "button",
+     "name": "상태 변경 안내 문구 정리본인 실사용 · 총무팀 시연 · <TS> · v1"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "select",
+     "label": "수행 단계",
+     "options": [
+      {
+       "text": "전체 단계",
+       "selected": true
+      },
+      {
+       "text": "MVP 구축"
+      },
+      {
+       "text": "본인 실사용"
+      },
+      {
+       "text": "정착 운영"
+      }
+     ]
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 팀장 · 조회 전용",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 개선 이력",
+    "  - text: 업무 워크스페이스",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  }
+ },
+ "interactions": [
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"전체 단계\" in the stage select",
+   "before": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"MVP 구축\" in the stage select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\"",
+    "    - option \"MVP 구축\" [selected]",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"본인 실사용\" in the stage select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\"",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\" [selected]",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"정착 운영\" in the stage select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\"",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\" [selected]",
+    "  - button \"관리대장 CSV\"",
+    "  - paragraph: 피드백이나 개선 결과를 기록해 보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 관리대장 CSV",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   },
+   "download": {
+    "filename": "개선이력관리대장.csv",
+    "text": [
+     "﻿\"제목\",\"단계\",\"출처\",\"피드백\",\"개선내용\",\"검증결과\",\"상태\",\"등록\",\"수정\",\"버전\"",
+     "\"기한 초과 표시\",\"MVP 구축\",\"\",\"기한이 지난 업무를 한눈에 구분하기 어렵다\",\"기한 초과 업무를 강조\",\"시연에서 구분이 쉬워졌다는 의견\",\"검증 완료\",\"<TS>\",\"<TS>\",\"1\"",
+     "\"상태 변경 안내 문구 정리\",\"본인 실사용\",\"총무팀 시연\",\"상태 변경 뒤 무엇이 바뀌었는지 알기 어렵다\",\"변경 완료 안내를 띄우도록 수정\",\"\",\"개선 중\",\"<TS>\",\"<TS>\",\"1\""
+    ]
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click ＋ 개선 기록",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "새 개선 기록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the first record row",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "개선 기록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: click 관리대장 CSV",
+   "before": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - button \"＋ 개선 기록\"",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - paragraph: 피드백이나 개선 결과를 기록해 보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   },
+   "download": {
+    "filename": "개선이력관리대장.csv",
+    "text": [
+     "﻿\"제목\",\"단계\",\"출처\",\"피드백\",\"개선내용\",\"검증결과\",\"상태\",\"등록\",\"수정\",\"버전\""
+    ]
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: click ＋ 개선 기록",
+   "before": {
+    "sameAsBeforeOfInteraction": 7
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "새 개선 기록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: click the first record row",
+   "before": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\" [selected]",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\"",
+    "  - button \"관리대장 CSV\"",
+    "  - article:",
+    "    - button \"기한 초과 표시 MVP 구축 · 본인 · <TS> · v1\":",
+    "      - strong: 기한 초과 표시",
+    "      - text: MVP 구축 · 본인 · <TS> · v1",
+    "    - text: 검증 완료",
+    "  - article:",
+    "    - button \"상태 변경 안내 문구 정리 본인 실사용 · 총무팀 시연 · <TS> · v1\":",
+    "      - strong: 상태 변경 안내 문구 정리",
+    "      - text: 본인 실사용 · 총무팀 시연 · <TS> · v1",
+    "    - text: 개선 중",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [
+     "개선 기록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: choose 정착 운영 in the stage select",
+   "before": {
+    "sameAsBeforeOfInteraction": 9
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"피드백을 개선으로, 개선을 성과로\" [level=1]",
+    "  - paragraph: MVP·실사용·정착 단계별 문제와 검증 결과를 기록하세요.",
+    "  - article:",
+    "    - heading \"01 · MVP 구축\" [level=3]",
+    "    - paragraph: \"접수·기한·중요도·상태·대시보드 근거: 시스템 시연과 구현 검증 결과\"",
+    "  - article:",
+    "    - heading \"02 · 본인 실사용\" [level=3]",
+    "    - paragraph: \"실제 업무 등록·담당자 배정·처리 기록 근거: 지표 검증·피드백·개선 이력\"",
+    "  - article:",
+    "    - heading \"03 · 정착 운영\" [level=3]",
+    "    - paragraph: \"월간 보고서 발행·지표 기반 개선 근거: 발행 이력과 개선 검증 결과\"",
+    "  - heading \"피드백 · 개선 이력 관리대장\" [level=2]",
+    "  - paragraph: 문제 발견 → 개선 → 검증 결과를 단계별로 기록합니다.",
+    "  - combobox \"수행 단계\":",
+    "    - option \"전체 단계\"",
+    "    - option \"MVP 구축\"",
+    "    - option \"본인 실사용\"",
+    "    - option \"정착 운영\" [selected]",
+    "  - button \"관리대장 CSV\"",
+    "  - paragraph: 피드백이나 개선 결과를 기록해 보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "개선 이력",
+    "title": "피드백을 개선으로, 개선을 성과로",
+    "openDialogs": [],
+    "toast": null
+   }
+  }
+ ]
+}

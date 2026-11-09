@@ -1,0 +1,1033 @@
+{
+ "screen": "create",
+ "variants": {
+  "admin/empty": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "새 업무 등록"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "자동 분류 · 유사 업무 찾기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "취소",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "업무 등록",
+     "type": "submit"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "업무 제목 *",
+     "placeholder": "어떤 요청을 받으셨나요?",
+     "required": true,
+     "maxlength": "200"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "requester",
+     "label": "요청자 *",
+     "placeholder": "홍길동",
+     "required": true,
+     "maxlength": "100"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "department",
+     "label": "부서",
+     "placeholder": "경영지원팀",
+     "maxlength": "100"
+    },
+    {
+     "kind": "select",
+     "name": "channel",
+     "label": "접수 경로",
+     "value": "메신저",
+     "options": [
+      {
+       "text": "메신저",
+       "selected": true
+      },
+      {
+       "text": "구두"
+      },
+      {
+       "text": "이메일"
+      },
+      {
+       "text": "전화"
+      },
+      {
+       "text": "기타"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "category",
+     "label": "업무 분류",
+     "value": "일반 총무",
+     "options": [
+      {
+       "text": "일반 총무",
+       "selected": true
+      },
+      {
+       "text": "고정업무"
+      },
+      {
+       "text": "비품·자산"
+      },
+      {
+       "text": "구매·지출"
+      },
+      {
+       "text": "시설·환경"
+      },
+      {
+       "text": "계약"
+      },
+      {
+       "text": "복리후생"
+      },
+      {
+       "text": "기타"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "name": "requested_at",
+     "label": "요청일 *",
+     "required": true,
+     "value": "2026-11-09"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "name": "due_date",
+     "label": "처리 기한"
+    },
+    {
+     "kind": "select",
+     "name": "priority",
+     "label": "중요도",
+     "value": "중",
+     "options": [
+      {
+       "text": "중",
+       "selected": true
+      },
+      {
+       "text": "상"
+      },
+      {
+       "text": "하"
+      }
+     ]
+    },
+    {
+     "kind": "textarea",
+     "name": "description",
+     "label": "요청 내용",
+     "placeholder": "요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+     "maxlength": "10000"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-09",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ]
+  },
+  "admin/populated": {
+   "opened": true,
+   "headings": [
+    {
+     "level": 2,
+     "text": "새 업무 등록"
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "button",
+     "name": "닫기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "자동 분류 · 유사 업무 찾기",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "취소",
+     "type": "button"
+    },
+    {
+     "kind": "button",
+     "name": "업무 등록",
+     "type": "submit"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "title",
+     "label": "업무 제목 *",
+     "placeholder": "어떤 요청을 받으셨나요?",
+     "required": true,
+     "maxlength": "200"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "requester",
+     "label": "요청자 *",
+     "placeholder": "홍길동",
+     "required": true,
+     "maxlength": "100"
+    },
+    {
+     "kind": "input",
+     "type": "text",
+     "name": "department",
+     "label": "부서",
+     "placeholder": "경영지원팀",
+     "maxlength": "100"
+    },
+    {
+     "kind": "select",
+     "name": "channel",
+     "label": "접수 경로",
+     "value": "메신저",
+     "options": [
+      {
+       "text": "메신저",
+       "selected": true
+      },
+      {
+       "text": "구두"
+      },
+      {
+       "text": "이메일"
+      },
+      {
+       "text": "전화"
+      },
+      {
+       "text": "기타"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "name": "category",
+     "label": "업무 분류",
+     "value": "일반 총무",
+     "options": [
+      {
+       "text": "일반 총무",
+       "selected": true
+      },
+      {
+       "text": "고정업무"
+      },
+      {
+       "text": "비품·자산"
+      },
+      {
+       "text": "구매·지출"
+      },
+      {
+       "text": "시설·환경"
+      },
+      {
+       "text": "계약"
+      },
+      {
+       "text": "복리후생"
+      },
+      {
+       "text": "기타"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "name": "requested_at",
+     "label": "요청일 *",
+     "required": true,
+     "value": "2026-11-09"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "name": "due_date",
+     "label": "처리 기한"
+    },
+    {
+     "kind": "select",
+     "name": "priority",
+     "label": "중요도",
+     "value": "중",
+     "options": [
+      {
+       "text": "중",
+       "selected": true
+      },
+      {
+       "text": "상"
+      },
+      {
+       "text": "하"
+      }
+     ]
+    },
+    {
+     "kind": "textarea",
+     "name": "description",
+     "label": "요청 내용",
+     "placeholder": "요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+     "maxlength": "10000"
+    }
+   ],
+   "tree": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-09",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ]
+  },
+  "viewer/empty": {
+   "opened": false,
+   "reason": "the register button is not visible for this role"
+  },
+  "viewer/populated": {
+   "opened": false,
+   "reason": "the register button is not visible for this role"
+  }
+ },
+ "interactions": [
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 업무 등록 with the required fields empty",
+   "before": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-09",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": null
+   },
+   "invalidFields": [
+    "title",
+    "requester"
+   ]
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 자동 분류 · 유사 업무 찾기 with title and description empty",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": "업무 제목이나 요청 내용을 먼저 입력하세요."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "type a title like an existing task then click 자동 분류 · 유사 업무 찾기",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "    - text: 노트북 준비 요청",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-09",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "    - text: 신규 입사자 장비",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph:",
+    "    - text: \"추천 분류:\"",
+    "    - strong: 비품·자산",
+    "    - button \"분류 적용\"",
+    "  - paragraph: 요청 내용의 업무 키워드와 설정된 분류를 매칭했습니다.",
+    "  - heading \"유사 업무\" [level=3]",
+    "  - button \"신규 입사자 노트북 준비 · 진행 중 · 유사도 73%\"",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 분류 적용 after the automatic classification",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "    - text: 복합기 토너 교체 요청",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-09",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "    - text: 프린터 토너",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph:",
+    "    - text: \"추천 분류:\"",
+    "    - strong: 일반 총무",
+    "    - button \"분류 적용\"",
+    "  - paragraph: 명확한 키워드가 없어 기본 분류를 제안합니다. 직접 확인하세요.",
+    "  - heading \"유사 업무\" [level=3]",
+    "  - button \"복합기 토너 교체 · 완료 · 유사도 50%\"",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": "추천 분류를 적용했습니다."
+   },
+   "categoryAfter": "일반 총무"
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "fill every field and click 업무 등록",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"프로젝터 램프 교체\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 오지후 부서 개발팀 접수 경로 이메일 분류 · 우선순위 시설·환경 · 상 요청일 2026-11-09 시스템 등록 시각 <TS> 처리 기한 2026-11-20 완료 시각 —",
+    "  - paragraph: 회의실 프로젝터 램프",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\" [selected]",
+    "    - option \"진행 중\"",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 미배정",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "프로젝터 램프 교체"
+    ],
+    "toast": "새 업무가 등록되었습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "fill only the required fields and click 업무 등록",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"필수만 입력\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 오지후 부서 — 접수 경로 메신저 분류 · 우선순위 일반 총무 · 중 요청일 2026-11-09 시스템 등록 시각 <TS> 처리 기한 — 완료 시각 —",
+    "  - paragraph: 등록된 상세 내용이 없습니다.",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\" [selected]",
+    "    - option \"진행 중\"",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 미배정",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "필수만 입력"
+    ],
+    "toast": "새 업무가 등록되었습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "clear the request date and click 업무 등록",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "    - text: 날짜 없음",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "    - text: 오지후",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\"",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": null
+   },
+   "invalidFields": [
+    "requested_at"
+   ]
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 취소",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the × close button",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "press Escape",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "reopen after typing and closing (form is reset)",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: fill the required fields and click 업무 등록",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: REQUEST DETAIL",
+    "  - heading \"첫 업무\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - button \"업무 수정\"",
+    "  - text: 요청자 오지후 부서 — 접수 경로 메신저 분류 · 우선순위 일반 총무 · 중 요청일 2026-11-09 시스템 등록 시각 <TS> 처리 기한 — 완료 시각 —",
+    "  - paragraph: 등록된 상세 내용이 없습니다.",
+    "  - combobox \"업무 상태\":",
+    "    - option \"접수\" [selected]",
+    "    - option \"진행 중\"",
+    "    - option \"대기\"",
+    "    - option \"완료\"",
+    "  - button \"상태 변경\"",
+    "  - separator",
+    "  - text: 처리 메모",
+    "  - textbox \"처리 메모\":",
+    "    - /placeholder: 진행 내용이나 처리 결과를 남겨 주세요.",
+    "  - button \"메모 남기기\"",
+    "  - button \"업무 삭제\"",
+    "  - separator",
+    "  - heading \"담당자 · 첨부파일\" [level=3]",
+    "  - paragraph:",
+    "    - text: 실제 업무 · 지표 포함",
+    "    - button \"데이터 구분 변경\"",
+    "  - paragraph: 최초 배정 시각 미배정",
+    "  - textbox \"담당자\":",
+    "    - /placeholder: 담당자 이름",
+    "  - button \"담당자 배정\"",
+    "  - paragraph: 첨부파일이 없습니다.",
+    "  - text: 첨부파일 추가 (최대 1MB, 업무당 10개)",
+    "  - button \"첨부파일 추가 (최대 1MB, 업무당 10개)\"",
+    "  - separator",
+    "  - heading \"업무 이력\" [level=3]",
+    "  - paragraph: 등록 및 변경 시각은 서버에서 자동 기록합니다.",
+    "  - text: <TS> · 총무 담당자",
+    "  - strong: 등록",
+    "  - paragraph: 업무가 접수되었습니다."
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "첫 업무"
+    ],
+    "toast": "새 업무가 등록되었습니다."
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: type a title then click 자동 분류 · 유사 업무 찾기",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- dialog:",
+    "  - paragraph: NEW REQUEST",
+    "  - heading \"새 업무 등록\" [level=2]",
+    "  - button \"닫기\": ×",
+    "  - paragraph: 구두·메신저로 받은 요청을 기록해 주세요.",
+    "  - text: 업무 제목 *",
+    "  - textbox \"업무 제목 *\":",
+    "    - /placeholder: 어떤 요청을 받으셨나요?",
+    "    - text: 노트북 준비 요청",
+    "  - text: 요청자 *",
+    "  - textbox \"요청자 *\":",
+    "    - /placeholder: 홍길동",
+    "  - text: 부서",
+    "  - textbox \"부서\":",
+    "    - /placeholder: 경영지원팀",
+    "  - text: 접수 경로",
+    "  - combobox \"접수 경로\":",
+    "    - option \"메신저\" [selected]",
+    "    - option \"구두\"",
+    "    - option \"이메일\"",
+    "    - option \"전화\"",
+    "    - option \"기타\"",
+    "  - text: 업무 분류",
+    "  - combobox \"업무 분류\":",
+    "    - option \"일반 총무\" [selected]",
+    "    - option \"고정업무\"",
+    "    - option \"비품·자산\"",
+    "    - option \"구매·지출\"",
+    "    - option \"시설·환경\"",
+    "    - option \"계약\"",
+    "    - option \"복리후생\"",
+    "    - option \"기타\"",
+    "  - text: 요청일 *",
+    "  - textbox \"요청일 *\": 2026-11-09",
+    "  - text: 처리 기한",
+    "  - textbox \"처리 기한\"",
+    "  - text: 중요도",
+    "  - combobox \"중요도\":",
+    "    - option \"중\" [selected]",
+    "    - option \"상\"",
+    "    - option \"하\"",
+    "  - text: 요청 내용",
+    "  - textbox \"요청 내용\":",
+    "    - /placeholder: 요청 내용을 붙여 넣거나 상세 내용을 적어 주세요.",
+    "  - button \"자동 분류 · 유사 업무 찾기\"",
+    "  - paragraph: 키워드·텍스트 유사도 기반 · 생성형 AI 미사용 · 제안은 확인 후 적용",
+    "  - paragraph:",
+    "    - text: \"추천 분류:\"",
+    "    - strong: 비품·자산",
+    "    - button \"분류 적용\"",
+    "  - paragraph: 요청 내용의 업무 키워드와 설정된 분류를 매칭했습니다.",
+    "  - heading \"유사 업무\" [level=3]",
+    "  - paragraph: 유사한 실제 업무가 없습니다.",
+    "  - paragraph: 요청일만 입력합니다. 경과시간은 선택일 00:00(한국 시간) 기준이며 등록·변경 시각은 서버에서 자동 기록합니다.",
+    "  - button \"취소\"",
+    "  - button \"업무 등록\""
+   ],
+   "page": {
+    "breadcrumb": "Overview",
+    "title": "좋은 하루예요, 총무 담당자님 ☀",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": null
+   }
+  }
+ ]
+}

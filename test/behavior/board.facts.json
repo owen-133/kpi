@@ -1,0 +1,3056 @@
+{
+ "screen": "board",
+ "variants": {
+  "admin/empty": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "모든 요청을 하나의 흐름으로"
+    },
+    {
+     "level": 2,
+     "text": "흩어진 요청을, 한 장의 보드로."
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 휴지통"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 설정"
+    },
+    {
+     "kind": "button",
+     "name": "＋ 새 업무 등록"
+    },
+    {
+     "kind": "button",
+     "name": "전체 0",
+     "pressed": "true"
+    },
+    {
+     "kind": "button",
+     "name": "접수0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "진행 중0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "대기0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "완료0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "간략 보기",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "CSV 내보내기"
+    },
+    {
+     "kind": "button",
+     "name": "새로고침"
+    },
+    {
+     "kind": "button",
+     "name": "기간 초기화"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "search",
+     "label": "업무 검색",
+     "placeholder": "업무·요청자·부서·내용 검색"
+    },
+    {
+     "kind": "select",
+     "label": "카드 분류 기준",
+     "value": "date",
+     "options": [
+      {
+       "text": "날짜별",
+       "selected": true
+      },
+      {
+       "text": "업무 분류별"
+      },
+      {
+       "text": "요청 부서별"
+      },
+      {
+       "text": "접수 경로별"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "label": "날짜 기준",
+     "value": "activity",
+     "options": [
+      {
+       "text": "처리일 (완료: 완료일 / 미완료: 요청일)",
+       "selected": true
+      },
+      {
+       "text": "요청일"
+      },
+      {
+       "text": "완료일"
+      },
+      {
+       "text": "등록일"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "시작일"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "종료일"
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 총무 담당자 · 업무 관리",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 업무 보드",
+    "  - text: 업무 워크스페이스",
+    "  - button \"관리자 휴지통\": ▤ 휴지통",
+    "  - button \"관리자 설정\": ⚙ 설정",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 0\" [pressed]",
+    "    - button \"접수 0\"",
+    "    - button \"진행 중 0\"",
+    "    - button \"대기 0\"",
+    "    - button \"완료 0\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 0개 그룹 · 0건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - strong: 첫 업무를 기록해 보세요.",
+    "    - paragraph: 오른쪽 위 새 업무 등록 버튼으로 구두·메신저 요청을 접수하세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  },
+  "admin/populated": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "모든 요청을 하나의 흐름으로"
+    },
+    {
+     "level": 2,
+     "text": "흩어진 요청을, 한 장의 보드로."
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 휴지통"
+    },
+    {
+     "kind": "button",
+     "name": "관리자 설정"
+    },
+    {
+     "kind": "button",
+     "name": "＋ 새 업무 등록"
+    },
+    {
+     "kind": "button",
+     "name": "전체 7",
+     "pressed": "true"
+    },
+    {
+     "kind": "button",
+     "name": "접수3",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "진행 중1",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "대기1",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "완료2",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "간략 보기",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "CSV 내보내기"
+    },
+    {
+     "kind": "button",
+     "name": "새로고침"
+    },
+    {
+     "kind": "button",
+     "name": "기간 초기화"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-09 (월)전체 1건 · 미완료 1건 1",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "월간 소모품 점검박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중기한 2026-11-13접수 후 2시간 50분"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-08 (일)전체 1건 · 미완료 0건 1",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "▸ 완료 업무 1건이력 보기",
+     "expanded": "false"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-06 (금)전체 1건 · 미완료 1건 1",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "사무실 정수기 점검정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하기한 2026-11-12접수 후 3일 0시간"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-05 (목)전체 2건 · 미완료 1건 11",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "[테스트] 연습용 등록 건테스터 · 기타 · 담당 미배정 접수 · 하기한 미지정접수 후 4일 0시간"
+    },
+    {
+     "kind": "button",
+     "name": "▸ 완료 업무 1건이력 보기",
+     "expanded": "false"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-03 (화)전체 2건 · 미완료 2건 11",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "최소 입력김철수 · · 담당 미배정 접수기한 미지정접수 후 6일 0시간"
+    },
+    {
+     "kind": "button",
+     "name": "신규 입사자 노트북 준비홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음기한 2026-11-05접수 후 6일 1시간"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "search",
+     "label": "업무 검색",
+     "placeholder": "업무·요청자·부서·내용 검색"
+    },
+    {
+     "kind": "select",
+     "label": "카드 분류 기준",
+     "value": "date",
+     "options": [
+      {
+       "text": "날짜별",
+       "selected": true
+      },
+      {
+       "text": "업무 분류별"
+      },
+      {
+       "text": "요청 부서별"
+      },
+      {
+       "text": "접수 경로별"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "label": "날짜 기준",
+     "value": "activity",
+     "options": [
+      {
+       "text": "처리일 (완료: 완료일 / 미완료: 요청일)",
+       "selected": true
+      },
+      {
+       "text": "요청일"
+      },
+      {
+       "text": "완료일"
+      },
+      {
+       "text": "등록일"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "시작일"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "종료일"
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 총무 담당자 · 업무 관리",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 업무 보드",
+    "  - text: 업무 워크스페이스",
+    "  - button \"관리자 휴지통\": ▤ 휴지통",
+    "  - button \"관리자 설정\": ⚙ 설정",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  },
+  "viewer/empty": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "모든 요청을 하나의 흐름으로"
+    },
+    {
+     "level": 2,
+     "text": "흩어진 요청을, 한 장의 보드로."
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "전체 0",
+     "pressed": "true"
+    },
+    {
+     "kind": "button",
+     "name": "접수0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "진행 중0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "대기0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "완료0",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "간략 보기",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "CSV 내보내기"
+    },
+    {
+     "kind": "button",
+     "name": "새로고침"
+    },
+    {
+     "kind": "button",
+     "name": "기간 초기화"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "search",
+     "label": "업무 검색",
+     "placeholder": "업무·요청자·부서·내용 검색"
+    },
+    {
+     "kind": "select",
+     "label": "카드 분류 기준",
+     "value": "date",
+     "options": [
+      {
+       "text": "날짜별",
+       "selected": true
+      },
+      {
+       "text": "업무 분류별"
+      },
+      {
+       "text": "요청 부서별"
+      },
+      {
+       "text": "접수 경로별"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "label": "날짜 기준",
+     "value": "activity",
+     "options": [
+      {
+       "text": "처리일 (완료: 완료일 / 미완료: 요청일)",
+       "selected": true
+      },
+      {
+       "text": "요청일"
+      },
+      {
+       "text": "완료일"
+      },
+      {
+       "text": "등록일"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "시작일"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "종료일"
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 팀장 · 조회 전용",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 업무 보드",
+    "  - text: 업무 워크스페이스",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 조회 전용",
+    "    - button \"전체 0\" [pressed]",
+    "    - button \"접수 0\"",
+    "    - button \"진행 중 0\"",
+    "    - button \"대기 0\"",
+    "    - button \"완료 0\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 0개 그룹 · 0건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - strong: 첫 업무를 기록해 보세요.",
+    "    - paragraph: 담당자가 등록한 업무가 이곳에 표시됩니다.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  },
+  "viewer/populated": {
+   "headings": [
+    {
+     "level": 1,
+     "text": "모든 요청을 하나의 흐름으로"
+    },
+    {
+     "level": 2,
+     "text": "흩어진 요청을, 한 장의 보드로."
+    }
+   ],
+   "buttons": [
+    {
+     "kind": "a",
+     "name": "AI아이지넷총무 업무 포털"
+    },
+    {
+     "kind": "button",
+     "name": "▦ Overview"
+    },
+    {
+     "kind": "button",
+     "name": "☷ 업무 보드"
+    },
+    {
+     "kind": "button",
+     "name": "◷ 업무 실적"
+    },
+    {
+     "kind": "button",
+     "name": "↗ 개선 이력"
+    },
+    {
+     "kind": "button",
+     "name": "전체 7",
+     "pressed": "true"
+    },
+    {
+     "kind": "button",
+     "name": "접수3",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "진행 중1",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "대기1",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "완료2",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "간략 보기",
+     "pressed": "false"
+    },
+    {
+     "kind": "button",
+     "name": "CSV 내보내기"
+    },
+    {
+     "kind": "button",
+     "name": "새로고침"
+    },
+    {
+     "kind": "button",
+     "name": "기간 초기화"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-09 (월)전체 1건 · 미완료 1건 1",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "월간 소모품 점검박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중기한 2026-11-13접수 후 2시간 50분"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-08 (일)전체 1건 · 미완료 0건 1",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "▸ 완료 업무 1건이력 보기",
+     "expanded": "false"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-06 (금)전체 1건 · 미완료 1건 1",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "사무실 정수기 점검정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하기한 2026-11-12접수 후 3일 0시간"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-05 (목)전체 2건 · 미완료 1건 11",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "[테스트] 연습용 등록 건테스터 · 기타 · 담당 미배정 접수 · 하기한 미지정접수 후 4일 0시간"
+    },
+    {
+     "kind": "button",
+     "name": "▸ 완료 업무 1건이력 보기",
+     "expanded": "false"
+    },
+    {
+     "kind": "button",
+     "name": "2026-11-03 (화)전체 2건 · 미완료 2건 11",
+     "expanded": "true"
+    },
+    {
+     "kind": "button",
+     "name": "최소 입력김철수 · · 담당 미배정 접수기한 미지정접수 후 6일 0시간"
+    },
+    {
+     "kind": "button",
+     "name": "신규 입사자 노트북 준비홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음기한 2026-11-05접수 후 6일 1시간"
+    }
+   ],
+   "fields": [
+    {
+     "kind": "input",
+     "type": "search",
+     "label": "업무 검색",
+     "placeholder": "업무·요청자·부서·내용 검색"
+    },
+    {
+     "kind": "select",
+     "label": "카드 분류 기준",
+     "value": "date",
+     "options": [
+      {
+       "text": "날짜별",
+       "selected": true
+      },
+      {
+       "text": "업무 분류별"
+      },
+      {
+       "text": "요청 부서별"
+      },
+      {
+       "text": "접수 경로별"
+      }
+     ]
+    },
+    {
+     "kind": "select",
+     "label": "날짜 기준",
+     "value": "activity",
+     "options": [
+      {
+       "text": "처리일 (완료: 완료일 / 미완료: 요청일)",
+       "selected": true
+      },
+      {
+       "text": "요청일"
+      },
+      {
+       "text": "완료일"
+      },
+      {
+       "text": "등록일"
+      }
+     ]
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "시작일"
+    },
+    {
+     "kind": "input",
+     "type": "date",
+     "label": "종료일"
+    }
+   ],
+   "tree": [
+    "- complementary:",
+    "  - link \"AI 아이지넷 총무 업무 포털\":",
+    "    - /url: /",
+    "  - strong: 아이지넷 워크스페이스",
+    "  - text: 총무 업무를 연결하는 공간 WORKSPACE",
+    "  - navigation:",
+    "    - button \"▦ Overview\"",
+    "    - button \"☷ 업무 보드\"",
+    "    - button \"◷ 업무 실적\"",
+    "    - button \"↗ 개선 이력\"",
+    "  - text: GA 아이지넷 총무 팀장 · 조회 전용",
+    "- banner:",
+    "  - text: Workspace /",
+    "  - strong: 업무 보드",
+    "  - text: 업무 워크스페이스",
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 조회 전용",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ]
+  }
+ },
+ "interactions": [
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the status filter 전체",
+   "before": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the status filter 접수",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\"",
+    "    - button \"접수 3\" [pressed]",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 3개 그룹 · 3건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-05 (목) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"2026-11-03 (화) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the status filter 진행 중",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\"",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\" [pressed]",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 1건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-03 (화) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the status filter 대기",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\"",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\" [pressed]",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 1건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the status filter 완료",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\"",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\" [pressed]",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 2개 그룹 · 2건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-05 (목) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "type a title word in the search box (노트북)",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\": 노트북",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 1건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-03 (화) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "type a requester name in the search box (김철수)",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\": 김철수",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 1건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-03 (화) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "type a word that matches nothing in the search box",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\": 해당없음",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 0개 그룹 · 0건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - strong: 조건에 맞는 업무가 없습니다.",
+    "    - paragraph: 검색어나 상태 필터를 바꿔보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "search a date text (2026-11-05) in the search box",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\": 2026-11-05",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 0개 그룹 · 0건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - strong: 조건에 맞는 업무가 없습니다.",
+    "    - paragraph: 검색어나 상태 필터를 바꿔보세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "combine the search 정산 with the status filter 완료",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\"",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\" [pressed]",
+    "    - searchbox \"업무 검색\": 정산",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 1건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"날짜별\" in the card grouping select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"업무 분류별\" in the card grouping select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\"",
+    "      - option \"업무 분류별\" [selected]",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 6개 그룹 · 7건 접수 → 진행 중 → 대기 → 완료 순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"고정업무 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"기타 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"미분류 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"비품·자산 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"시설·환경 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"구매·지출 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"요청 부서별\" in the card grouping select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\"",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\" [selected]",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 4개 그룹 · 7건 접수 → 진행 중 → 대기 → 완료 순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"미분류 전체 2건 · 미완료 2건 2\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"총무팀 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"인사팀 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"경영지원팀 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"접수 경로별\" in the card grouping select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\"",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\" [selected]",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 6개 그룹 · 7건 접수 → 진행 중 → 대기 → 완료 순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"기타 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"메신저 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"미분류 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"이메일 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"구두 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"전화 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"처리일 (완료: 완료일 / 미완료: 요청일)\" in the date basis select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"요청일\" in the date basis select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\"'",
+    "      - option \"요청일\" [selected]",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 6개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"2026-11-02 (월) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-01 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"완료일\" in the date basis select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\"'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\" [selected]",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 3개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-05 (목) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"미완료 전체 5건 · 미완료 5건 3 1 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose \"등록일\" in the date basis select",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\"'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\" [selected]",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 6개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"2026-11-02 (월) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-01 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "set the start date to 2026-11-05",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\": 2026-11-05",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 4개 그룹 · 5건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "set the end date to 2026-11-04",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\": 2026-11-04",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 2건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "set start 2026-11-03 and end 2026-11-05 then click 기간 초기화",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "choose the completion-date basis with a range 2026-11-08 to 2026-11-08",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\"'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\" [selected]",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\": 2026-11-08",
+    "    - text: 종료일",
+    "    - textbox \"종료일\": 2026-11-08",
+    "    - button \"기간 초기화\"",
+    "    - text: 1개 그룹 · 1건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 간략 보기",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"상세 보기\" [pressed]",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검\"",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"법인카드 정산\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검\"",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"연습용 등록 건\"",
+    "    - button \"복합기 토너 교체\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력\"",
+    "    - button \"신규 입사자 노트북 준비\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 간략 보기 twice",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the first group header to collapse it",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 접수 · 월간 소모품 점검 1\"",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "collapse then expand the first group header",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "group by 업무 분류별 then collapse the first group",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\"",
+    "      - option \"업무 분류별\" [selected]",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 6개 그룹 · 7건 접수 → 진행 중 → 대기 → 완료 순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"고정업무 접수 · 월간 소모품 점검 1\"",
+    "    - button \"기타 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"미분류 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"비품·자산 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"시설·환경 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"구매·지출 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click CSV 내보내기",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   },
+   "download": {
+    "filename": "총무업무_2026-11-09.csv",
+    "text": [
+     "﻿\"업무\",\"요청자\",\"부서\",\"접수 경로\",\"분류\",\"상태\",\"요청일\",\"등록 시각\",\"완료 시각\"",
+     "\"월간 소모품 점검\",\"박민수\",\"총무팀\",\"메신저\",\"고정업무\",\"접수\",\"2026-11-09\",\"<TS>\",\"\"",
+     "\"사무실 정수기 점검\",\"정하윤\",\"경영지원팀\",\"이메일\",\"시설·환경\",\"대기\",\"2026-11-06\",\"<TS>\",\"\"",
+     "\"연습용 등록 건\",\"테스터\",\"\",\"기타\",\"기타\",\"접수\",\"2026-11-05\",\"<TS>\",\"\"",
+     "\"최소 입력\",\"김철수\",\"\",\"\",\"\",\"접수\",\"2026-11-03\",\"<TS>\",\"\"",
+     "\"신규 입사자 노트북 준비\",\"홍길동\",\"인사팀\",\"메신저\",\"비품·자산\",\"진행 중\",\"2026-11-03\",\"<TS>\",\"\"",
+     "\"복합기 토너 교체\",\"이서연\",\"총무팀\",\"구두\",\"시설·환경\",\"완료\",\"2026-11-02\",\"<TS>\",\"<TS>\"",
+     "\"법인카드 정산\",\"최도윤\",\"경영지원팀\",\"전화\",\"구매·지출\",\"완료\",\"2026-11-01\",\"<TS>\",\"<TS>\""
+    ]
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "add a task through the API then click 새로고침",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 8\" [pressed]",
+    "    - button \"접수 4\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 8건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 2건 · 미완료 2건 2\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"새로고침 확인 확인자 · · 담당 미배정 접수 기한 미지정 접수 후 0초\":",
+    "      - strong: 새로고침 확인",
+    "      - text: 확인자 · · 담당 미배정 접수 기한 미지정 접수 후 0초",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click ▸ 완료 업무 이력 보기 in a group",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▾ 완료 업무 1건 이력 보기\" [expanded]",
+    "    - button \"법인카드 정산 최도윤 · 경영지원팀 · 전화 · 담당 미배정 완료 · 상 기한 2026-11-08 처리 완료\":",
+    "      - strong: 법인카드 정산",
+    "      - text: 최도윤 · 경영지원팀 · 전화 · 담당 미배정 완료 · 상 기한 2026-11-08 처리 완료",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click every ▸ 완료 업무 이력 보기 toggle",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▾ 완료 업무 1건 이력 보기\" [expanded]",
+    "    - button \"법인카드 정산 최도윤 · 경영지원팀 · 전화 · 담당 미배정 완료 · 상 기한 2026-11-08 처리 완료\":",
+    "      - strong: 법인카드 정산",
+    "      - text: 최도윤 · 경영지원팀 · 전화 · 담당 미배정 완료 · 상 기한 2026-11-08 처리 완료",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▾ 완료 업무 1건 이력 보기\" [expanded]",
+    "    - button \"복합기 토너 교체 이서연 · 총무팀 · 구두 · 담당 미배정 완료 · 중 기한 2026-11-06 처리 완료\":",
+    "      - strong: 복합기 토너 교체",
+    "      - text: 이서연 · 총무팀 · 구두 · 담당 미배정 완료 · 중 기한 2026-11-06 처리 완료",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click a task row (opens the detail dialog)",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the fixed-category task row",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "월간 소모품 점검"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click the test task row",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "연습용 등록 건"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "populated",
+   "action": "click 새 업무 등록",
+   "before": {
+    "sameAsBeforeOfInteraction": 0
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "새 업무 등록"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: click 새로고침",
+   "before": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 0\" [pressed]",
+    "    - button \"접수 0\"",
+    "    - button \"진행 중 0\"",
+    "    - button \"대기 0\"",
+    "    - button \"완료 0\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 0개 그룹 · 0건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - strong: 첫 업무를 기록해 보세요.",
+    "    - paragraph: 오른쪽 위 새 업무 등록 버튼으로 구두·메신저 요청을 접수하세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: type in the search box",
+   "before": {
+    "sameAsBeforeOfInteraction": 35
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - button \"＋ 새 업무 등록\"",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 업무 관리",
+    "    - button \"전체 0\" [pressed]",
+    "    - button \"접수 0\"",
+    "    - button \"진행 중 0\"",
+    "    - button \"대기 0\"",
+    "    - button \"완료 0\"",
+    "    - searchbox \"업무 검색\": 아무거나",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 0개 그룹 · 0건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - strong: 첫 업무를 기록해 보세요.",
+    "    - paragraph: 오른쪽 위 새 업무 등록 버튼으로 구두·메신저 요청을 접수하세요.",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  },
+  {
+   "role": "admin",
+   "state": "empty",
+   "action": "empty state: click CSV 내보내기",
+   "before": {
+    "sameAsBeforeOfInteraction": 35
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   },
+   "download": {
+    "filename": "총무업무_2026-11-09.csv",
+    "text": [
+     "﻿\"업무\",\"요청자\",\"부서\",\"접수 경로\",\"분류\",\"상태\",\"요청일\",\"등록 시각\",\"완료 시각\""
+    ]
+   }
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: click a task row",
+   "before": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 조회 전용",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\" [selected]",
+    "      - option \"업무 분류별\"",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 5개 그룹 · 7건 최신 날짜순 · 같은 날짜는 상태순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"2026-11-09 (월) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"2026-11-08 (일) 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-06 (금) 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"2026-11-05 (목) 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"2026-11-03 (화) 전체 2건 · 미완료 2건 1 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [
+     "신규 입사자 노트북 준비"
+    ],
+    "toast": null
+   }
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: click CSV 내보내기",
+   "before": {
+    "sameAsBeforeOfInteraction": 38
+   },
+   "after": "unchanged",
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   },
+   "download": {
+    "filename": "총무업무_2026-11-09.csv",
+    "text": [
+     "﻿\"업무\",\"요청자\",\"부서\",\"접수 경로\",\"분류\",\"상태\",\"요청일\",\"등록 시각\",\"완료 시각\"",
+     "\"월간 소모품 점검\",\"박민수\",\"총무팀\",\"메신저\",\"고정업무\",\"접수\",\"2026-11-09\",\"<TS>\",\"\"",
+     "\"사무실 정수기 점검\",\"정하윤\",\"경영지원팀\",\"이메일\",\"시설·환경\",\"대기\",\"2026-11-06\",\"<TS>\",\"\"",
+     "\"연습용 등록 건\",\"테스터\",\"\",\"기타\",\"기타\",\"접수\",\"2026-11-05\",\"<TS>\",\"\"",
+     "\"최소 입력\",\"김철수\",\"\",\"\",\"\",\"접수\",\"2026-11-03\",\"<TS>\",\"\"",
+     "\"신규 입사자 노트북 준비\",\"홍길동\",\"인사팀\",\"메신저\",\"비품·자산\",\"진행 중\",\"2026-11-03\",\"<TS>\",\"\"",
+     "\"복합기 토너 교체\",\"이서연\",\"총무팀\",\"구두\",\"시설·환경\",\"완료\",\"2026-11-02\",\"<TS>\",\"<TS>\"",
+     "\"법인카드 정산\",\"최도윤\",\"경영지원팀\",\"전화\",\"구매·지출\",\"완료\",\"2026-11-01\",\"<TS>\",\"<TS>\""
+    ]
+   }
+  },
+  {
+   "role": "viewer",
+   "state": "populated",
+   "action": "viewer: choose the 업무 분류별 grouping",
+   "before": {
+    "sameAsBeforeOfInteraction": 38
+   },
+   "after": [
+    "- main:",
+    "  - paragraph: AIJINET · GENERAL AFFAIRS",
+    "  - heading \"모든 요청을 하나의 흐름으로\" [level=1]",
+    "  - paragraph: 접수부터 완료까지, 놓치는 업무 없이 관리하세요.",
+    "  - region \"총무 업무 카드 보드\":",
+    "    - paragraph: GENERAL AFFAIRS · LIVE BOARD",
+    "    - heading \"흩어진 요청을, 한 장의 보드로.\" [level=2]",
+    "    - text: 분류별로 모으고, 상태별로 살펴보세요. 조회 전용",
+    "    - button \"전체 7\" [pressed]",
+    "    - button \"접수 3\"",
+    "    - button \"진행 중 1\"",
+    "    - button \"대기 1\"",
+    "    - button \"완료 2\"",
+    "    - searchbox \"업무 검색\"",
+    "    - combobox \"카드 분류 기준\":",
+    "      - option \"날짜별\"",
+    "      - option \"업무 분류별\" [selected]",
+    "      - option \"요청 부서별\"",
+    "      - option \"접수 경로별\"",
+    "    - button \"간략 보기\"",
+    "    - button \"CSV 내보내기\"",
+    "    - button \"새로고침\"",
+    "    - text: 날짜 기준",
+    "    - combobox \"날짜 기준\":",
+    "      - 'option \"처리일 (완료: 완료일 / 미완료: 요청일)\" [selected]'",
+    "      - option \"요청일\"",
+    "      - option \"완료일\"",
+    "      - option \"등록일\"",
+    "    - text: 시작일",
+    "    - textbox \"시작일\"",
+    "    - text: 종료일",
+    "    - textbox \"종료일\"",
+    "    - button \"기간 초기화\"",
+    "    - text: 6개 그룹 · 7건 접수 → 진행 중 → 대기 → 완료 순 · 한국 날짜 기준 · 완료는 완료일, 미완료는 요청일",
+    "    - button \"고정업무 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"월간 소모품 점검 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분\":",
+    "      - strong: 월간 소모품 점검",
+    "      - text: 박민수 · 총무팀 · 메신저 · 담당 미배정 접수 · 중 기한 2026-11-13 접수 후 2시간 50분",
+    "    - button \"기타 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"[테스트] 연습용 등록 건 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간\":",
+    "      - strong: \"[테스트] 연습용 등록 건\"",
+    "      - text: 테스터 · 기타 · 담당 미배정 접수 · 하 기한 미지정 접수 후 4일 0시간",
+    "    - button \"미분류 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"최소 입력 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간\":",
+    "      - strong: 최소 입력",
+    "      - text: 김철수 · · 담당 미배정 접수 기한 미지정 접수 후 6일 0시간",
+    "    - button \"비품·자산 전체 1건 · 미완료 1건 1\" [expanded]",
+    "    - button \"신규 입사자 노트북 준비 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간\":",
+    "      - strong: 신규 입사자 노트북 준비",
+    "      - text: 홍길동 · 인사팀 · 메신저 · 담당 박지원 진행 중 · 높음 기한 2026-11-05 접수 후 6일 1시간",
+    "    - button \"시설·환경 전체 2건 · 미완료 1건 1 1\" [expanded]",
+    "    - button \"사무실 정수기 점검 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간\":",
+    "      - strong: 사무실 정수기 점검",
+    "      - text: 정하윤 · 경영지원팀 · 이메일 · 담당 미배정 대기 · 하 기한 2026-11-12 접수 후 3일 0시간",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "    - button \"구매·지출 전체 1건 · 미완료 0건 1\" [expanded]",
+    "    - button \"▸ 완료 업무 1건 이력 보기\"",
+    "  - text: 아이지넷 · 요청부터 완료까지, 업무의 모든 순간을 기록합니다."
+   ],
+   "page": {
+    "breadcrumb": "업무 보드",
+    "title": "모든 요청을 하나의 흐름으로",
+    "openDialogs": [],
+    "toast": null
+   }
+  }
+ ]
+}
