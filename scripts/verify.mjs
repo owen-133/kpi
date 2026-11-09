@@ -50,6 +50,18 @@ function rootTests({root}) {
   return {...r, note: r.ok ? envNote : `${r.note}; ${envNote}`};
 }
 
+// `npm audit` needs the registry. Its exit 1 means either advisories at or above --audit-level or "could not ask";
+// only the second prints `audit request to <url> failed, reason: <cause>`, which is reported as env-skipped like
+// the other layers that lack their environment. Anything else that exits non-zero is a real failure.
+function audit({root}) {
+  const r = exec('npm', ['--prefix', 'web', 'audit', '--omit=dev', '--audit-level=high'], {cwd: root});
+  if (r.ok) return r;
+  const unreachable = r.output.match(/audit request to \S+ failed, reason: (.*)$/m);
+  if (!unreachable) return r;
+  const cause = unreachable[1].match(/\bE[A-Z_]{3,}\b/)?.[0] ?? unreachable[1].trim().slice(0, 60);
+  return {ok: true, output: r.output, note: `env-skipped: npm registry unreachable (${cause})`};
+}
+
 const web = (args) => ({root}) => exec(args[0], args.slice(1), {cwd: join(root, 'web')});
 
 export const LAYERS = [
@@ -66,6 +78,7 @@ export const LAYERS = [
       return r.status === 3 ? {...r, note: 'pinned graft missing: run `sh scripts/setup-graft.sh`'} : r;
     },
   },
+  {id: 'audit', run: audit},
   {
     id: 'agents-size',
     run: ({root}) => {

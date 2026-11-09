@@ -10,7 +10,7 @@
 import {test, after} from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-import {mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync} from 'node:fs';
+import {chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -109,7 +109,53 @@ test('the real CLI exits 2 on a usage error and lists the known layers', () => {
 });
 
 test('the layer table names the required layers in order', () => {
-  assert.deepEqual(LAYERS.map((l) => l.id), ['root-tests', 'web-tests', 'web-types', 'web-build', 'generated', 'graft', 'agents-size', 'product-untouched']);
+  assert.deepEqual(LAYERS.map((l) => l.id), ['root-tests', 'web-tests', 'web-types', 'web-build', 'generated', 'graft', 'audit', 'agents-size', 'product-untouched']);
+});
+
+// The audit layer runs `npm --prefix web audit ...`; a fake `npm` first on PATH stands for the registry's answer.
+function runAuditWith({status, text}) {
+  const bin = tmp();
+  const argsFile = join(bin, 'args.txt');
+  writeFileSync(join(bin, 'npm'), `#!/bin/sh\necho "$@" > '${argsFile}'\nprintf '%s\\n' '${text}' >&2\nexit ${status}\n`);
+  chmodSync(join(bin, 'npm'), 0o755);
+  const saved = process.env.PATH;
+  process.env.PATH = `${bin}:${saved}`;
+  try {
+    const layer = LAYERS.find((l) => l.id === 'audit');
+    return {...runLayerOutcome(layer, tmp()), args: readFileSync(argsFile, 'utf8').trim()};
+  } finally {
+    process.env.PATH = saved;
+  }
+}
+const runLayerOutcome = (layer, root) => {
+  const r = layer.run({root});
+  return {state: r.state ?? (r.ok ? 'PASS' : 'FAIL'), note: r.note ?? '', output: r.output ?? ''};
+};
+
+test('audit: asks npm for high-severity production advisories and passes when it finds none', () => {
+  const r = runAuditWith({status: 0, text: 'found 0 vulnerabilities'});
+  assert.equal(r.args, '--prefix web audit --omit=dev --audit-level=high');
+  assert.equal(r.state, 'PASS');
+  assert.doesNotMatch(r.note, /env-skipped/);
+});
+
+test('audit: a reported vulnerability fails the layer', () => {
+  const r = runAuditWith({status: 1, text: 'next  <16.4.6\nSeverity: high\n1 high severity vulnerability'});
+  assert.equal(r.state, 'FAIL');
+  assert.match(r.output, /high severity vulnerability/);
+});
+
+test('audit: an unreachable registry is env-skipped with the reason, for ENOTFOUND, ETIMEDOUT and EAI_AGAIN', () => {
+  for (const code of ['ENOTFOUND', 'ETIMEDOUT', 'EAI_AGAIN']) {
+    const r = runAuditWith({status: 1, text: `npm warn audit request to https://registry.npmjs.org/-/npm/v1/security/advisories/bulk failed, reason: getaddrinfo ${code} registry.npmjs.org\nundefined\nnpm error audit endpoint returned an error`});
+    assert.equal(r.state, 'PASS', code);
+    assert.match(r.note, new RegExp(`^env-skipped: .*${code}`), code);
+  }
+});
+
+test('audit: a failure that is neither a finding nor a network error still fails', () => {
+  const r = runAuditWith({status: 1, text: 'npm error code EJSONPARSE'});
+  assert.equal(r.state, 'FAIL');
 });
 
 test('agents-size: below the limit passes, padded over 32768 bytes fails and the table shows it', () => {
