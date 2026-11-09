@@ -191,6 +191,9 @@ function writeFreezePreload(runDir) {
   const file = join(runDir, 'freeze-time.mjs');
   writeFileSync(file, `const FIXED=Date.parse(${JSON.stringify(FIXED_TIME)}),Real=Date;
 class FrozenDate extends Real{constructor(...a){if(a.length===0)super(FIXED);else super(...a);}static now(){return FIXED;}}
+// parse and UTC are own statics because Next copies only own statics when it wraps Date for a request.
+Object.defineProperty(FrozenDate,'parse',{value:Real.parse,writable:true,configurable:true});
+Object.defineProperty(FrozenDate,'UTC',{value:Real.UTC,writable:true,configurable:true});
 globalThis.Date=FrozenDate;
 `);
   return file;
@@ -220,6 +223,7 @@ function serverEnv(freeze, dataDir) {
   const env = {...process.env, ADMIN_PASSWORD: ADMIN.password, VIEWER_PASSWORD: VIEWER.password, NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --import ${pathToFileURL(freeze).href}`.trim()};
   for (const key of ['STORAGE_BACKEND', 'NODE_ENV', 'SUPABASE_URL']) delete env[key];
   if (dataDir) env.DATA_DIR = dataDir;
+  else env.NODE_ENV = 'test'; // the Next app refuses to start in production without DATABASE_URL; it then uses its in-memory development store
   return env;
 }
 
@@ -364,7 +368,7 @@ async function run(options) {
         mkdirSync(join(runDir, 'second-data'));
         nextBase = await launch(`second legacy instance (${secondRoot})`, process.execPath, ['server.js'], secondRoot, serverEnv(freeze, join(runDir, 'second-data')), 30000);
       } else {
-        nextBase = await launch('next app', 'npx', ['next', 'start', '-p', String(await freePort())], join(ROOT, 'web'), serverEnv(freeze, null), 90000);
+        nextBase = await launch('next app', 'npx', ['next', 'start'], join(ROOT, 'web'), serverEnv(freeze, null), 90000);
       }
     }
     const browser = await chromium.launch({headless: true});
