@@ -1,4 +1,5 @@
 'use client';
+import {ChecklistSection} from './ChecklistSection.tsx';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
@@ -81,7 +82,7 @@ export function DetailDialog() {
           </div>
         ))}
       </div>
-      <p className="description">{task.description || '등록된 상세 내용이 없습니다.'}</p>
+      <ChecklistSection task={task} editable={editable} api={apis.request} actions={actions}/>
       {editable ? (
         <>
           <form

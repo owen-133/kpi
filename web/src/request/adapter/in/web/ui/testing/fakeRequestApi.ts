@@ -20,6 +20,8 @@ export class FakeRequestApi implements RequestApi {
   nextId = 'new-task';
   editResult: EditTaskResult = { ok: true, revision: 1 };
 
+  async updateChecklist(id:string,body:Parameters<RequestApi['updateChecklist']>[1]):Promise<unknown>{this.log.record('updateChecklist',[id,body]);return {ok:true};}
+
   async listTasks(): Promise<TaskSummary[]> {
     this.log.record('listTasks', []);
     return structuredClone(this.tasks);

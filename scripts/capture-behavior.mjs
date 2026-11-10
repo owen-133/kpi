@@ -279,6 +279,7 @@ async function interaction(h, cache, spec) {
     s.page.on('dialog', onDialog);
     const note = {};
     try { await spec.run(s.page, s, note); } finally { s.page.off('dialog', onDialog); }
+    if (spec.afterScope === '#detail-dialog') await s.page.locator('#detail-dialog[open] #detail-content h2').waitFor({state: 'visible'});
     await settle(s.page, 250);
     record.after = await lines(s.page, spec.afterScope ?? spec.scope);
     Object.assign(record, {page: await pageState(s.page)}, note);
@@ -717,6 +718,7 @@ const SCREENS = {
     '업무 하나의 상세 창이다. 요청 정보, 내용, 상태 변경, 처리 메모, 담당자·첨부파일, 업무 이력이 한 창에 있다 (R-006).',
     '', '사용 방법', '- 상태를 바꾸면 창이 닫히고 목록이 갱신된다. 완료 업무를 되돌릴 때는 사유가 필요하다 (R-002, R-003).',
     '- 메모는 이력에만 쌓인다 (R-004). 담당자 배정, 데이터 구분 변경, 첨부 추가·삭제, 업무 삭제도 여기에서 한다 (R-015, R-020, R-021, R-026).',
+    '- 번호·글머리 목록은 개별 완료 체크와 해제를 지원하고 하위 업무를 추가할 수 있다 (R-035).',
     '- 조회 계정은 읽기만 하며 변경 도구가 보이지 않는다 (R-007).']},
 };
 

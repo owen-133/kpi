@@ -1,3 +1,4 @@
+import type {ChecklistChange} from '../../../../domain/TaskChecklist.ts';
 import type { ApiClient } from '../../../../../shared/adapter/in/web/ui/apiClient.ts';
 
 /** KPI columns merged into every row of GET /api/tasks (absent while the KPI tables are not installed). */
@@ -105,6 +106,7 @@ export type LifecycleEventView = {
 };
 
 export interface RequestApi {
+  updateChecklist(id:string,body:{readonly revision:number;readonly change:ChecklistChange}):Promise<unknown>;
   listTasks(): Promise<TaskSummary[]>;
   getTask(id: string): Promise<TaskDetailView>;
   createTask(body: NewTaskBody): Promise<{ readonly id: string }>;
@@ -120,6 +122,7 @@ export interface RequestApi {
 
 export function createRequestApi(client: ApiClient): RequestApi {
   return {
+    updateChecklist: (id,body) => client.request(`tasks/${id}/checklist`,body),
     listTasks: () => client.request<TaskSummary[]>('tasks'),
     getTask: (id) => client.request<TaskDetailView>('tasks/' + id),
     createTask: (body) => client.request<{ id: string }>('tasks', body),

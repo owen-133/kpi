@@ -1,3 +1,4 @@
+import {updateChecklistHandler} from './updateChecklistHandler.ts';
 import type { RouteDefinition } from '../../../../shared/adapter/in/web/RouteRegistry.ts';
 import type { RequestUseCases } from '../../../application/port/in/RequestUseCases.ts';
 import { createHandlers } from './handlers.ts';
@@ -8,6 +9,7 @@ import { createHandlers } from './handlers.ts';
 export function requestRoutes(useCases: RequestUseCases): readonly RouteDefinition[] {
   const handlers = createHandlers(useCases);
   return [
+    { method: 'POST', pattern: /^\/api\/tasks\/([^/]+)\/checklist$/, handler: updateChecklistHandler(useCases.updateChecklist) },
     { method: 'GET', pattern: '/api/tasks', handler: handlers.list },
     { method: 'POST', pattern: '/api/tasks', handler: handlers.create },
     { method: 'GET', pattern: /^\/api\/tasks\/([^/]+)$/, handler: handlers.detail },

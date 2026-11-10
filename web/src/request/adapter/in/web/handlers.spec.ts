@@ -17,6 +17,7 @@ const refuse = (error: unknown): RequestUseCases => {
     throw error;
   };
   return {
+    updateChecklist: { execute: fail },
     listTasks: { list: fail },
     getTaskDetail: { detail: fail },
     registerTask: { register: fail },

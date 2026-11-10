@@ -1,3 +1,4 @@
+import {UpdateChecklistService} from './UpdateChecklistService.ts';
 import type { OrbitFunctionArguments, OrbitFunctionName, OrbitFunctions } from '../../../shared/port/OrbitFunctions.ts';
 import type { RequestUseCases } from '../port/in/RequestUseCases.ts';
 import { AddTaskNoteService } from './AddTaskNoteService.ts';
@@ -16,6 +17,7 @@ export function createRequestUseCases(open: () => Promise<OrbitFunctions>): Requ
     call: async (name: OrbitFunctionName, args: OrbitFunctionArguments) => (await open()).call(name, args),
   };
   return {
+    updateChecklist: new UpdateChecklistService(functions),
     listTasks: new ListTasksService(functions),
     getTaskDetail: new GetTaskDetailService(functions),
     registerTask: new RegisterTaskService(functions),

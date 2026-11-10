@@ -38,7 +38,7 @@ evidence:
 - web/src/access/adapter/in/web/bodyLimit.ts:2 ~ export const BODY_LIMIT_CHARACTERS = 1_600_000
 - web/src/request/domain/TaskLimits.ts:2 ~ export const FIELD_MAX_LENGTH = 10000
 - supabase/deletion.sql:23-28 ~ elsif action='create' then
-- web/src/request/adapter/in/web/routes.ts:12 ~ handler: handlers.create
+- web/src/request/adapter/in/web/routes.ts:14 ~ handler: handlers.create
 - web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
 - web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 - web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
@@ -72,7 +72,7 @@ evidence:
 - web/src/request/domain/TaskStatus.ts:3 ~ export const TASK_STATUSES = ['접수', '진행 중', '대기', '완료']
 - supabase/schema.sql:9 ~ check(status in
 - supabase/deletion.sql:40-46 ~ elsif action='status' then
-- web/src/request/adapter/in/web/routes.ts:14 ~ handler: handlers.changeStatus
+- web/src/request/adapter/in/web/routes.ts:16 ~ handler: handlers.changeStatus
 - web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
 - web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 - web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
@@ -126,7 +126,7 @@ home: web/src/request
 evidence:
 - supabase/deletion.sql:47-49 ~ elsif action='note' then
 - web/src/request/adapter/in/web/schemas.ts:50 ~ const noteSchema = z
-- web/src/request/adapter/in/web/routes.ts:15 ~ handler: handlers.addNote
+- web/src/request/adapter/in/web/routes.ts:17 ~ handler: handlers.addNote
 - web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
 - web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 - web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
@@ -176,8 +176,8 @@ evidence:
 - web/src/request/application/service/GetTaskDetailService.ts:19 ~ return { ...task, kpi: await this.kpi(id) }
 - supabase/deletion.sql:21-22 ~ if action='list' then
 - supabase/deletion.sql:36-39 ~ if t.deleted_at is not null and (action<>'detail'
-- web/src/request/adapter/in/web/routes.ts:11 ~ handler: handlers.list
-- web/src/request/adapter/in/web/routes.ts:13 ~ handler: handlers.detail
+- web/src/request/adapter/in/web/routes.ts:13 ~ handler: handlers.list
+- web/src/request/adapter/in/web/routes.ts:15 ~ handler: handlers.detail
 - web/src/request/adapter/in/web/handlers.spec.ts:1 ~ // R-001 R-002 R-004 R-006
 - web/src/request/adapter/in/web/request.scenario.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
 - web/src/request/adapter/in/web/request.parity.spec.ts:1 ~ // R-001 R-002 R-003 R-004 R-006
@@ -420,7 +420,7 @@ layer: out
 status: planned
 home: web/src/request
 evidence:
-- web/src/request/adapter/in/web/routes.ts:8 ~ export function requestRoutes(
+- web/src/request/adapter/in/web/routes.ts:9 ~ export function requestRoutes(
 
 요청 라우트(`routes.ts` 의 `requestRoutes`)에 팀장 확인이나 댓글 경로가 없다.
 
@@ -476,7 +476,7 @@ evidence:
 - web/src/assignment/domain/AssigneeName.ts:2 ~ 담당자를 1~100자로 입력하세요.
 - web/src/request/application/service/ListTasksService.ts:17 ~ tasks.map((task) => ({ ...task, ...byTask.get(task.id) }))
 - supabase/kpi.sql:41-44 ~ elsif action='assign' then
-- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:149 ~ <h3>담당자 · 첨부파일</h3>
+- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:150 ~ <h3>담당자 · 첨부파일</h3>
 - web/src/assignment/adapter/in/web/ui/AssignmentApi.ts:12 ~ /assign
 - web/src/board/domain/taskLabels.ts:11 ~ 담당 ${task.assignee?.trim() || '미배정'}
 - web/src/assignment/adapter/in/web/routes.ts:34 ~ /assign$/
@@ -507,7 +507,7 @@ evidence:
 - web/src/report/domain/MonthlyMetrics.ts:44 ~ !t.deleted_at && !t.is_test
 - web/src/automation/domain/automation.ts:62 ~ export function similarTasks(
 - web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:12 ~ tasks.filter((t) => !t.is_test)
-- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:152 ~ isTest: Boolean(kpi?.is_test)
+- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:153 ~ isTest: Boolean(kpi?.is_test)
 - web/src/board/domain/taskLabels.ts:3 ~ const TEST_MARK = '[테스트]'
 - web/src/assignment/adapter/in/web/routes.ts:25 ~ /test-data$/
 - web/src/assignment/adapter/in/web/assignment.scenario.spec.ts:97 ~ marking test data over HTTP [R-021]
@@ -648,21 +648,21 @@ layer: core
 status: current
 home: web/src/request
 evidence:
-- web/src/request/adapter/in/web/routes.ts:20 ~ pattern: '/api/trash'
+- web/src/request/adapter/in/web/routes.ts:22 ~ pattern: '/api/trash'
 - supabase/deletion.sql:21-22 ~ if action='list' then
 - supabase/deletion.sql:36 ~ if t.deleted_at is not null and (action<>'detail'
 - supabase/deletion.sql:62 ~ if action='trash' then
 - supabase/deletion.sql:68-69 ~ if action='delete' and t.deleted_at is not null
 - supabase/deletion.sql:79-80 ~ update orbit_private.tasks set deleted_at=case
-- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:136 ~ id="delete-task"
+- web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:137 ~ id="delete-task"
 - web/src/portal/adapter/in/web/ui/Shell.tsx:93 ~ id="open-trash"
 - web/src/request/adapter/in/web/lifecycle.parity.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycleSchemas.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/application/service/LifecycleServices.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/domain/TaskEdit.spec.ts:1 ~ // R-031 R-026 R-027
-- web/src/request/adapter/in/web/routes.ts:17 ~ handlers.lifecycle('delete')
-- web/src/request/adapter/in/web/routes.ts:18 ~ handlers.lifecycle('restore')
+- web/src/request/adapter/in/web/routes.ts:19 ~ handlers.lifecycle('delete')
+- web/src/request/adapter/in/web/routes.ts:20 ~ handlers.lifecycle('restore')
 - web/src/request/domain/TaskLifecycle.ts:1 ~ R-026 delete and restore
 golden:
 test-name:
@@ -696,7 +696,7 @@ evidence:
 - web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/application/service/LifecycleServices.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/domain/TaskEdit.spec.ts:1 ~ // R-031 R-026 R-027
-- web/src/request/adapter/in/web/routes.ts:19 ~ handlers.lifecycle('purge')
+- web/src/request/adapter/in/web/routes.ts:21 ~ handlers.lifecycle('purge')
 - web/src/request/domain/TaskLifecycle.ts:1 ~ R-027 purge
 golden:
 test-name:
@@ -811,7 +811,7 @@ evidence:
 - web/src/request/adapter/in/web/lifecycle.scenario.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/application/service/LifecycleServices.spec.ts:1 ~ // R-031 R-026 R-027
 - web/src/request/domain/TaskEdit.spec.ts:1 ~ // R-031 R-026 R-027
-- web/src/request/adapter/in/web/routes.ts:16 ~ /edit$/
+- web/src/request/adapter/in/web/routes.ts:18 ~ /edit$/
 - web/src/request/domain/TaskEdit.ts:1 ~ (R-031)
 golden:
 test-name:
@@ -906,3 +906,23 @@ accept:
 - Given 어제 요청하고 오늘 완료한 업무 / When 기본 날짜별 보드를 보면 / Then 한국 시간의 오늘 완료일 그룹과 기간 검색에 포함된다
 - Given 미완료 또는 재개한 업무 / When 기본 날짜별 보드를 보면 / Then 요청일을 사용하고 완료일이 누락된 완료 업무는 완료일 미상으로 구분한다
 - Given 요청일이나 등록일을 직접 선택 / When 날짜별 보드를 보면 / Then 선택한 기준을 유지한다
+
+### R-035 업무 내 하위 항목 체크 관리
+layer: core
+status: current
+home: web/src/request/
+evidence:
+- web/src/request/domain/TaskChecklist.ts:11 ~ export function changeChecklist
+- web/src/request/application/service/UpdateChecklistService.ts:9 ~ async execute
+- web/src/request/adapter/in/web/ui/detail/ChecklistSection.tsx:7 ~ export function ChecklistSection
+golden:
+test-name:
+- 하위 업무 체크는 번호 목록과 본문을 보존하고 추가·완료·해제를 지원한다
+- Given a checklist change / When saved / Then existing edit history and revision protection are used
+- 하위 업무 완료·추가·해제는 이력에 남고 조회 계정·충돌·삭제 업무를 차단한다
+accept:
+- Given 상세 내용의 번호 목록 / When 개별 항목을 완료 체크하거나 해제하면 / Then 전체 업무 상태는 유지하고 항목 변경을 영속 저장하며 서버 시각과 사유가 이력에 남는다
+- Given 관리자의 상세 화면 / When 하위 업무를 추가하면 / Then 기존 본문을 보존하고 미완료 항목을 추가한다
+- Given 조회 계정 또는 동시 수정 충돌 / When 하위 항목 변경을 시도하면 / Then 변경을 차단하고 기존 저장 내용을 보존한다
+
+하위 항목은 상세 내용의 번호·글머리 목록에 체크 마커를 저장한다. 기존 orbit_edit_task의 원자적 버전 검사와 불변 이력을 사용하며 별도 DB 마이그레이션이나 하위 업무의 독립 KPI 건수는 추가하지 않는다.

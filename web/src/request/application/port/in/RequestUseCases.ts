@@ -1,3 +1,4 @@
+import type {UpdateChecklistUseCase} from './UpdateChecklistUseCase.ts';
 import type { AddTaskNoteUseCase } from './AddTaskNoteUseCase.ts';
 import type { ChangeTaskLifecycleUseCase } from './ChangeTaskLifecycleUseCase.ts';
 import type { ChangeTaskStatusUseCase } from './ChangeTaskStatusUseCase.ts';
@@ -10,6 +11,7 @@ import type { RegisterTaskUseCase } from './RegisterTaskUseCase.ts';
 
 /** The in-ports of the request context, as the driving adapter receives them. */
 export type RequestUseCases = {
+  readonly updateChecklist: UpdateChecklistUseCase;
   readonly listTasks: ListTasksQuery;
   readonly getTaskDetail: GetTaskDetailQuery;
   readonly registerTask: RegisterTaskUseCase;

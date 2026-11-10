@@ -55,3 +55,10 @@ test('the fake answers copies, records every call and fails an unknown task like
   assert.deepEqual(fake.log.names(), ['getTask', 'getTask', 'purgeTask']);
   assert.deepEqual(fake.log.argsOf('purgeTask'), [['a', 'r', 'c']]);
 });
+
+// R-035
+test('checklist changes use the guarded checklist endpoint with an explicit revision',async()=>{
+ const client=recordingClient();
+ await createRequestApi(client).updateChecklist('abc',{revision:2,change:{kind:'toggle',line:1,done:true}});
+ assert.deepEqual(client.requests,[{path:'tasks/abc/checklist',body:{revision:2,change:{kind:'toggle',line:1,done:true}},hasBody:true}]);
+});

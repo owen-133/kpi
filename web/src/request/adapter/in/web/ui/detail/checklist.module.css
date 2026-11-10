@@ -1,0 +1,8 @@
+.section { margin:24px 0; }
+.row {display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid #e6eaf2;font-size:14px;line-height:1.6;white-space:normal;}
+.row input {flex:0 0 18px;width:18px;height:18px;margin:3px 0;cursor:pointer;}
+.row span {flex:1;min-width:0;overflow-wrap:anywhere;}
+.row:has(input:checked) span {text-decoration:line-through;color:#8491a7;}
+.row small {color:#8491a7;white-space:nowrap;}
+.form {margin-top:16px;}
+.form button {margin-top:8px;}
