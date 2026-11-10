@@ -13,8 +13,9 @@
 //       An entry may carry an anchor, `path:N[-M] ~ <literal text>`: then the literal must occur inside the cited
 //       lines (inside the file when no lines are cited), and the message names where the literal is now
 //   C5  a test tag R-NNN points to a known requirement that is current
-//   C6  no requirement title appears verbatim in AGENTS.md or docs/** outside docs/ssot/;
-//       AGENTS.md mentions docs/ssot/requirements.md. README.md is upstream product documentation, not one
+//   C6  no requirement title appears verbatim in any AGENTS.md of the repository (root and nested, outside
+//       node_modules, .git, .next, graft, scratch, web/ssot-fixtures and web/arch-fixtures) or in docs/** outside docs/ssot/;
+//       the root AGENTS.md mentions docs/ssot/requirements.md. README.md is upstream product documentation, not one
 //       of our rule documents, so it is not scanned
 //   C7  `home:` names where the requirement lives in the hexagonal tree: a path under web/src/<context>/ that exists
 //       (a trailing `…`, `...`, `/*` or `/**` marks a prefix). Required from R-033 up;
@@ -77,6 +78,21 @@ function unwrap(value: string): string {
     if (m === null) return v;
     v = m[2].trim();
   }
+}
+
+// Last line (1-based, inclusive) of each requirement's block, in the order of `reqs`: the line before the next
+// `#`..`###` heading outside a code fence, or the last line of the text. Same fence rule as parseRequirements.
+export function blockEndLines(text: string, reqs: Requirement[]): number[] {
+  const lines = text.split('\n').map((l) => l.replace(/\r$/, ''));
+  const total = text.endsWith('\n') ? lines.length - 1 : lines.length;
+  return reqs.map((req) => {
+    let inFence = false;
+    for (let i = req.line; i < total; i++) {
+      if (FENCE.test(lines[i])) inFence = !inFence;
+      else if (!inFence && ANY_HEADING.test(lines[i])) return i;
+    }
+    return total;
+  });
 }
 
 // Parses requirement blocks. Tolerant of bullets, bold keys, backticks and blank lines between list items;
@@ -429,6 +445,19 @@ function walk(dir: string, accept: (name: string) => boolean, skipDir: (full: st
   return out.sort();
 }
 
+const TAG_EXAMPLE_SPECS = new Set(['ssot.spec.ts', 'ssot-show.spec.ts']);
+const AGENTS_SKIP_DIR_NAMES = new Set(['.git', '.next', 'graft', 'scratch']);
+const AGENTS_SKIP_DIRS = ['web/ssot-fixtures', 'web/arch-fixtures'];
+
+// Every AGENTS.md below repoRoot except the root one, skipping tool output and fixture trees.
+function nestedAgentsFiles(repoRoot: string): string[] {
+  const skip = (full: string): boolean => {
+    const rel = path.relative(repoRoot, full).split(path.sep).join('/');
+    return AGENTS_SKIP_DIR_NAMES.has(path.basename(full)) || AGENTS_SKIP_DIRS.includes(rel);
+  };
+  return walk(repoRoot, (n) => n === 'AGENTS.md', skip).filter((f) => path.relative(repoRoot, f) !== 'AGENTS.md');
+}
+
 function readSources(root: string, files: string[]): SourceFile[] {
   return files.map((full) => ({ file: path.relative(root, full).split(path.sep).join('/'), text: fs.readFileSync(full, 'utf8') }));
 }
@@ -452,22 +481,23 @@ export function loadFixtureCorpus(dir: string, repoRoot: string): { corpus: Corp
   return { corpus, requirements };
 }
 
-// Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts, which mentions tags as examples)
-// and the root tooling tests scripts/**/*.test.mjs; docs scanned for restated titles are AGENTS.md and docs/** outside docs/ssot/.
+// Real repository: tests are web/src/**/*.spec.ts (except ssot.spec.ts and ssot-show.spec.ts, which mention tags as examples)
+// and the root tooling tests scripts/**/*.test.mjs; docs scanned for restated titles are every non-fixture AGENTS.md
+// (root first, then nested ones) and docs/** outside docs/ssot/.
 export function loadRealCorpus(repoRoot: string): { corpus: Corpus; requirements: Requirement[] } {
   const ssot = path.join(repoRoot, SSOT_PATH);
   if (!fs.existsSync(ssot)) throw new Error(`missing ${SSOT_PATH}`);
   const requirements = parseRequirements(fs.readFileSync(ssot, 'utf8'));
   const agents = path.join(repoRoot, 'AGENTS.md');
   if (!fs.existsSync(agents)) throw new Error('missing AGENTS.md');
-  const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => path.basename(f) !== 'ssot.spec.ts');
+  const specs = walk(path.join(repoRoot, 'web', 'src'), (n) => n.endsWith('.spec.ts')).filter((f) => !TAG_EXAMPLE_SPECS.has(path.basename(f)));
   const toolTests = walk(path.join(repoRoot, 'scripts'), (n) => n.endsWith('.test.mjs'));
   const ssotDir = path.join(repoRoot, 'docs', 'ssot');
   const docs = walk(path.join(repoRoot, 'docs'), (n) => n.endsWith('.md'), (full) => full === ssotDir);
   const corpus: Corpus = {
     root: repoRoot,
     testFiles: readSources(repoRoot, [...specs, ...toolTests]),
-    docFiles: readSources(repoRoot, [agents, ...docs]),
+    docFiles: readSources(repoRoot, [agents, ...nestedAgentsFiles(repoRoot), ...docs]),
     agentsText: fs.readFileSync(agents, 'utf8'),
     goldenLabels: loadGoldenLabels(repoRoot),
   };

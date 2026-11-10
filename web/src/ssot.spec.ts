@@ -51,8 +51,11 @@ const CLEAN_FIXTURES = ['clean', 'clean-markdown-variants', 'clean-test-name-wit
 // Tree fixtures are miniature repositories read by loadRealCorpus (AGENTS.md, README.md, docs/**, test/golden).
 // README.md is upstream product documentation, so a title that only README.md contains is not a C6 violation.
 const TREE_CLEAN_FIXTURES = ['tree-title-only-in-readme'];
+// A nested AGENTS.md that mentions only ids is clean and still scanned; one that restates a title fires C6.
+const TREE_NESTED_CLEAN_FIXTURE = 'tree-nested-agents-ids-only';
 const TREE_VIOLATION_FIXTURES: { dir: string; code: RuleCode; needle: string }[] = [
   { dir: 'tree-title-in-docs-file', code: 'C6', needle: 'docs/notes.md' },
+  { dir: 'tree-title-in-nested-agents', code: 'C6', needle: 'web/AGENTS.md' },
 ];
 
 function fixtureViolations(dir: string) {
@@ -67,6 +70,7 @@ describe('ssot checks fire on violation fixtures and pass on clean ones', () => 
       ...VIOLATION_FIXTURES.map((f) => f.dir),
       ...CLEAN_FIXTURES,
       ...TREE_CLEAN_FIXTURES,
+      TREE_NESTED_CLEAN_FIXTURE,
       ...TREE_VIOLATION_FIXTURES.map((f) => f.dir),
     ].sort();
     assert.deepStrictEqual(onDisk, declared);
@@ -106,6 +110,13 @@ describe('ssot checks fire on violation fixtures and pass on clean ones', () => 
       assert.strictEqual(violations.length, 0, formatViolations(violations));
     });
   }
+
+  it(`fixture: ${TREE_NESTED_CLEAN_FIXTURE} passes every rule and its nested AGENTS.md is scanned`, () => {
+    const { corpus, requirements } = loadRealCorpus(path.join(FIXTURES, TREE_NESTED_CLEAN_FIXTURE));
+    assert.deepStrictEqual(corpus.docFiles.map((f) => f.file), ['AGENTS.md', 'web/AGENTS.md']);
+    const violations = checkAll(requirements, corpus);
+    assert.strictEqual(violations.length, 0, formatViolations(violations));
+  });
 
   for (const { dir, code, needle } of TREE_VIOLATION_FIXTURES) {
     it(`fixture: ${dir} fires ${code} through docs/** and no other rule`, () => {

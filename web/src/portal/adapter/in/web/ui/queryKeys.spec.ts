@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { queryKeys } from './queryKeys.ts';
 
-test('the keys are the ones docs/architecture.md §8 lists', () => {
+test('the keys are the ones docs/architecture.md 「화면 구조 규칙」 lists', () => {
   assert.deepEqual(queryKeys.session, ['session']);
   assert.deepEqual(queryKeys.settings, ['settings']);
   assert.deepEqual(queryKeys.tasks, ['tasks']);

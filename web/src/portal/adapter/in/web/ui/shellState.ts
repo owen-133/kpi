@@ -1,4 +1,4 @@
-// Screen state of the portal shell (docs/architecture.md §8). It holds only what the legacy page kept in module variables
+// Screen state of the portal shell (docs/architecture.md 「화면 구조 규칙」). It holds only what the legacy page kept in module variables
 // (`view`, `lastRefreshed`) and what its DOM implied (which dialog is open, when a screen was drawn).
 export type View = 'overview' | 'board' | 'report' | 'improvements';
 export type DialogName = 'create' | 'improvement' | 'trash' | 'settings' | 'edit' | 'detail';
