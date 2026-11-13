@@ -357,10 +357,10 @@ layer: supporting
 status: current
 home: web/src/portal
 evidence:
-- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:24 ~ export function statCards(
-- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:30 ~ t.due_date && t.due_date < today && t.status !== '완료'
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:25 ~ export function statCards(
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:31 ~ t.due_date && t.due_date < today && t.status !== '완료'
 - web/src/shared/adapter/in/web/ui/format.ts:35 ~ export function completionPercent(
-- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:70 ~ export function kpiStrip(
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:74 ~ export function kpiStrip(
 - web/src/portal/adapter/in/web/ui/overview/autoRefresh.ts:4 ~ export const AUTO_REFRESH_MS = 30000
 - web/src/report/domain/MonthlyMetrics.ts:52 ~ const hours = completed.map
 golden:
@@ -506,7 +506,7 @@ evidence:
 - supabase/kpi.sql:38-40 ~ elsif action='mark_test' then
 - web/src/report/domain/MonthlyMetrics.ts:44 ~ !t.deleted_at && !t.is_test
 - web/src/automation/domain/automation.ts:62 ~ export function similarTasks(
-- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:12 ~ tasks.filter((t) => !t.is_test)
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:13 ~ tasks.filter((t) => !t.is_test)
 - web/src/request/adapter/in/web/ui/detail/DetailDialog.tsx:153 ~ isTest: Boolean(kpi?.is_test)
 - web/src/board/domain/taskLabels.ts:3 ~ const TEST_MARK = '[테스트]'
 - web/src/assignment/adapter/in/web/routes.ts:25 ~ /test-data$/
@@ -538,7 +538,7 @@ evidence:
 - web/src/report/adapter/in/web/ui/ReportView.tsx:15 ~ function MetricCards(
 - web/src/report/adapter/in/web/ui/ReportView.tsx:115 ~ id="report-month"
 - web/src/report/adapter/in/web/ui/ReportView.tsx:122 ~ id="metrics-csv"
-- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:70 ~ export function kpiStrip(
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:74 ~ export function kpiStrip(
 - web/src/report/adapter/in/web/routes.ts:21 ~ pattern: '/api/report-preview'
 - web/src/report/domain/MonthlyMetrics.spec.ts:1 ~ // R-022
 - web/src/report/adapter/in/web/report.scenario.spec.ts:1 ~ // R-022, R-023: from the HTTP handler through the services to the real SQL functions (in-memory PGlite).
@@ -837,7 +837,7 @@ home: web/src/settings
 evidence:
 - web/src/settings/domain/PortalSettings.ts:107 ~ portalName: 'orbit.ops'
 - web/src/settings/domain/PortalSettings.ts:26 ~ ["portalName", "포털 이름", "아이지넷"]
-- web/src/portal/adapter/in/web/ui/overview/OverviewView.tsx:113 ~ task-row task-row--labeled
+- web/src/portal/adapter/in/web/ui/overview/OverviewView.tsx:114 ~ task-row task-row--labeled
 - web/src/app/site.ts:3 ~ PAGE_TITLE
 - web/src/report/adapter/in/web/ui/pdf/createReportPdf.ts:48 ~ options.portalName || '아이지넷'
 - web/src/app/site.ts:1 ~ SITE_TITLE = "아이지넷"
@@ -926,3 +926,17 @@ accept:
 - Given 조회 계정 또는 동시 수정 충돌 / When 하위 항목 변경을 시도하면 / Then 변경을 차단하고 기존 저장 내용을 보존한다
 
 하위 항목은 상세 내용의 번호·글머리 목록에 체크 마커를 저장한다. 기존 orbit_edit_task의 원자적 버전 검사와 불변 이력을 사용하며 별도 DB 마이그레이션이나 하위 업무의 독립 KPI 건수는 추가하지 않는다.
+
+### R-036 개요 목록의 하위 업무 진행 표시
+layer: supporting
+status: current
+home: web/src/portal/adapter/in/web/ui/overview/
+evidence:
+- web/src/portal/adapter/in/web/ui/overview/overviewModel.ts:60 ~ const items = checklistItems
+- web/src/portal/adapter/in/web/ui/overview/OverviewView.tsx:118 ~ row.checklistLabel
+golden:
+test-name:
+- 하위 업무가 있는 개요 행만 완료 수를 표시하고 체크 변경을 반영한다
+accept:
+- Given 하위 업무가 있는 업무 / When 메인 개요 목록을 보면 / Then 하위 업무 존재와 완료 수·전체 수를 작은 표시로 확인한다
+- Given 하위 업무 완료 또는 해제 / When 개요 목록이 갱신되면 / Then 최신 체크 상태를 표시하며 일반 업무에는 표시를 추가하지 않는다

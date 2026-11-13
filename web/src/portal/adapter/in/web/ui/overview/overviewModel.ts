@@ -1,3 +1,4 @@
+import { checklistItems } from '../../../../../../request/domain/TaskChecklist.ts';
 // What the Overview shows, computed from the task list: the pure part of the legacy `stats()`, `rows()`, `percent()` and
 // `dashboardKpi()` of public/app.js. The component only places these values.
 import { currentMonth } from '../../../../../../report/domain/ReportMonth.ts';
@@ -40,6 +41,7 @@ export function completion(tasks: readonly TaskSummary[]): Completion {
 
 export type DueCell = { readonly kind: 'none' } | { readonly kind: 'date'; readonly value: string; readonly className: string };
 export type RowView = {
+  readonly checklistLabel?: string;
   readonly id: string;
   readonly title: string;
   readonly subtitle: string;
@@ -55,7 +57,9 @@ export function taskRow(t: TaskSummary, today: string): RowView {
   const due: DueCell = t.due_date
     ? { kind: 'date', value: t.due_date, className: `badge ${t.due_date < today && t.status !== '완료' ? 'urgent' : ''}` }
     : { kind: 'none' };
-  return { id: t.id, title: t.title, subtitle, status: t.status, statusClass: `badge ${modifier}`, due };
+  const items = checklistItems(t.description || '');
+  const checklist = items.length ? { checklistLabel: `하위 업무 ${items.filter(item => item.done).length}/${items.length} 완료` } : {};
+  return { ...checklist, id: t.id, title: t.title, subtitle, status: t.status, statusClass: `badge ${modifier}`, due };
 }
 
 export type KpiStrip = {

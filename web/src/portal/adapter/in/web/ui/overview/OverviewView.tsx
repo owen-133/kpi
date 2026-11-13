@@ -1,5 +1,6 @@
 'use client';
 
+import styles from './checklistBadge.module.css';
 import { useLayoutEffect, useRef } from 'react';
 import { todayKst } from '../../../../../../shared/adapter/in/web/ui/format.ts';
 import { usePortal } from '../PortalContext.tsx';
@@ -114,6 +115,7 @@ function TaskRow(p: { row: RowView; onOpen: (id: string) => void }) {
       <span className="status-dot"></span>
       <button className="task-open" data-task={row.id} onClick={() => p.onOpen(row.id)}>
         <strong>{row.title}</strong>
+        {row.checklistLabel ? <span className={styles.badge}>{row.checklistLabel}</span> : null}
         <small>{row.subtitle}</small>
       </button>
       <dl className="task-row-meta">

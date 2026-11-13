@@ -130,3 +130,13 @@ test('the sync status reads the time of the last refresh in KST, or a dash befor
   assert.equal(syncStatusText('2026-11-09T03:05:00.000Z'), '최근 갱신 2026. 11. 09. 오후 12:05');
   assert.equal(syncStatusText(''), '최근 갱신 —');
 });
+
+// R-036
+test('하위 업무가 있는 개요 행만 완료 수를 표시하고 체크 변경을 반영한다',()=>{
+ const row=(description:string)=>taskRow(task({id:'sub',description}),'2026-11-13') as ReturnType<typeof taskRow> & {checklistLabel?:string};
+ assert.equal(row('1. 편지\n2. PC').checklistLabel,'하위 업무 0/2 완료');
+ assert.equal(row('1. [x] 편지\n2. [ ] PC').checklistLabel,'하위 업무 1/2 완료');
+ assert.equal(row('- [x] 편지\n- [X] PC').checklistLabel,'하위 업무 2/2 완료');
+ for(const description of ['', '단순 안내문', '완료: PC 준비']) assert.equal(row(description).checklistLabel,undefined);
+ assert.equal(row('안내\n1. [ ] 편지\n2. [ ] PC').checklistLabel,'하위 업무 0/2 완료');
+});
